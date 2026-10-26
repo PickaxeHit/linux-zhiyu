@@ -1,0 +1,54 @@
+#!/bin/bash
+# mkinitbootimg — build and AVB-sign init_boot.img for Lenovo TB378FC
+# ("zhiyu", SM8750).
+#
+# init_boot carries the *generic* ramdisk, which we deliberately leave empty:
+# our /init and all boot-time modules live in the vendor ramdisk (vendor_boot).
+# The partition still needs a valid image + AVB footer, so we emit an empty
+# cpio.gz.
+#
+# usage: ./mkinitbootimg [outdir]
+# env:   KEY, SIZE, OUT
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")" && pwd)
+OUT=${OUT:-${1:-$ROOT/out}}
+KEY=${KEY:-$ROOT/avb-test-key.pem}
+SIZE=${SIZE:-8388608}		# init_boot partition (8 MiB)
+PAGESIZE=4096
+OS_VERSION=17.0.0
+OS_PATCH=2026-09
+
+MKBOOTIMG=${MKBOOTIMG:-/usr/bin/mkbootimg}
+AVBTOOL=${AVBTOOL:-/usr/bin/avbtool}
+UNPACK=${UNPACK:-/usr/bin/unpack_bootimg}
+[ "$(readlink -f "$MKBOOTIMG")" = "$(readlink -f "$0")" ] && MKBOOTIMG=/usr/bin/mkbootimg
+
+die() { echo "mkinitbootimg: $*" >&2; exit 1; }
+
+[ -f "$KEY" ] || die "AVB key not found: $KEY"
+mkdir -p "$OUT"
+work=$(mktemp -d "$OUT/.build.XXXXXX"); trap 'rm -rf "$work"' EXIT
+
+# empty cpio archive (".", ".." only) — same thing the original kit produced
+mkdir -p "$work/empty"
+( cd "$work/empty" && find . -print0 | cpio --null -o --format=newc --owner=0:0 --reproducible --quiet | gzip -n -9 ) > "$work/empty.cpio.gz"
+echo "ramdisk: empty ($(stat -c %s "$work/empty.cpio.gz") bytes)"
+
+img=$OUT/init_boot.img
+"$MKBOOTIMG" --header_version 4 --pagesize $PAGESIZE \
+	--os_version "$OS_VERSION" --os_patch_level "$OS_PATCH" \
+	--ramdisk "$work/empty.cpio.gz" \
+	--output "$img"
+
+[ "$(stat -c %s "$img")" -le "$SIZE" ] || die "init_boot.img larger than partition"
+"$AVBTOOL" add_hash_footer --image "$img" --partition_name init_boot \
+	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" \
+	--prop "com.android.build.boot.os_version:$OS_VERSION" \
+	--prop "com.android.build.boot.security_patch:$OS_PATCH" >/dev/null
+"$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
+
+echo "--- self check ---"
+( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) | grep -E "kernel_size|ramdisk size" | head -2
+echo "$img: $(stat -c %s "$img") bytes  md5 $(md5sum "$img" | cut -d' ' -f1)"
+echo "flash: dd if=$img of=/dev/disk/by-partlabel/init_boot_b bs=4M conv=fsync"

@@ -1,0 +1,58 @@
+#!/bin/bash
+# mkbootimg — build and AVB-sign boot.img for Lenovo TB378FC ("zhiyu", SM8750).
+#
+#   boot.img = kernel Image + fixed command line
+#   (the /init and every .ko used at boot live in the vendor ramdisk, so boot.img
+#    carries no ramdisk)
+#
+# usage: ./mkbootimg [outdir]
+# env:   KERNEL, CMDLINE, KEY, SIZE, OUT
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")" && pwd)
+OUT=${OUT:-${1:-$ROOT/out}}
+KERNEL=${KERNEL:-$ROOT/kernel-source/arch/arm64/boot/Image}
+KEY=${KEY:-$ROOT/avb-test-key.pem}
+SIZE=${SIZE:-100663296}		# boot partition (96 MiB)
+PAGESIZE=4096
+OS_VERSION=17.0.0
+OS_PATCH=2026-09
+
+# Boot command line.  Keep in sync with the flashed image: console stays alive
+# across suspend so a failed resume is captured in pstore, and genpd/clk are
+# not allowed to shut down unused blocks (io mappings we poke by hand).
+CMDLINE=${CMDLINE:-"rdinit=/init console=tty0 loglevel=7 ignore_loglevel log_buf_len=4M keep_bootcon fbcon=nodefer panic=15 clk_ignore_unused pd_ignore_unused androidboot.slot_suffix=_b androidboot.bootdevice=1d84000.ufshc msm_drm.dsi_display0=qcom,mdss_dsi_zhiyu_nt36526_csot_dsc_vid: hqsysfs.pcba_stage=PVT ufsffu.boot_mode=normal rootwait ro init=/sbin/init silent_boot.mode=nonsilent no_console_suspend pm_debug_messages"}
+
+MKBOOTIMG=${MKBOOTIMG:-/usr/bin/mkbootimg}
+AVBTOOL=${AVBTOOL:-/usr/bin/avbtool}
+UNPACK=${UNPACK:-/usr/bin/unpack_bootimg}
+
+# The script is named like the tool it wraps: never exec itself.
+[ "$(readlink -f "$MKBOOTIMG")" = "$(readlink -f "$0")" ] && MKBOOTIMG=/usr/bin/mkbootimg
+
+die() { echo "mkbootimg: $*" >&2; exit 1; }
+
+[ -f "$KERNEL" ] || die "kernel image not found: $KERNEL (build it: make -C kernel-source ARCH=arm64 LLVM=1 Image)"
+[ -f "$KEY" ]    || die "AVB key not found: $KEY"
+[ "$SIZE" -ge "$(stat -c %s "$KERNEL")" ] || die "kernel larger than partition"
+mkdir -p "$OUT"
+work=$(mktemp -d "$OUT/.build.XXXXXX"); trap 'rm -rf "$work"' EXIT
+
+img=$OUT/boot.img
+echo "kernel : $KERNEL ($(stat -c %s "$KERNEL") bytes, md5 $(md5sum "$KERNEL" | cut -d' ' -f1))"
+
+"$MKBOOTIMG" --header_version 4 --pagesize $PAGESIZE \
+	--os_version "$OS_VERSION" --os_patch_level "$OS_PATCH" \
+	--kernel "$KERNEL" --cmdline "$CMDLINE" \
+	--output "$img"
+
+"$AVBTOOL" add_hash_footer --image "$img" --partition_name boot \
+	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" \
+	--prop "com.android.build.boot.os_version:$OS_VERSION" \
+	--prop "com.android.build.boot.security_patch:$OS_PATCH" >/dev/null
+"$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
+
+echo "--- self check ---"
+( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) | grep -E "kernel_size|ramdisk size|command line" | head -3
+echo "$img: $(stat -c %s "$img") bytes  md5 $(md5sum "$img" | cut -d' ' -f1)"
+echo "flash: dd if=$img of=/dev/disk/by-partlabel/boot_b bs=4M conv=fsync"

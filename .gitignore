@@ -1,0 +1,16 @@
+/out/
+/initramfs
+/initramfs.bak.*
+/initramfs-src/.stage.*
+/initramfs-src/busybox/busybox
+/initramfs-src/busybox/.config
+/initramfs-src/busybox/.config.old
+/initramfs-src/busybox/include/config
+/initramfs-src/busybox/include/autoconf.h
+/initramfs-src/busybox/include/bbconfigopts.h
+/initramfs-src/busybox/include/usage.h
+/initramfs-src/busybox/.tmp_*
+/initramfs-src/busybox/*.o
+/initramfs-src/busybox/*.a
+/initramfs-src/busybox/*.cmd
+*.bak

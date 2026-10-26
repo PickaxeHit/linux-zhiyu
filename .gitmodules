@@ -1,0 +1,8 @@
+[submodule "kernel-source"]
+	path = kernel-source
+	url = https://github.com/PickaxeHit/linux-kernel-zhiyu.git
+	branch = linux-7.2.y
+[submodule "initramfs-src/busybox"]
+	path = initramfs-src/busybox
+	url = https://github.com/vda-linux/busybox_mirror
+	branch = 1_38_0
