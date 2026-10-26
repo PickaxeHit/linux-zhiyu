@@ -1,0 +1,14 @@
+cat
+cttyhack
+echo
+getty
+ip
+killall
+mkdir
+mount
+reboot
+setsid
+sh
+sleep
+switch_root
+uname

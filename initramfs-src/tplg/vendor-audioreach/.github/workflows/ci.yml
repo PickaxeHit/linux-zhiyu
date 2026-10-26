@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: GPL-2.0
+#
+# Copyright (c) 2024 Linaro Ltd.
+# Author: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+#                             <krzk@kernel.org>
+
+name: "Builds"
+on:
+  pull_request:
+  push:
+  schedule:
+    # Run at 1:01 AM, every Tuesday
+    - cron: '1 1 * * 2'
+  workflow_dispatch:
+
+jobs:
+  job:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y --no-install-recommends \
+          alsa-utils
+
+    - name: Build Project
+      uses: threeal/cmake-action@v2.0.0
