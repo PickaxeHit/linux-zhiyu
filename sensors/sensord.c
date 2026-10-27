@@ -184,6 +184,13 @@ static void accel_process(Sensord *self, gdouble x, gdouble y, gdouble z)
 		angle += 360.0;
 	quadrant = ((gint)((angle + 45.0) / 90.0)) % 4;
 
+	if (self->current_quadrant < 0) {
+		self->current_quadrant = quadrant;
+		self->candidate_quadrant = -1;
+		set_orientation(self, quadrant_names[quadrant]);
+		return;
+	}
+
 	if (quadrant == self->current_quadrant) {
 		self->candidate_quadrant = -1;
 		return;
@@ -368,9 +375,7 @@ static void start_sensor(Sensord *self)
 
 	self->has_light = TRUE;
 	self->has_accel = TRUE;
-	if (!self->orientation)
-		self->orientation = g_strdup("left-up");
-	self->current_quadrant = 0;
+	self->current_quadrant = -1;
 
 	light = lookup_suid("ambient_light");
 	if (light) {
@@ -496,7 +501,6 @@ int main(void)
 	Sensord self = { 0 };
 	GMainLoop *loop;
 
-	self.orientation = g_strdup("left-up");
 	loop = g_main_loop_new(NULL, FALSE);
 
 	self.owner_id = g_bus_own_name(G_BUS_TYPE_SYSTEM, BUS_NAME,
