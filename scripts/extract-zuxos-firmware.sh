@@ -81,6 +81,7 @@ dump_fw() {
 dump_fw /firmware/aw882xx_acf.bin "$out/aw882xx_acf.bin"
 dump_fw /firmware/novatek_ts_fw.bin "$out/novatek/nt36526e-zhiyu.bin"
 dump_fw /firmware/gen80000_zap.mbn "$out/qcom/sm8750/zhiyu/gen80000_zap.mbn"
+dump_fw /firmware/vpu35_4v.mbn "$out/qcom/sm8750/vpu35_4v.mbn"
 for f in gen80000_aqe.fw gen80000_gmu.bin gen80000_sqe.fw; do
 	dump_fw "/firmware/$f" "$out/qcom/$f"
 done
