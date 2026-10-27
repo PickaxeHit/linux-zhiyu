@@ -1,0 +1,14 @@
+[Unit]
+Description=SensorProxy daemon backed by sensh/SNS Client
+After=hexagonrpcd-sensor.service
+Requires=hexagonrpcd-sensor.service
+Before=iio-sensor-proxy.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/sensord
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
