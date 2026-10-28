@@ -1,0 +1,5 @@
+# The PM8550 flash LED is exposed as a plain LED class device.  Its sysfs
+# attributes are root-only by default; let the desktop user drive the torch
+# without sudo (same group that owns the camera nodes).
+SUBSYSTEM=="leds", KERNEL=="white:flash:tb378fc", ACTION=="add", \
+	RUN+="/bin/chmod 0666 /sys/class/leds/white:flash:tb378fc/brightness /sys/class/leds/white:flash:tb378fc/flash_strobe"
