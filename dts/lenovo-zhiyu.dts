@@ -5312,7 +5312,18 @@
 				led-controller@ee00 {
 					compatible = "qcom,pm8550-flash-led", "qcom,spmi-flash-led";
 					reg = <0xee00>;
-					status = "disabled";
+					status = "okay";
+
+					led-0 {
+						label = "white:flash:tb378fc";
+						function = "flash";
+						color = <0>;
+						led-sources = <1 4>;
+						led-max-microamp = <100000>;
+						flash-max-microamp = <200000>;
+						flash-max-timeout-us = <200000>;
+						default-state = "off";
+					};
 				};
 
 				pwm {

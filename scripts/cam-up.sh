@@ -13,6 +13,8 @@ loaded() { lsmod | grep -q "^$1 "; }
 # The system dma-buf heap is a module; without it libcamera cannot allocate
 # buffers for the software ISP and silently disables debayering.
 modprobe -a system_heap
+# Flash LED (used as a fill light for the rear camera).
+modprobe -a led-class-flash leds-qcom-flash
 
 # Camera clock providers must be up before the sensor probes: without
 # cambistmclkcc-sm8750 the sensor's clk_get() defers forever and the sensor

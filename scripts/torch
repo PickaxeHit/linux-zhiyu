@@ -1,0 +1,39 @@
+#!/bin/sh
+# Torch control for the TB378FC rear flash LED (PM8550, channels 1+4).
+#   torch on [level]   continuous light, level 0-255 (default 200)
+#   torch off
+#   torch status
+L=/sys/class/leds/white:flash:tb378fc
+[ -d "$L" ] || { echo "flash LED not present (modprobe leds-qcom-flash)" >&2; exit 1; }
+
+settle() {
+	# The driver latches the mode asynchronously; retry until it reports the
+	# state we asked for (same trick the stock torch service uses).
+	i=0
+	while [ "$(cat "$L/flash_strobe")" != "$1" ]; do
+		echo "$1" > "$L/flash_strobe"
+		i=$((i + 1))
+		if [ "$i" -gt 40 ]; then
+			echo "flash did not settle" >&2
+			return 1
+		fi
+		sleep 0.05
+	done
+}
+
+case "${1:-status}" in
+on)
+	echo "${2:-200}" > "$L/brightness"
+	settle 0
+	;;
+off)
+	echo 0 > "$L/brightness"
+	;;
+status)
+	echo "brightness=$(cat "$L/brightness") flash_strobe=$(cat "$L/flash_strobe")"
+	;;
+*)
+	echo "usage: torch on [0-255] | off | status" >&2
+	exit 1
+	;;
+esac
