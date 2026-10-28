@@ -7530,11 +7530,12 @@
 					phandle = <0xc6>;
 				};
 
-				ldo8 {
-					regulator-name = "vreg_l8b_1p8";
-					regulator-min-microvolt = <0x1b7740>;
-					regulator-max-microvolt = <0x2dc6c0>;
+				cam_vana: ldo8 {
+					regulator-name = "vreg_l8b_2p8";
+					regulator-min-microvolt = <0x2ab980>;
+					regulator-max-microvolt = <0x2ab980>;
 					phandle = <0x96>;
+					regulator-always-on;
 				};
 
 				ldo9 {
@@ -7559,7 +7560,7 @@
 					regulator-initial-mode = <0x03>;
 					phandle = <0xc5>;
 				};
-				cam_vana: ldo7 {
+				ldo7 {
 					regulator-name = "vreg_l7b_2p8";
 					regulator-min-microvolt = <0x2ab980>;
 					regulator-max-microvolt = <0x2ab980>;
@@ -7630,8 +7631,16 @@
 				compatible = "qcom,pm8550ve-rpmh-regulators";
 				qcom,pmic-id = "i";
 
-				cam_vdig: ldo1 {
+				ldo1 {
 					regulator-name = "vreg_l1i_1p2";
+					regulator-min-microvolt = <0x124f80>;
+					regulator-max-microvolt = <0x124f80>;
+					regulator-initial-mode = <0x03>;
+					regulator-always-on;
+				};
+
+				cam_vdig: ldo2 {
+					regulator-name = "vreg_l2i_1p2";
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x124f80>;
 					regulator-initial-mode = <0x03>;
@@ -9998,6 +10007,11 @@
 
 				port@5 {
 					reg = <5>;
+					csiphy5_ep: endpoint {
+						remote-endpoint = <&ov13b10_ep>;
+						data-lanes = <0 1 2 3>;
+						link-frequencies = /bits/ 64 <560000000>;
+					};
 				};
 			};
 
@@ -10037,7 +10051,7 @@
 					status = "okay";
 					port {
 						ov13b10_ep: endpoint {
-							remote-endpoint = <&csiphy1_ep>;
+							remote-endpoint = <&csiphy5_ep>;
 							data-lanes = <0 1 2 3>;
 							link-frequencies = /bits/ 64 <560000000>;
 						};
