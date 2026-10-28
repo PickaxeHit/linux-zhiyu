@@ -10077,6 +10077,7 @@
 					avdd-supply = <&cam_vana>;
 					vaf-supply = <&cam_vaf>;
 					dvdd-supply = <&cam_vdig>;
+					lens-focus = <&vcm>;
 					status = "okay";
 					port {
 						ov13b10_ep: endpoint {
@@ -10085,6 +10086,13 @@
 							link-frequencies = /bits/ 64 <560000000>;
 						};
 					};
+				};
+
+				vcm: actuator@c {
+					compatible = "dongwoon,dw9807-vcm";
+					reg = <0x0c>;
+					vdd-supply = <&cam_vaf>;
+					status = "okay";
 				};
 };
 		};
