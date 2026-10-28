@@ -1,0 +1,4 @@
+# libcamera's software ISP needs a dma-buf heap; the kernel exposes it as
+# /dev/dma_heap/* with 0600 root:root by default, which locks out the
+# desktop user.  Give the video group access, like the V4L2 nodes.
+SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"
