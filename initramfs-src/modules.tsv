@@ -94,3 +94,4 @@ videobuf2-vmalloc.ko	drivers/media/common/videobuf2/videobuf2-vmalloc.ko
 videocc-sm8750.ko	drivers/clk/qcom/videocc-sm8750.ko
 videodev.ko	drivers/media/v4l2-core/videodev.ko
 wcd939x-usbss.ko	drivers/usb/typec/mux/wcd939x-usbss.ko
+system_heap.ko	drivers/dma-buf/heaps/system_heap.ko
