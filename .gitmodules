@@ -6,3 +6,7 @@
 	path = initramfs-src/busybox
 	url = https://github.com/vda-linux/busybox_mirror
 	branch = 1_38_0
+[submodule "libcamera"]
+	path = libcamera
+	url = git@github.com:PickaxeHit/libcamera-zhiyu.git
+	branch = tb378fc
