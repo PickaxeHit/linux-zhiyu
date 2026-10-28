@@ -7545,6 +7545,13 @@
 					phandle = <0x95>;
 				};
 
+				cam_vaf: ldo16 {
+					regulator-name = "vreg_l16b_2p8";
+					regulator-min-microvolt = <0x2ab980>;
+					regulator-max-microvolt = <0x2ab980>;
+					regulator-initial-mode = <0x03>;
+				};
+
 				ldo17 {
 					regulator-name = "vreg_l17b_2p5";
 					regulator-min-microvolt = <0x263540>;
@@ -10045,7 +10052,7 @@
 				#address-cells = <1>;
 				#size-cells = <0>;
 							ov13b10: camera@36 {
-					compatible = "ovti,ov13b10";
+					compatible = "lenovo,tb378fc-ov13b10", "ovti,ov13b10";
 					reg = <0x36>;
 					reset-gpios = <&tlmm 11 GPIO_ACTIVE_LOW>;
 					clocks = <&cambistmclkcc 6>;
@@ -10056,6 +10063,7 @@
 					assigned-clock-rates = <19200000>;
 					dovdd-supply = <&cam_vio>;
 					avdd-supply = <&cam_vana>;
+					vaf-supply = <&cam_vaf>;
 					dvdd-supply = <&cam_vdig>;
 					status = "okay";
 					port {
