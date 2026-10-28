@@ -7530,7 +7530,7 @@
 					phandle = <0xc6>;
 				};
 
-				cam_vana: ldo8 {
+				ldo8 {
 					regulator-name = "vreg_l8b_2p8";
 					regulator-min-microvolt = <0x2ab980>;
 					regulator-max-microvolt = <0x2ab980>;
@@ -7567,7 +7567,7 @@
 					regulator-initial-mode = <0x03>;
 					phandle = <0xc5>;
 				};
-				ldo7 {
+				cam_vana: ldo7 {
 					regulator-name = "vreg_l7b_2p8";
 					regulator-min-microvolt = <0x2ab980>;
 					regulator-max-microvolt = <0x2ab980>;
@@ -7581,7 +7581,7 @@
 					regulator-initial-mode = <0x03>;
 					regulator-always-on;
 				};
-				cam_vdig: ldo11 {
+				ldo11 {
 					regulator-name = "vreg_l11b_1p2";
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x124f80>;
@@ -7645,7 +7645,7 @@
 				compatible = "qcom,pm8550ve-rpmh-regulators";
 				qcom,pmic-id = "i";
 
-				ldo1 {
+				cam_vdig: ldo1 {
 					regulator-name = "vreg_l1i_1p2";
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x124f80>;
