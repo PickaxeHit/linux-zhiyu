@@ -14,3 +14,4 @@
 /initramfs-src/busybox/*.a
 /initramfs-src/busybox/*.cmd
 *.bak
+avb-test-key.pem

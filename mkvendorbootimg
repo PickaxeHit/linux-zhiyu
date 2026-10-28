@@ -48,10 +48,16 @@ fi
 [ "$(stat -c %s "$RAMDISK")" -lt $((SIZE - 400000)) ] || die "ramdisk too large for partition"
 
 # ---- board DTB ------------------------------------------------------------
-if [ ! -f "$DTB" ]; then
-	[ -f "$DTS" ] || die "neither $DTB nor $DTS exists"
+# The board DTS uses the C preprocessor, so preprocess it first.  Always
+# regenerate the DTB when the source is present: silently reusing a stale
+# .dtb next to the .dts once shipped an image without the camera nodes.
+if [ -f "$DTS" ]; then
 	echo "dtb    : compiling $DTS"
-	dtc -I dts -O dtb -o "$DTB" "$DTS"
+	cpp -nostdinc -I "$ROOT/kernel-source/include" -undef \
+		-x assembler-with-cpp -o "$work/board.dts" "$DTS"
+	dtc -I dts -O dtb -o "$DTB" "$work/board.dts"
+elif [ ! -f "$DTB" ]; then
+	die "neither $DTB nor $DTS exists"
 fi
 
 # ---- vendor bootconfig (merged into the kernel command line) --------------
