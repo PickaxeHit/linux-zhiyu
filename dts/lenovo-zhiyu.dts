@@ -7682,7 +7682,7 @@
 					phandle = <0x165>;
 				};
 
-				ldo1 {
+				cam_csi0p9: ldo1 {
 					regulator-name = "vreg_l1f_0p88";
 					regulator-min-microvolt = <0xd6d80>;
 					regulator-max-microvolt = <0xe09c0>;
@@ -9558,6 +9558,7 @@
 
 			ldo8 {
 				regulator-name = "vreg_pmu_pcie_0p9";
+				regulator-always-on;
 				phandle = <0x11b>;
 			};
 
@@ -9842,7 +9843,7 @@
 			iommus = <&apps_smmu 0x1c00 0x0>;
 			dma-coherent;
 			vdd-csiphy5-1p2-supply = <&cam_csi1p2>;
-			vdd-csiphy5-0p8-supply = <&cam_csi0p9_fixed>;
+			vdd-csiphy5-0p9-supply = <&cam_csi0p9>;
 
 			reg = <0x0 0x0ad27000 0x0 0x2b00>,
 			      <0x0 0x0ad2a000 0x0 0x2b00>,
@@ -10107,13 +10108,6 @@
 			
 };
 
-		cam_csi0p9: regulator-csi0p9 {
-			compatible = "regulator-fixed";
-			regulator-name = "cam_csi0p9";
-			regulator-min-microvolt = <900000>;
-			regulator-max-microvolt = <900000>;
-			regulator-always-on;
-		};
 
 		};
 };
@@ -10167,11 +10161,7 @@
 };
 
 &{/} {
-	cam_csi0p9_fixed: regulator-csi0p9-fixed {
-		compatible = "regulator-fixed";
-		regulator-name = "cam_csi0p9";
-		regulator-min-microvolt = <900000>;
-		regulator-max-microvolt = <900000>;
-		regulator-always-on;
-	};
+};
+
+&{/} {
 };
