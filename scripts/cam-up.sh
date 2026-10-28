@@ -42,6 +42,9 @@ while :; do
 	sleep 0.2
 done
 
+# VCM autofocus (dw9807-compatible GT9772B on the same CCI bus).
+modprobe dw9807-vcm 2>/dev/null || insmod /root/cam/dw9807-vcm.ko 2>/dev/null || true
+
 if [ -e /dev/dma_heap/system ]; then
 	echo "camera stack up"
 else
