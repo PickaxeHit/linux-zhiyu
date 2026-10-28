@@ -1,0 +1,15 @@
+[Unit]
+Description=Load the TB378FC rear camera stack (camss + ov13b10)
+# Load late on purpose: a broken camera module must never be able to block
+# boot, and at this point a failure is recoverable over the network link.
+After=multi-user.target
+Wants=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh /root/cam-up.sh
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target

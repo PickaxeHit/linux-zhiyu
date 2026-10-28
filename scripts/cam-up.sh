@@ -1,32 +1,47 @@
 #!/bin/sh
-# TB378FC rear OV13B10: load the camera stack (run on the device).
-#   M=/root/cam SEQ=0 sh cam-up.sh
-# SEQ=0 -> mainline power sequence (MCLK first). SEQ=1 -> legacy MCLK-last.
+# TB378FC rear OV13B10: load the camera stack (run on the device, as root).
+#
+#   sh /root/cam-up.sh
+#
+# Idempotent: exits early when the stack is already up, so it is safe to call
+# from a boot service and by hand.
 set -e
 M=${M:-/root/cam}
-SEQ=${SEQ:-0}
+
+loaded() { lsmod | grep -q "^$1 "; }
+
+# The system dma-buf heap is a module; without it libcamera cannot allocate
+# buffers for the software ISP and silently disables debayering.
+modprobe -a system_heap
 
 # Camera clock providers must be up before the sensor probes: without
-# cambistmclkcc-sm8750 the sensor's clk_get() defers forever and the
-# sensor never binds (-EPROBE_DEFER shown as "Resource temporarily
-# unavailable" when binding by hand).
+# cambistmclkcc-sm8750 the sensor's clk_get() defers forever and the sensor
+# never binds (-EPROBE_DEFER shows up as "Resource temporarily unavailable"
+# when binding by hand).
 modprobe -a camcc-sm8750 cambistmclkcc-sm8750
 modprobe -a v4l2-fwnode v4l2-async mc videobuf2-common videobuf2-v4l2 \
 	videobuf2-dma-sg
 
-insmod "$M/ov13b10.ko" tb_pwr_seq="$SEQ"
-insmod "$M/qcom-camss.ko"
+if ! loaded qcom_camss; then
+	insmod "$M/qcom-camss.ko"
+fi
+if ! loaded ov13b10; then
+	insmod "$M/ov13b10.ko"
+fi
 
 i=0
 while :; do
-	if [ -e /dev/media0 ] && [ -e /sys/bus/i2c/devices/4-0036/driver ]; then
-		break
-	fi
+	[ -e /dev/media0 ] && break
 	i=$((i + 1))
 	if [ "$i" -gt 150 ]; then
-		echo "sensor/media did not come up" >&2
+		echo "camera stack did not come up" >&2
 		exit 1
 	fi
 	sleep 0.2
 done
-echo "camera stack up (power sequence $SEQ)"
+
+if [ -e /dev/dma_heap/system ]; then
+	echo "camera stack up"
+else
+	echo "camera stack up (warning: no /dev/dma_heap/system)" >&2
+fi
