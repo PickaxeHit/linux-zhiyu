@@ -17,6 +17,9 @@ audio/snd-seq-device.ko	sound/core/snd-seq-device.ko
 audio/snd-soc-aw882xx.ko	sound/soc/codecs/snd-soc-aw882xx.ko
 audio/snd-soc-aw88395-lib.ko	sound/soc/codecs/snd-soc-aw88395-lib.ko
 audio/snd-soc-core.ko	sound/soc/snd-soc-core.ko
+audio/snd-soc-lpass-macro-common.ko	sound/soc/codecs/snd-soc-lpass-macro-common.ko
+audio/snd-soc-lpass-va-macro.ko	sound/soc/codecs/snd-soc-lpass-va-macro.ko
+audio/snd-soc-lpass-tx-macro.ko	sound/soc/codecs/snd-soc-lpass-tx-macro.ko
 audio/snd-soc-sm8750.ko	sound/soc/qcom/snd-soc-sm8750.ko
 audio/snd-timer.ko	sound/core/snd-timer.ko
 audio/soundcore.ko	sound/soundcore.ko

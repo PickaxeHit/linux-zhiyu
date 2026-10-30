@@ -4369,6 +4369,7 @@
 		codec@6ae0000 {
 			compatible = "qcom,sm8750-lpass-tx-macro", "qcom,sm8550-lpass-tx-macro";
 			reg = <0x00 0x6ae0000 0x00 0x1000>;
+			qcom,tx-dmic-clk-div-factor = <4 4 4 4>;
 			clocks = <0x89 0x39 0x01 0x89 0x66 0x01 0x89 0x67 0x01 0x8a>;
 			clock-names = "mclk", "macro", "dcodec", "fsgen";
 			#clock-cells = <0x00>;
@@ -4471,6 +4472,16 @@
 			#clock-cells = <0x00>;
 			clock-output-names = "fsgen";
 			#sound-dai-cells = <0x01>;
+			/*
+			 * The two microphones are DMIC clocked by the VA macro.
+			 * Only the DMIC2/3 pair is muxed: gpio7, the data line of
+			 * the DMIC0/1 pair, is the front camera reset on this
+			 * board, so driving that pin as DMIC leaks a clock into
+			 * the camera reset net.
+			 */
+			pinctrl-0 = <&dmic23_default>;
+			pinctrl-names = "default";
+			qcom,dmic-sample-rate = <4800000>;
 			phandle = <0x8a>;
 		};
 
@@ -4526,7 +4537,7 @@
 				};
 			};
 
-			dmic01-default-state {
+			dmic01_default: dmic01-default-state {
 
 				clk-pins {
 					pins = "gpio6";
@@ -4543,7 +4554,7 @@
 				};
 			};
 
-			dmic23-default-state {
+			dmic23_default: dmic23-default-state {
 
 				clk-pins {
 					pins = "gpio8";

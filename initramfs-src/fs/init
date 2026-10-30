@@ -138,7 +138,8 @@ for pass in 1 2 3 4 5 6; do
 	for m in apr q6core soundcore snd snd-seq-device snd-timer snd-pcm \
 		 snd-compress snd-pcm-dmaengine snd-soc-core snd-q6dsp-common \
 		 snd-q6apm q6prm q6prm-clocks q6apm-dai q6apm-lpass-dais \
-		 snd-soc-aw88395-lib snd-soc-aw882xx snd-soc-sm8750; do
+		 snd-soc-aw88395-lib snd-soc-aw882xx snd-soc-lpass-macro-common \
+		 snd-soc-lpass-va-macro snd-soc-lpass-tx-macro snd-soc-sm8750; do
 		for k in /lib/modules/*/audio/$m.ko; do
 			[ -f "$k" ] || continue
 			grep -qx "$m" "$loaded_list" && continue

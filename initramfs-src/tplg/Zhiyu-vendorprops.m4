@@ -45,3 +45,39 @@ DEVICE_SG_ADD(piano/subgraph-device-tdm-playback.m4, `Secondary TDM0', SECONDARY
 
 STREAM_DEVICE_PLAYBACK_MIXER(SECONDARY_TDM_RX_0, ``SECONDARY_TDM_RX_0'', ``MultiMedia1'')
 STREAM_DEVICE_PLAYBACK_ROUTE(SECONDARY_TDM_RX_0, ``SECONDARY_TDM_RX_0 Audio Mixer'', ``MultiMedia1, stream0.logger1'')
+
+dnl ---------------------------------------------------------------------------
+dnl Capture: the two microphones are DMIC on the VA macro, read through the
+dnl LPASS codec DMA (VA_CODEC_DMA_TX_0).  MultiMedia3 is the recording PCM.
+dnl ---------------------------------------------------------------------------
+dnl The front-end DAI is S32 (what the ADSP hands the host); the PCM
+dnl converter inside the sub-graph turns the DMIC stream into that format.
+STREAM_SG_PCM_ADD(audioreach/subgraph-stream-capture.m4, FRONTEND_DAI_MULTIMEDIA3,
+    `S32_LE', 48000, 48000, 1, 2,
+    0x00004003, 0x00004003, 0x00006020, `110000')
+
+dnl The vendor DT clocks the DMICs from the TX macro, so the capture port is
+dnl the TX codec DMA, not the VA one (the DSP rejects the VA port on this
+dnl firmware with error 0x01001002).
+dnl Capture: the two microphones are DMIC on the VA macro, read through the
+dnl VA codec DMA (same shape as the Lenovo ThinkPad T14s Gen 7 reference in
+dnl this tree: VA_CODEC_DMA_TX_0, LPAIF_INTF_TYPE_VA, CODEC_INTF_IDX_TX0,
+dnl S32_LE on the device side).
+dnl
+dnl This board runs the q6apm driver in single-graph mode: the frontend graph
+dnl owns the whole pipeline, so the device sub-graph has to join the capture
+dnl stream's graph (DAI index FRONTEND_DAI_MULTIMEDIA3).  Publishing it under
+dnl its own DAI index makes the backend open a graph that has no source
+dnl sub-graph, and the DSP then rejects GRAPH_START with 0x01001002.
+define(`FORCE_DEVICE_GRAPH_ID', FRONTEND_DAI_MULTIMEDIA3)dnl
+DEVICE_SG_ADD(piano/subgraph-device-codec-dma-capture.m4, `VA_CODEC_DMA_TX_0', VA_CODEC_DMA_TX_0,
+    `S32_LE', 48000, 48000, 1, 2,
+    LPAIF_INTF_TYPE_VA, CODEC_INTF_IDX_TX0, 0, DATA_FORMAT_FIXED_POINT,
+    0x00004018, 0x00004018, 0x00006180)
+
+STREAM_DEVICE_CAPTURE_MIXER(FRONTEND_DAI_MULTIMEDIA3, ``VA_CODEC_DMA_TX_0'')
+dnl The device sub-graph names its DAPM stream "<DEVICE> Capture"; the route
+dnl has to use that name, not the bare device name.
+dnl two fields: sink = the stream mixer, source = the device sub-graph's
+dnl capture stream (a third field would be parsed as a mixer control name).
+STREAM_DEVICE_CAPTURE_ROUTE(FRONTEND_DAI_MULTIMEDIA3, ``MultiMedia3 Mixer'', ``, VA_CODEC_DMA_TX_0 Capture'')
