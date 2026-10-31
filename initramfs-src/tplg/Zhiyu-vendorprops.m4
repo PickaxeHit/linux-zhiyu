@@ -45,3 +45,34 @@ DEVICE_SG_ADD(piano/subgraph-device-tdm-playback.m4, `Secondary TDM0', SECONDARY
 
 STREAM_DEVICE_PLAYBACK_MIXER(SECONDARY_TDM_RX_0, ``SECONDARY_TDM_RX_0'', ``MultiMedia1'')
 STREAM_DEVICE_PLAYBACK_ROUTE(SECONDARY_TDM_RX_0, ``SECONDARY_TDM_RX_0 Audio Mixer'', ``MultiMedia1, stream0.logger1'')
+
+dnl ---------------------------------------------------------------------------
+dnl Capture: the two microphones are DMIC on the VA macro, read through the
+dnl LPASS codec DMA (VA_CODEC_DMA_TX_0).  MultiMedia3 is the recording PCM.
+dnl ---------------------------------------------------------------------------
+dnl The recording backend keeps its own graph (DAI index VA_CODEC_DMA_TX_0,
+dnl the vendor layout): the q6apm backend opens, prepares and starts it, like
+dnl Android's PAL does for every device sub-graph.
+undefine(`FORCE_DEVICE_GRAPH_ID')dnl
+dnl The microphones are DMICs of the TX macro, and the vendor machine driver
+dnl reads them through the TX codec DMA (its handset-mic device is backed by
+dnl CODEC_DMA-LPAIF_RXTX-TX-3 and its "dmic3" mixer path enables TX AIF1 DEC2
+dnl with DMIC2 selected).  Also note the DSP only accepts 16 bit here.
+DEVICE_SG_ADD(piano/subgraph-device-codec-dma-capture.m4, `TX_CODEC_DMA_TX_3', TX_CODEC_DMA_TX_3,
+    `S16_LE', 48000, 48000, 2, 2,
+    LPAIF_INTF_TYPE_RXTX, CODEC_INTF_IDX_TX3, 0, DATA_FORMAT_FIXED_POINT,
+    0x00004008, 0x00004008, 0x00006080)
+
+dnl The front-end DAI is S32 (what the ADSP hands the host); the PCM
+dnl converter inside the sub-graph turns the DMIC stream into that format.
+STREAM_SG_PCM_ADD(audioreach/subgraph-stream-capture.m4, FRONTEND_DAI_MULTIMEDIA3,
+    `S16_LE', 48000, 48000, 2, 2,
+    0x00004003, 0x00004003, 0x00006020, `110000')
+
+STREAM_DEVICE_CAPTURE_MIXER(FRONTEND_DAI_MULTIMEDIA3, ``TX_CODEC_DMA_TX_3'')
+dnl "<sink widget>, <mixer control>, <source widget>".  This route is what
+dnl makes the FE->BE graph control exist at all: its put() stores the module
+dnl connection (device logger -> stream logger) that goes into the backend's
+dnl GRAPH_OPEN payload.  An empty control name (as this line used to have)
+dnl produces no control and therefore no connection for the DSP.
+STREAM_DEVICE_CAPTURE_ROUTE(FRONTEND_DAI_MULTIMEDIA3, ``MultiMedia3 Mixer'', ``TX_CODEC_DMA_TX_3, device120.logger1'')
