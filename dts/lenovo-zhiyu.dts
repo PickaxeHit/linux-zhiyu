@@ -10212,18 +10212,15 @@
 					assigned-clock-rates = <19200000>;
 					dovdd-supply = <&cam_vio>;
 					/*
-					 * The vendor tree gives the rear module its own 2.8 V and
-					 * 1.2 V rails (pm_humu_l8 / pm_humu_l11, i.e. cam_vana_rear
-					 * and cam_vdig_rear), but binding them shrank the actuator's
-					 * usable travel to DAC 260..350 - the auto-focus coil no
-					 * longer has enough drive outside that window and thumps
-					 * against its stops.  vreg_l7b/vreg_l1i give the same
-					 * voltages with more headroom and restore the full range,
-					 * so the module and its VCM stay on those rails.
+					 * The rear module has its own 2.8 V and 1.2 V rails
+					 * (pm_humu_l8 / pm_humu_l11); cam_vana and cam_vdig
+					 * belong to the front module.  Binding the front's rails
+					 * to the rear sensor made its actuator noticeably
+					 * weaker, so keep each module on its own supply.
 					 */
-					avdd-supply = <&cam_vana>;
+					avdd-supply = <&cam_vana_rear>;
 					vaf-supply = <&cam_vaf>;
-					dvdd-supply = <&cam_vdig>;
+					dvdd-supply = <&cam_vdig_rear>;
 					lens-focus = <&vcm>;
 					status = "okay";
 					port {
