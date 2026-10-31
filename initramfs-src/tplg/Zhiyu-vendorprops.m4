@@ -50,10 +50,15 @@ dnl ---------------------------------------------------------------------------
 dnl Capture: the two microphones are DMIC on the VA macro, read through the
 dnl LPASS codec DMA (VA_CODEC_DMA_TX_0).  MultiMedia3 is the recording PCM.
 dnl ---------------------------------------------------------------------------
-dnl The recording backend keeps its own graph (DAI index VA_CODEC_DMA_TX_0,
-dnl the vendor layout): the q6apm backend opens, prepares and starts it, like
-dnl Android's PAL does for every device sub-graph.
-undefine(`FORCE_DEVICE_GRAPH_ID')dnl
+dnl Single graph, exactly like the TDM playback device above: the vendor's
+dnl capture use case (ACDB graph key 25) is ONE GRAPH_OPEN payload that carries
+dnl the stream sub-graph and the codec-DMA device sub-graph together, and the
+dnl cross-sub-graph connection (splitter -> stream logger) is then a link
+dnl inside that graph.  With the device sub-graph in a graph of its own (id
+dnl 120) the DSP accepts both GRAPH_OPENs and both GRAPH_STARTs but never moves
+dnl a frame, because the connection names a module (the stream logger) that
+dnl does not exist yet when the device graph is opened first.
+define(`FORCE_DEVICE_GRAPH_ID', `FRONTEND_DAI_MULTIMEDIA3')dnl
 dnl The microphones are DMICs of the TX macro, and the vendor machine driver
 dnl reads them through the TX codec DMA (its handset-mic device is backed by
 dnl CODEC_DMA-LPAIF_RXTX-TX-3 and its "dmic3" mixer path enables TX AIF1 DEC2

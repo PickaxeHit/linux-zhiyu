@@ -172,6 +172,17 @@ for pass in 1 2 3 4 5 6; do
 done
 log "AUDIO: $audio_loaded modules loaded (ordered)"
 
+# Capture runs a single graph: the topology puts the codec-DMA device sub-graph
+# into the frontend graph, the same way the TDM playback device sub-graph is
+# handled, because the vendor DSP refuses to move data across two graphs while
+# it happily accepts both GRAPH_OPENs and both GRAPH_STARTs.  The capture
+# frontend is MultiMedia3, whose q6apm-dai graph id is its DAI index (2), so the
+# backend has to be told that id instead of its own DAI index (120).
+if [ -e /sys/module/q6apm_lpass_dais/parameters/capture_be_graph_id ]; then
+	echo 2 > /sys/module/q6apm_lpass_dais/parameters/capture_be_graph_id
+	log "AUDIO: capture backend graph id $(cat /sys/module/q6apm_lpass_dais/parameters/capture_be_graph_id)"
+fi
+
 
 # ---------------------------------------------------------------------------
 # 3b. WLAN factory MAC
