@@ -10212,13 +10212,18 @@
 					assigned-clock-rates = <19200000>;
 					dovdd-supply = <&cam_vio>;
 					/*
-					 * The rear module is powered from its own 2.8 V and
-					 * 1.2 V rails (vreg_l8b / vreg_l11b); cam_vana and
-					 * cam_vdig are the front module's rails.
+					 * The vendor tree gives the rear module its own 2.8 V and
+					 * 1.2 V rails (pm_humu_l8 / pm_humu_l11, i.e. cam_vana_rear
+					 * and cam_vdig_rear), but binding them shrank the actuator's
+					 * usable travel to DAC 260..350 - the auto-focus coil no
+					 * longer has enough drive outside that window and thumps
+					 * against its stops.  vreg_l7b/vreg_l1i give the same
+					 * voltages with more headroom and restore the full range,
+					 * so the module and its VCM stay on those rails.
 					 */
-					avdd-supply = <&cam_vana_rear>;
+					avdd-supply = <&cam_vana>;
 					vaf-supply = <&cam_vaf>;
-					dvdd-supply = <&cam_vdig_rear>;
+					dvdd-supply = <&cam_vdig>;
 					lens-focus = <&vcm>;
 					status = "okay";
 					port {
@@ -10234,6 +10239,16 @@
 					compatible = "dongwoon,dw9807-vcm";
 					reg = <0x0c>;
 					vdd-supply = <&cam_vaf>;
+					/*
+					 * The lens only travels over part of the DAC's 0..1023
+					 * range; beyond it the coil pulls the lens into its
+					 * mechanical stops (audible knocking, and wear).  The
+					 * vendor autofocus on the same module stays inside
+					 * 0..400, so cap the control there: libcamera's
+					 * contrast-detect search and any other client then
+					 * cannot leave the safe window.
+					 */
+					dongwoon,focus-range = <0 400>;
 					status = "okay";
 				};
 };
