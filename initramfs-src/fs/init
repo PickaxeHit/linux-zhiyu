@@ -122,6 +122,10 @@ done
 log "MODULES: $modules_loaded loaded"
 
 # ---------------------------------------------------------------------------
+# Audio parser tracing: the topology parser runs at card probe, which the
+# machine driver triggers, so enable its debug output once snd-q6apm is in.
+mount -t debugfs none /sys/kernel/debug 2>/dev/null || true
+
 # 3b. Audio: q6apm / AudioReach, after the ADSP remoteproc is running.
 #     Modules live in lib/modules/<ver>/audio/ and are loaded in dependency
 #     order; the retry passes cover the module interdependencies.
@@ -151,6 +155,10 @@ for pass in 1 2 3 4 5 6; do
 				echo "$m" >> "$loaded_list"
 				count=$((count + 1))
 				log "AUDIO: ok $m $(md5sum "$k" | cut -d" " -f1)"
+				if [ "$m" = snd-q6apm ]; then
+					printf 'file qdsp6/topology.c +p\nfile qdsp6/q6apm.c +p\nfile qdsp6/audioreach.c +p\n' \
+						>> /sys/kernel/debug/dynamic_debug/control 2>/dev/null || true
+				fi
 			else
 				if [ "$pass" -le 2 ]; then
 					e=$(insmod "$k" 2>&1 | head -1)
