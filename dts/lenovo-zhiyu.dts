@@ -7651,7 +7651,7 @@
 					phandle = <0xc6>;
 				};
 
-				ldo8 {
+				cam_vana_rear: ldo8 {
 					regulator-name = "vreg_l8b_2p8";
 					regulator-min-microvolt = <0x2ab980>;
 					regulator-max-microvolt = <0x2ab980>;
@@ -7710,7 +7710,7 @@
 					regulator-initial-mode = <0x03>;
 					regulator-always-on;
 				};
-				ldo11 {
+				cam_vdig_rear: ldo11 {
 					regulator-name = "vreg_l11b_1p2";
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x124f80>;
@@ -9971,6 +9971,16 @@
 			compatible = "qcom,sm8750-camss";
 			iommus = <&apps_smmu 0x1c00 0x0>;
 			dma-coherent;
+			vdd-csiphy0-1p2-supply = <&cam_csi1p2>;
+			vdd-csiphy0-0p9-supply = <&cam_csi0p9>;
+			vdd-csiphy1-1p2-supply = <&cam_csi1p2>;
+			vdd-csiphy1-0p9-supply = <&cam_csi0p9>;
+			vdd-csiphy2-1p2-supply = <&cam_csi1p2>;
+			vdd-csiphy2-0p9-supply = <&cam_csi0p9>;
+			vdd-csiphy3-1p2-supply = <&cam_csi1p2>;
+			vdd-csiphy3-0p9-supply = <&cam_csi0p9>;
+			vdd-csiphy4-1p2-supply = <&cam_csi1p2>;
+			vdd-csiphy4-0p9-supply = <&cam_csi0p9>;
 			vdd-csiphy5-1p2-supply = <&cam_csi1p2>;
 			vdd-csiphy5-0p9-supply = <&cam_csi0p9>;
 
@@ -10137,6 +10147,15 @@
 
 				port@1 {
 					reg = <1>;
+					csiphy1_ep: endpoint {
+						remote-endpoint = <&gc08a8_ep>;
+						/* CAMSS turns this list into the PHY lane mask,
+						 * so it holds the physical lane positions (0..3),
+						 * not the CSI-2 data lane numbers.
+						 */
+						data-lanes = <0 1 2 3>;
+						link-frequencies = /bits/ 64 <336000000>;
+					};
 				};
 
 				port@2 {
@@ -10192,9 +10211,14 @@
 					assigned-clocks = <&cambistmclkcc 6>;
 					assigned-clock-rates = <19200000>;
 					dovdd-supply = <&cam_vio>;
-					avdd-supply = <&cam_vana>;
+					/*
+					 * The rear module is powered from its own 2.8 V and
+					 * 1.2 V rails (vreg_l8b / vreg_l11b); cam_vana and
+					 * cam_vdig are the front module's rails.
+					 */
+					avdd-supply = <&cam_vana_rear>;
 					vaf-supply = <&cam_vaf>;
-					dvdd-supply = <&cam_vdig>;
+					dvdd-supply = <&cam_vdig_rear>;
 					lens-focus = <&vcm>;
 					status = "okay";
 					port {
@@ -10223,6 +10247,8 @@
 			clocks = <&camcc CAM_CC_CAM_TOP_AHB_CLK>,
 				 <&camcc CAM_CC_CCI_1_CLK>;
 			clock-names = "ahb", "cci";
+			pinctrl-0 = <&cam_cci1_default>;
+			pinctrl-names = "default";
 			status = "okay";
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -10232,9 +10258,37 @@
 				clock-frequency = <400000>;
 				#address-cells = <1>;
 				#size-cells = <0>;
-			
 
-			
+				/*
+				 * Front camera: GalaxyCore GC08A8 (8 MP, 4-lane RAW10) on
+				 * CCI1 master 0, CSIPHY1, 19.2 MHz on CAM_MCLK4 (gpio93,
+				 * "cam_aon_mclk4" is the pad function the vendor firmware
+				 * uses) and reset on gpio7, both from the stock camera node.
+				 */
+				gc08a8: camera@31 {
+					compatible = "galaxycore,gc08a8";
+					reg = <0x31>;
+					reset-gpios = <&tlmm 7 GPIO_ACTIVE_LOW>;
+					clocks = <&cambistmclkcc 8>;
+					clock-names = "xvclk";
+					assigned-clocks = <&cambistmclkcc 8>;
+					assigned-clock-rates = <19200000>;
+					pinctrl-names = "default";
+					pinctrl-0 = <&cam_mclk4_default &cam_reset7_default>;
+					dovdd-supply = <&cam_vio>;
+					avdd-supply = <&cam_vana>;
+					dvdd-supply = <&cam_vdig>;
+					rotation = <270>;
+					orientation = <0>;
+					status = "okay";
+					port {
+						gc08a8_ep: endpoint {
+							remote-endpoint = <&csiphy1_ep>;
+							data-lanes = <1 2 3 4>;
+							link-frequencies = /bits/ 64 <336000000>;
+						};
+					};
+				};
 };
 
 			cci1_i2c1: i2c-bus@1 {
@@ -10272,12 +10326,35 @@
 		bias-disable;
 	};
 
+	cam_reset7_default: cam-reset7-default {
+		pins = "gpio7";
+		function = "gpio";
+		drive-strength = <2>;
+		bias-disable;
+		output-low;
+	};
+
 	cam_reset11_default: cam-reset11-default {
 		pins = "gpio11";
 		function = "gpio";
 		drive-strength = <2>;
 		bias-disable;
 		output-low;
+	};
+
+	cam_cci1_default: cam-cci1-default {
+		scl-pins {
+			pins = "gpio118";
+			function = "cci_i2c_scl";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+		sda-pins {
+			pins = "gpio117";
+			function = "cci_i2c_sda";
+			drive-strength = <2>;
+			bias-pull-up;
+		};
 	};
 
 	cam_cci0_default: cam-cci0-default {
