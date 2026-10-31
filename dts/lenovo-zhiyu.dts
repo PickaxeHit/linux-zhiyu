@@ -4300,6 +4300,24 @@
 								clocks = <0x89 0x25 0x01>;
 								clock-names = "bclk";
 							};
+
+							/*
+							 * The codec-DMA (LPAIF RXTX) interfaces need the
+							 * same AP-side interface clock vote the TDM
+							 * interfaces get (see dai@28 and the machine
+							 * driver's TDM bclk vote): without it the DSP
+							 * starts the graphs but the backend never fills a
+							 * period.  The interface clock is the LPASS
+							 * internal digital codec core clock, which the
+							 * q6prm clock provider does not expose yet, so
+							 * this reference currently resolves to no clock
+							 * and the vote is a no-op.
+							 */
+							dai@78 {
+								reg = <0x78>;
+								clocks = <0x89 0x32 0x01>;
+								clock-names = "bclk";
+							};
 						};
 
 						dais {
@@ -4489,15 +4507,26 @@
 			pinctrl-names = "default";
 			qcom,din-ports = <0x04>;
 			qcom,dout-ports = <0x00>;
-			qcom,ports-sinterval-low = <0x1010303>;
-			qcom,ports-offset1 = <0x101>;
+			qcom,ports-sinterval-low = /bits/ 8 <0x01 0x03 0x03 0x03>;
+			/*
+			 * WCD939x ADC capture ports as the stock firmware lays
+			 * them out: ADC1/ADC2 leave the codec on its first data
+			 * port at lane 1, offset 0; ADC3/ADC4 on the second one at
+			 * lane 0, offset 2.  The upstream MTP defaults (offset 1 on
+			 * lane 0 for both ports, sample interval 1 for DP2) do not
+			 * match, and the TX macro then never receives valid ADC
+			 * words.  Both ADC streams are carried on master DP3/DP2
+			 * because the controller only has four data ports and the
+			 * driver hands out 1..nports; DP4 would be rejected.
+			 */
+			qcom,ports-offset1 = /bits/ 8 <0x00 0x02 0x00 0x00>;
 			qcom,ports-offset2 = <0x00>;
 			qcom,ports-hstart = <0xffffffff>;
 			qcom,ports-hstop = <0xffffffff>;
 			qcom,ports-word-length = <0xffffffff>;
 			qcom,ports-block-pack-mode = <0xffffffff>;
 			qcom,ports-block-group-count = <0xffffffff>;
-			qcom,ports-lane-control = <0x1020000>;
+			qcom,ports-lane-control = /bits/ 8 <0x01 0x00 0x01 0x00>;
 			#address-cells = <0x02>;
 			#size-cells = <0x00>;
 			#sound-dai-cells = <0x01>;
@@ -4508,11 +4537,33 @@
 				compatible = "sdw20217010e00";
 				reg = <0x00 0x03>;
 				/*
-				 * ADC1/2 come out on the ADC port, ADC3/4 on the
-				 * ADC/DMIC port; on this board they are mapped to
-				 * the TX macro's SWR_MIC4 and SWR_MIC8 inputs.
+				 * Slave data port -> SoundWire master data port.
+				 * Codec port 1 (ADC1/ADC2) is received on master DP3
+				 * and reaches the TX macro's SWR_MIC4 input, codec
+				 * port 2 (ADC3/ADC4) on master DP2 -> SWR_MIC8.
 				 */
-				qcom,tx-port-mapping = <0x03 0x04 0x03 0x04>;
+				qcom,tx-port-mapping = <0x03 0x02 0x03 0x02>;
+				/*
+				 * Channel layout of the codec's TX data ports, from
+				 * the stock qcom,tx_swr_ch_map: <port mask> per
+				 * channel in enum wcd939x_tx_sdw_channels order.
+				 * ADC3/ADC4 sit on port 2 as its channels 0/1, not as
+				 * channels 2/3 of port 1.
+				 */
+				qcom,tx-ch-map =
+					<0x01 0x01>,	/* ADC1  */
+					<0x01 0x02>,	/* ADC2  */
+					<0x02 0x01>,	/* ADC3  */
+					<0x02 0x02>,	/* ADC4  */
+					<0x03 0x01>,	/* DMIC0 */
+					<0x03 0x02>,	/* DMIC1 */
+					<0x03 0x04>,	/* MBHC  */
+					<0x03 0x04>,	/* DMIC2 */
+					<0x03 0x08>,	/* DMIC3 */
+					<0x04 0x01>,	/* DMIC4 */
+					<0x04 0x02>,	/* DMIC5 */
+					<0x04 0x04>,	/* DMIC6 */
+					<0x04 0x08>;	/* DMIC7 */
 			};
 		};
 

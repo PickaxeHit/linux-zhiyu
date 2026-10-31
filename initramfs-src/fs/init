@@ -140,9 +140,9 @@ for pass in 1 2 3 4 5 6; do
 		 snd-q6apm q6prm q6prm-clocks q6apm-dai q6apm-lpass-dais \
 		 snd-soc-aw88395-lib snd-soc-aw882xx snd-soc-lpass-macro-common \
 		 snd-soc-lpass-va-macro snd-soc-lpass-tx-macro \
-		 snd-soc-lpass-rx-macro soundwire-bus soundwire-qcom \
+		 snd-soc-lpass-rx-macro slimbus soundwire-bus soundwire-qcom \
 		 snd-soc-wcd-common snd-soc-wcd-mbhc regmap-sdw \
-		 snd-soc-wcd939x-sdw snd-soc-wcd939x \
+		 snd-soc-wcd939x-sdw snd-soc-wcd-classh snd-soc-wcd939x \
 		 snd-soc-qcom-common snd-soc-qcom-sdw snd-soc-sm8750; do
 		for k in /lib/modules/*/audio/$m.ko; do
 			[ -f "$k" ] || continue
