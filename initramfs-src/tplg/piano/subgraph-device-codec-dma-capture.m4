@@ -7,6 +7,7 @@ include(`audioreach/container.m4') dnl
 include(`audioreach/module_log.m4') dnl
 include(`audioreach/module_codec_dma.m4') dnl
 include(`util/mixer.m4') dnl
+include(`piano/module_splitter.m4') dnl
 dnl
 #
 # SubGraph for Device Backend
@@ -38,6 +39,7 @@ define(`CONT_STACK_SIZE', 8192) dnl'
 
 define(`CDC_DMA_MODULE_IID', MOD_IID_START) dnl
 define(`LOG_MODULE_IID', eval(MOD_IID_START + 1)) dnl
+define(`SPLITTER_MODULE_IID', eval(MOD_IID_START + 2)) dnl
 define(`SG_INDEX', 1) dnl
 define(`CONTAINER_INDEX', 1) dnl
 define(`MOD_INDEX', 1) dnl
@@ -50,6 +52,7 @@ define(`DEVICE_CAPTURE_ROUTE',
 `        lines ['
 `                "NAME_PREFIX.codec_dma_tx$1, , $2 Capture"'
 `                "NAME_PREFIX.logger$1, , NAME_PREFIX.codec_dma_tx$1"'
+`                "NAME_PREFIX.splitter$1, , NAME_PREFIX.logger$1"'
 `        ]'
 `}')
 
@@ -64,7 +67,13 @@ AR_SUBGRAPH(SG_INDEX, DEVICE_GRAPH_ID, SG_IID_START, DEVICE_PERF_MODE, DEVICE_DI
 AR_CONTAINER(CONTAINER_INDEX, CONT_IID_START, CONT_CAP, CONT_STACK_SIZE, CONT_POSITION, DEVICE_DOMAIN_ID)
 
 AR_MODULE_CODEC_DMA_TX(MOD_INDEX, SG_INDEX, CONTAINER_INDEX, CDC_DMA_MODULE_IID, 0, 1, 1, 2, DEVICE_INTF_TYPE, DEVICE_INTF_INDEX, DEVICE_DATA_FORMAT, `DEVICE_NAME', LOG_MODULE_IID)
-AR_MODULE_LOG(   MOD_INDEX, SG_INDEX,       CONTAINER_INDEX, LOG_MODULE_IID,     1, 1, 1, 2, 0x000019ab, 1, 0, NONE_IID)
+AR_MODULE_LOG(   MOD_INDEX, SG_INDEX,       CONTAINER_INDEX, LOG_MODULE_IID,     1, 1, 1, 2, 0x000019ab, 1, 0, SPLITTER_MODULE_IID)
+dnl One output is enough here: the vendor declares 23 because one device
+dnl sub-graph serves every capture use case, while this one belongs to a single
+dnl use case.  Declaring 23 leaves the remaining output->destination array
+dnl entries uninitialised in the parser and puts garbage connections into the
+dnl graph-open payload.
+AR_MODULE_SPLITTER(MOD_INDEX, SG_INDEX,     CONTAINER_INDEX, SPLITTER_MODULE_IID, 1, 1, 1, 2, NONE_IID)
 dnl kcontrol switch
 DEVICE_CAPTURE_MIXER(SG_INDEX, `DEVICE_NAME')
 DEVICE_CAPTURE_ROUTE(MOD_INDEX, `DEVICE_NAME')
