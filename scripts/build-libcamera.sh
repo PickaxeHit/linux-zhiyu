@@ -34,6 +34,11 @@ setup_args=(
 	-Dgstreamer=disabled -Dpycamera=disabled -Dv4l2=enabled
 	-Dcam=enabled -Dqcam=enabled
 	-Dtest=false -Ddocumentation=disabled
+	# The debayer and the statistics pass are the hot loops; a debug build runs
+	# them at -O0 and a single stats frame then takes tens of milliseconds,
+	# which shows up as uneven frame pacing.
+	-Dbuildtype=release
+	-Dcpp_args=-Wno-array-bounds
 	--prefix="$PREFIX"
 )
 
@@ -70,6 +75,10 @@ if [ "$setup_only" = 0 ]; then
 	if [ "$do_install" = 1 ]; then
 		echo "== installing to $PREFIX =="
 		ssh_run "ninja -C '$BUILD' install && ldconfig"
+		# The V4L2 compatibility layer has no install rule of its own;
+		# libcamerify preloads it from libexec, so put it there.
+		ssh_run "install -Dm755 '$BUILD/src/v4l2/v4l2-compat.so' \
+			 /usr/local/libexec/libcamera/v4l2-compat.so"
 	fi
 fi
 
