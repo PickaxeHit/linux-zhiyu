@@ -75,4 +75,4 @@ dnl makes the FE->BE graph control exist at all: its put() stores the module
 dnl connection (device logger -> stream logger) that goes into the backend's
 dnl GRAPH_OPEN payload.  An empty control name (as this line used to have)
 dnl produces no control and therefore no connection for the DSP.
-STREAM_DEVICE_CAPTURE_ROUTE(FRONTEND_DAI_MULTIMEDIA3, ``MultiMedia3 Mixer'', ``TX_CODEC_DMA_TX_3, device120.logger1'')
+STREAM_DEVICE_CAPTURE_ROUTE(FRONTEND_DAI_MULTIMEDIA3, ``MultiMedia3 Mixer'', ``TX_CODEC_DMA_TX_3, device120.splitter1'')
