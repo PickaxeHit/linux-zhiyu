@@ -4538,23 +4538,28 @@
 				reg = <0x00 0x03>;
 				/*
 				 * Slave data port -> SoundWire master data port.
-				 * Codec port 1 (ADC1/ADC2) is received on master DP3
-				 * and reaches the TX macro's SWR_MIC4 input, codec
-				 * port 2 (ADC3/ADC4) on master DP2 -> SWR_MIC8.
+				 * Codec port 1 carries every ADC channel and is
+				 * received on master DP3, which the TX macro sees as
+				 * its SWR_MIC4..SWR_MIC7 inputs (four per data port,
+				 * starting at the second data port).
 				 */
-				qcom,tx-port-mapping = <0x03 0x02 0x03 0x02>;
+				qcom,tx-port-mapping = <0x03 0x04 0x03 0x04>;
 				/*
-				 * Channel layout of the codec's TX data ports, from
-				 * the stock qcom,tx_swr_ch_map: <port mask> per
-				 * channel in enum wcd939x_tx_sdw_channels order.
-				 * ADC3/ADC4 sit on port 2 as its channels 0/1, not as
-				 * channels 2/3 of port 1.
+				 * Channel layout of the codec's TX data ports:
+				 * <port mask> per channel in enum
+				 * wcd939x_tx_sdw_channels order.  The codec's reset
+				 * TX channel map puts ADC1..ADC4 on data port 1 as
+				 * its channels 1..4, and the Linux driver never
+				 * programs a different map (the vendor's "ADCn
+				 * ChMap" controls do not exist here), so a layout
+				 * with ADC3/ADC4 on a second port would ask the bus
+				 * for channels the codec does not send.
 				 */
 				qcom,tx-ch-map =
 					<0x01 0x01>,	/* ADC1  */
 					<0x01 0x02>,	/* ADC2  */
-					<0x02 0x01>,	/* ADC3  */
-					<0x02 0x02>,	/* ADC4  */
+					<0x01 0x04>,	/* ADC3  */
+					<0x01 0x08>,	/* ADC4  */
 					<0x03 0x01>,	/* DMIC0 */
 					<0x03 0x02>,	/* DMIC1 */
 					<0x03 0x04>,	/* MBHC  */
