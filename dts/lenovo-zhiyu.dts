@@ -610,6 +610,37 @@
 		};
 	};
 
+	/*
+	 * WCD939x audio codec.  Its capture side reaches the TX macro over the
+	 * LPASS TX SoundWire master, which is how the built-in microphones (the
+	 * analog AMIC1/AMIC4 inputs) are recorded.
+	 */
+	wcd939x: audio-codec {
+		compatible = "qcom,wcd9395-codec", "qcom,wcd9390-codec";
+
+		qcom,mbhc-buttons-vthreshold-microvolt = <0x124f8 0x249f0 0x39dd8 0x7a120 0x7a120 0x7a120 0x7a120 0x7a120>;
+		qcom,mbhc-headset-vthreshold-microvolt = <0x19f0a0>;
+		qcom,mbhc-headphone-vthreshold-microvolt = <0xc350>;
+
+		qcom,micbias1-microvolt = <0x1b7740>;
+		qcom,micbias2-microvolt = <0x1b7740>;
+		qcom,micbias3-microvolt = <0x1b7740>;
+		qcom,micbias4-microvolt = <0x1b7740>;
+
+		qcom,rx-device = <&wcd_rx>;
+		qcom,tx-device = <&wcd_tx>;
+
+		reset-gpios = <&tlmm 0x65 0x01>;
+
+		vdd-buck-supply = <&vreg_l15b_1p8>;
+		vdd-rxtx-supply = <&vreg_l15b_1p8>;
+		vdd-io-supply = <&vreg_l15b_1p8>;
+		vdd-mic-bias-supply = <&vreg_bob1>;
+		vdd-px-supply = <&vreg_l2i_1p2>;
+
+		#sound-dai-cells = <0x01>;
+	};
+
 	firmware {
 
 		zhiyu-stock-overlay {
@@ -4363,7 +4394,14 @@
 			#address-cells = <0x02>;
 			#size-cells = <0x00>;
 			#sound-dai-cells = <0x01>;
-			status = "disabled";
+			status = "okay";
+
+			/* WCD939x RX side: playback ports */
+			wcd_rx: codec@0,4 {
+				compatible = "sdw20217010e00";
+				reg = <0x00 0x04>;
+				qcom,rx-port-mapping = <0x01 0x02 0x03 0x04 0x05 0x09>;
+			};
 		};
 
 		codec@6ae0000 {
@@ -4463,7 +4501,19 @@
 			#address-cells = <0x02>;
 			#size-cells = <0x00>;
 			#sound-dai-cells = <0x01>;
-			status = "disabled";
+			status = "okay";
+
+			/* WCD939x TX side: ADC/DMIC capture ports */
+			wcd_tx: codec@0,3 {
+				compatible = "sdw20217010e00";
+				reg = <0x00 0x03>;
+				/*
+				 * ADC1/2 come out on the ADC port, ADC3/4 on the
+				 * ADC/DMIC port; on this board they are mapped to
+				 * the TX macro's SWR_MIC4 and SWR_MIC8 inputs.
+				 */
+				qcom,tx-port-mapping = <0x03 0x04 0x03 0x04>;
+			};
 		};
 
 		codec@7660000 {
@@ -7575,12 +7625,20 @@
 					phandle = <0x127>;
 				};
 
-				ldo15 {
+				vreg_l15b_1p8: ldo15 {
 					regulator-name = "vreg_l15b_1p8";
 					regulator-min-microvolt = <0x1b7740>;
 					regulator-max-microvolt = <0x1b7740>;
 					regulator-initial-mode = <0x03>;
 					phandle = <0xc5>;
+				};
+
+				/* mic bias supply of the WCD939x */
+				vreg_bob1: bob1 {
+					regulator-name = "vreg_bob1";
+					regulator-min-microvolt = <0x2de600>;
+					regulator-max-microvolt = <0x3d0900>;
+					regulator-initial-mode = <0x03>;
 				};
 				cam_vana: ldo7 {
 					regulator-name = "vreg_l7b_2p8";
@@ -7668,7 +7726,7 @@
 					regulator-always-on;
 				};
 
-				ldo2 {
+				vreg_l2i_1p2: ldo2 {
 					regulator-name = "vreg_l2i_1p2";
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x124f80>;
