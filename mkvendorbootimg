@@ -15,6 +15,7 @@ ROOT=$(cd "$(dirname "$0")" && pwd)
 OUT=${OUT:-${1:-$ROOT/out}}
 INITRAMFS=${INITRAMFS:-$ROOT/initramfs}
 RAMDISK=${RAMDISK:-}
+KS=${KS:-$ROOT/kernel-source}
 DTB=${DTB:-$ROOT/dts/lenovo-zhiyu.dtb}
 DTS=${DTS:-$ROOT/dts/lenovo-zhiyu.dts}
 BOOTCONFIG=${BOOTCONFIG:-$ROOT/bootconfig.extra}
@@ -53,7 +54,7 @@ fi
 # .dtb next to the .dts once shipped an image without the camera nodes.
 if [ -f "$DTS" ]; then
 	echo "dtb    : compiling $DTS"
-	cpp -nostdinc -I "$ROOT/kernel-source/include" -undef \
+	cpp -nostdinc -I "$KS/include" -undef \
 		-x assembler-with-cpp -o "$work/board.dts" "$DTS"
 	dtc -I dts -O dtb -o "$DTB" "$work/board.dts"
 elif [ ! -f "$DTB" ]; then
