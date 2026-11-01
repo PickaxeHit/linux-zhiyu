@@ -296,17 +296,34 @@ wlan_apply_factory_mac() {
 # The Linux rootfs is a plain directory on the shared f2fs, so the space is
 # shared dynamically with Android instead of being split into partitions.
 data_rootfs() {
+	# The UFS probe is asynchronous: the partitions show up a moment after the
+	# module is in, so wait for the userdata one instead of looking once.  A
+	# single look used to be enough only because the old module loop happened
+	# to spend a couple of seconds retrying unrelated insmods.
 	ud=
-	for b in /sys/class/block/*; do
-		if grep -q '^PARTNAME=userdata$' "$b/uevent" 2>/dev/null; then
-			ud=/dev/${b##*/}
-			break
-		fi
+	i=0
+	while [ "$i" -lt 30 ]; do
+		for b in /sys/class/block/*; do
+			if grep -q '^PARTNAME=userdata$' "$b/uevent" 2>/dev/null; then
+				ud=/dev/${b##*/}
+				break
+			fi
+		done
+		[ -n "$ud" ] && break
+		i=$((i + 1))
+		sleep 1
 	done
-	[ -n "$ud" ] || { cmsg "no userdata partition"; return 1; }
+	[ -n "$ud" ] || { cmsg "no userdata partition after ${i}s"; return 1; }
+	[ "$i" -gt 0 ] && cmsg "userdata $ud after ${i}s"
 
 	mkdir -p /mnt/data
-	mount -t f2fs -o rw "$ud" /mnt/data || { cmsg "f2fs mount of $ud failed"; return 1; }
+	i=0
+	until mount -t f2fs -o rw "$ud" /mnt/data; do
+		i=$((i + 1))
+		[ "$i" -ge 3 ] && { cmsg "f2fs mount of $ud failed"; return 1; }
+		cmsg "f2fs mount of $ud failed, retry $i"
+		sleep 1
+	done
 
 	mkdir -p /newroot
 	mount --bind /mnt/data/linux /newroot || { cmsg "bind of /data/linux failed"; umount /mnt/data; return 1; }
