@@ -110,3 +110,36 @@ videocc-sm8750.ko	drivers/clk/qcom/videocc-sm8750.ko
 videodev.ko	drivers/media/v4l2-core/videodev.ko
 wcd939x-usbss.ko	drivers/usb/typec/mux/wcd939x-usbss.ko
 system_heap.ko	drivers/dma-buf/heaps/system_heap.ko
+# ---------------------------------------------------------------------------
+# Everything the machine needs to come up, so that a boot needs nothing from
+# /lib/modules on the rootfs (rootfs copies are only for re-probing a driver
+# that is being worked on).  The init script loads this whole tree in
+# dependency order; the blocks above keep the ones that need to be early.
+# ---------------------------------------------------------------------------
+cambistmclkcc-sm8750.ko	drivers/clk/qcom/cambistmclkcc-sm8750.ko
+pinctrl-lpass-lpi.ko	drivers/pinctrl/qcom/pinctrl-lpass-lpi.ko
+pinctrl-sm8650-lpass-lpi.ko	drivers/pinctrl/qcom/pinctrl-sm8650-lpass-lpi.ko
+qcom-pd-mapper.ko	drivers/soc/qcom/qcom_pd_mapper.ko
+qcom-stats.ko	drivers/soc/qcom/qcom_stats.ko
+socinfo.ko	drivers/soc/qcom/socinfo.ko
+icc-bwmon.ko	drivers/soc/qcom/icc-bwmon.ko
+pmic_glink_altmode.ko	drivers/soc/qcom/pmic_glink_altmode.ko
+aux-hpd-bridge.ko	drivers/gpu/drm/bridge/aux-hpd-bridge.ko
+qcom-spmi-temp-alarm.ko	drivers/thermal/qcom/qcom-spmi-temp-alarm.ko
+led-class-flash.ko	drivers/leds/led-class-flash.ko
+leds-qcom-flash.ko	drivers/leds/flash/leds-qcom-flash.ko
+rpmsg-ctrl.ko	drivers/rpmsg/rpmsg_ctrl.ko
+rpmsg-char.ko	drivers/rpmsg/rpmsg_char.ko
+dm-mod.ko	drivers/md/dm-mod.ko
+af-alg.ko	crypto/af_alg.ko
+zstd.ko	crypto/zstd.ko
+snd-seq.ko	sound/core/seq/snd-seq.ko
+# cameras: CCI bus, CAMSS, the two sensors and the VCM
+v4l2-fwnode.ko	drivers/media/v4l2-core/v4l2-fwnode.ko
+v4l2-async.ko	drivers/media/v4l2-core/v4l2-async.ko
+v4l2-cci.ko	drivers/media/v4l2-core/v4l2-cci.ko
+i2c-qcom-cci.ko	drivers/i2c/busses/i2c-qcom-cci.ko
+qcom-camss.ko	drivers/media/platform/qcom/camss/qcom-camss.ko
+ov13b10.ko	drivers/media/i2c/ov13b10.ko
+gc08a8.ko	drivers/media/i2c/gc08a8.ko
+dw9807-vcm.ko	drivers/media/i2c/dw9807-vcm.ko
