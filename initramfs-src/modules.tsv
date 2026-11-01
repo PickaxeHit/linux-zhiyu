@@ -133,7 +133,7 @@ rpmsg-char.ko	drivers/rpmsg/rpmsg_char.ko
 dm-mod.ko	drivers/md/dm-mod.ko
 af-alg.ko	crypto/af_alg.ko
 zstd.ko	crypto/zstd.ko
-snd-seq.ko	sound/core/seq/snd-seq.ko
+audio/snd-seq.ko	sound/core/seq/snd-seq.ko
 # cameras: CCI bus, CAMSS, the two sensors and the VCM
 v4l2-fwnode.ko	drivers/media/v4l2-core/v4l2-fwnode.ko
 v4l2-async.ko	drivers/media/v4l2-core/v4l2-async.ko
