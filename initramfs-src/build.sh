@@ -76,13 +76,22 @@ while IFS=$'\t' read -r rel src; do
 	mods=$((mods + 1))
 done < "$here/modules.tsv"
 
-# ---- 5. modprobe index ----------------------------------------------------
+# ---- 5. modprobe index and load order -------------------------------------
 depmod -b "$stage" "$VER" 2>/dev/null || echo "   depmod: warnings ignored"
+
+# depmod knows the dependency graph; hand it to init so the modules can be
+# insmod'ed in an order that never hits "Unknown symbol" (see order-modules.py
+# for what the phases mean).
+[ -x "$(command -v python3)" ] || die "python3 is needed to order the modules"
+python3 "$here/order-modules.py" "$stage/lib/modules/$VER" \
+	> "$stage/lib/modules/$VER/load-order" \
+	|| die "module ordering failed"
+ordered=$(wc -l < "$stage/lib/modules/$VER/load-order")
 
 # ---- 6. summary + publish -------------------------------------------------
 echo "init   : $(head -1 "$stage/init")"
 echo "busybox: $("$here"/../initramfs/bin/busybox 2>/dev/null | head -0; file -b "$BB" | cut -d, -f1-3)"
-echo "applets: $applets   firmware: $fw files   modules: $mods"
+echo "applets: $applets   firmware: $fw files   modules: $mods ($ordered ordered)"
 echo "tree   : $(find "$stage" -type f | wc -l) files, $(du -sh "$stage" | cut -f1)"
 
 mkdir -p "$(dirname "$OUT")"

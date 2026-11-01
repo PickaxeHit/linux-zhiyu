@@ -55,20 +55,70 @@ log() { echo "<6>ZHIYU: $*" >/dev/kmsg; }
 cmsg() { log "SD-ROOTFS: $*"; }
 
 log "INIT $(uname -r)"
-# ---------------------------------------------------------------------------
-# 1. Wi-Fi stack, in dependency order.
-#
-# Must be insmod'ed here and in this order: the generic retry loop below does
-# not resolve modules.dep, and mac80211/ath12k silently fail with
-# "Unknown symbol cfg80211_*" when loaded out of order.  ath12k must also be
-# early so the WCN7860 finishes its MHI boot (see the header comment).
-# ---------------------------------------------------------------------------
-for m in cfg80211 mac80211 qrtr qrtr-mhi mhi-pci-generic ath12k ath12k-wifi7 \
-	pwrseq-qcom-wcn phy-qcom-qmp-pcie; do
-	for k in /lib/modules/*/$m.ko; do
-		[ -f "$k" ] && insmod "$k" 2>/dev/null && log "WIRELESS: $m loaded"
+
+# Modules are loaded in the order depmod computed at ramdisk build time
+# (`load-order`, one "<phase><TAB><path>" line per module, dependencies first).
+# Guessing the order and retrying used to cost a dmesg full of
+# "Unknown symbol cfg80211_*" on every boot; with the real order a failure now
+# means the module really could not be loaded.
+moddir=/lib/modules/$(uname -r)
+load_order=$moddir/load-order
+loaded_list=/tmp/.loaded
+failed_list=/tmp/.failed
+: > "$loaded_list"
+: > "$failed_list"
+tab=$(printf '\t')
+mods_in_phase=0
+
+load_mod() {
+	rel=$1
+	grep -qx "$rel" "$loaded_list" && return 0
+	if insmod "$moddir/$rel" 2>/dev/null; then
+		echo "$rel" >> "$loaded_list"
+		mods_in_phase=$((mods_in_phase + 1))
+		return 0
+	fi
+	return 1
+}
+
+# Report a module that did not load, once.
+load_failed() {
+	grep -qx "$1" "$failed_list" && return 0
+	echo "$1" >> "$failed_list"
+	log "$2: FAIL $1"
+}
+
+# load_phase <n> <tag>: load every module of phase <n>, in dependency order.
+load_phase() {
+	mods_in_phase=0
+	while IFS="$tab" read -r phase rel; do
+		[ "$phase" = "$1" ] || continue
+		[ -n "$rel" ] || continue
+		load_mod "$rel" || load_failed "$rel" "$2"
+	done < "$load_order"
+	log "$2: $mods_in_phase loaded"
+}
+
+if [ -f "$load_order" ]; then
+	# -------------------------------------------------------------------
+	# 1. Wi-Fi stack first: the chip's MHI boot must finish before the rest
+	#    of the system takes over PCIe (runtime PM / ASPM), otherwise ath12k
+	#    fails with "MHI did not enter READY state" (-110).
+	# -------------------------------------------------------------------
+	load_phase 1 WIRELESS
+else
+	# Should not happen: build.sh always writes the order.  Fall back to a
+	# blind load, so a mismatched ramdisk cannot leave the board dead.
+	log "MODULES: no $load_order, falling back to a blind load"
+	for pass in 1 2 3 4 5; do
+		count=0
+		for k in /lib/modules/*/*.ko; do
+			rel=${k#/lib/modules/*/}
+			load_mod "$rel" && count=$((count + 1))
+		done
+		[ "$count" -eq 0 ] && break
 	done
-done
+fi
 
 # ---------------------------------------------------------------------------
 # 2. USB gadget (the NCM link is brought up from userspace).
@@ -84,51 +134,29 @@ log "USB: gadget setup deferred to userspace"
 usb_state="DEFERRED"
 
 # ---------------------------------------------------------------------------
-# 2b. ADSP / PMIC / battery, in dependency order.
-for m in qcom_q6v5 qcom_sysmon qcom_pil_info qcom_common qcom_glink_smem \
-	 mdt_loader qcom_q6v5_pas; do
-	for k in /lib/modules/*/$m.ko; do
-		[ -f "$k" ] && insmod "$k" 2>/dev/null && log "BATTERY: $m loaded"
-	done
-done
-sleep 2
-for m in qmi_helpers qcom_pdr_msg pdr_interface pmic_glink qcom_battmgr; do
-	for k in /lib/modules/*/$m.ko; do
-		[ -f "$k" ] && insmod "$k" 2>/dev/null && log "BATTERY: $m loaded"
-	done
-done
+# 2b. ADSP remoteproc, then the PMIC glink that talks to it.
+# ---------------------------------------------------------------------------
+if [ -f "$load_order" ]; then
+	load_phase 2 BATTERY
+	sleep 2
+	load_phase 3 BATTERY
+fi
 
 # ---------------------------------------------------------------------------
-# 3. Everything else in the closure.  Each pass loads whatever is ready and
-#    the rest is retried once its dependencies have come up.
+# 3. Everything else the ramdisk carries, in dependency order: phase 4 is the
+#    top level, phase 5 the audio tree (loaded below, once the ADSP runs).
 # ---------------------------------------------------------------------------
-loaded_list=/tmp/.loaded
-: > "$loaded_list"
-modules_loaded=0
-for pass in 1 2 3 4 5; do
-	count=0
-	for m in /lib/modules/*/*.ko; do
-		[ -f "$m" ] || continue
-		b=$(basename "$m" .ko)
-		grep -qx "$b" "$loaded_list" && continue
-		if insmod "$m" 2>/dev/null; then
-			echo "$b" >> "$loaded_list"
-			count=$((count + 1))
-		fi
-	done
-	[ "$count" -eq 0 ] && break
-	modules_loaded=$((modules_loaded + count))
-done
-log "MODULES: $modules_loaded loaded"
+[ -f "$load_order" ] && load_phase 4 MODULES
 
-# ---------------------------------------------------------------------------
-# Audio parser tracing: the topology parser runs at card probe, which the
-# machine driver triggers, so enable its debug output once snd-q6apm is in.
+
+# The topology parser runs when the machine driver probes, so its debug output
+# has to be enabled through debugfs once the modules are in.
 mount -t debugfs none /sys/kernel/debug 2>/dev/null || true
 
-# 3b. Audio: q6apm / AudioReach, after the ADSP remoteproc is running.
-#     Modules live in lib/modules/<ver>/audio/ and are loaded in dependency
-#     order; the retry passes cover the module interdependencies.
+# ---------------------------------------------------------------------------
+# 3b. Audio: q6apm / AudioReach, after the ADSP remoteproc is running.  Phase 5
+#     of the load order is the audio tree, dependencies first.
+# ---------------------------------------------------------------------------
 for i in $(seq 1 60); do
 	for r in /sys/class/remoteproc/*; do
 		[ "$(cat "$r/state" 2>/dev/null)" = "running" ] && break 2
@@ -136,9 +164,9 @@ for i in $(seq 1 60); do
 	sleep 1
 done
 log "AUDIO: remoteproc states=$(for r in /sys/class/remoteproc/*; do printf '%s=%s ' "$(basename "$r")" "$(cat "$r/state" 2>/dev/null)"; done)"
-audio_loaded=0
-for pass in 1 2 3 4 5 6; do
-	count=0
+if [ -f "$load_order" ]; then
+	load_phase 5 AUDIO
+else
 	for m in apr q6core soundcore snd snd-seq-device snd-timer snd-pcm \
 		 snd-compress snd-pcm-dmaengine snd-soc-core snd-q6dsp-common \
 		 snd-q6apm q6prm q6prm-clocks q6apm-dai q6apm-lpass-dais \
@@ -147,30 +175,18 @@ for pass in 1 2 3 4 5 6; do
 		 snd-soc-lpass-rx-macro slimbus soundwire-bus soundwire-qcom \
 		 snd-soc-wcd-common snd-soc-wcd-mbhc regmap-sdw \
 		 snd-soc-wcd939x-sdw snd-soc-wcd-classh snd-soc-wcd939x \
-		 snd-soc-qcom-common snd-soc-qcom-sdw snd-soc-sm8750; do
-		for k in /lib/modules/*/audio/$m.ko; do
+		 snd-soc-qcom-common snd-soc-qcom-sdw snd-soc-sm8750 snd-seq; do
+		for k in /lib/modules/*/audio/"$m".ko; do
 			[ -f "$k" ] || continue
-			grep -qx "$m" "$loaded_list" && continue
-			if insmod "$k" 2>/dev/null; then
-				echo "$m" >> "$loaded_list"
-				count=$((count + 1))
-				log "AUDIO: ok $m $(md5sum "$k" | cut -d" " -f1)"
-				if [ "$m" = snd-q6apm ]; then
-					printf 'file qdsp6/topology.c +p\nfile qdsp6/q6apm.c +p\nfile qdsp6/audioreach.c +p\n' \
-						>> /sys/kernel/debug/dynamic_debug/control 2>/dev/null || true
-				fi
-			else
-				if [ "$pass" -le 2 ]; then
-					e=$(insmod "$k" 2>&1 | head -1)
-					log "AUDIO: FAIL($pass) $m: $e"
-				fi
-			fi
+			rel=${k#/lib/modules/*/}
+			load_mod "$rel" || load_failed "$rel" AUDIO
 		done
 	done
-	[ "$count" -eq 0 ] && break
-	audio_loaded=$((audio_loaded + count))
-done
-log "AUDIO: $audio_loaded modules loaded (ordered)"
+fi
+
+printf 'file qdsp6/topology.c +p\nfile qdsp6/q6apm.c +p\nfile qdsp6/audioreach.c +p\n' \
+	>> /sys/kernel/debug/dynamic_debug/control 2>/dev/null || true
+
 
 # Capture runs a single graph: the topology puts the codec-DMA device sub-graph
 # into the frontend graph, the same way the TDM playback device sub-graph is
