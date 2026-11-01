@@ -99,6 +99,14 @@ stamp=$(date +%Y%m%d-%H%M%S)
 if [ -e "$OUT" ] && [ "${KEEP_OLD:-1}" = 1 ]; then
 	mv "$OUT" "$OUT.bak.$stamp"
 	echo "old    : kept as $OUT.bak.$stamp"
+	# Keep the last KEEP_BACKUPS snapshots (default 3) and drop the rest: one is
+	# ~94 MB and a bring-up session runs this script dozens of times.
+	keep=${KEEP_BACKUPS:-3}
+	( cd "$(dirname "$OUT")" && ls -1d "$(basename "$OUT")".bak.* 2>/dev/null | \
+		sort | head -n -"$keep" | while read -r old_bak; do
+			rm -rf "$old_bak"
+			echo "pruned : $old_bak"
+		done )
 fi
 mv "$stage" "$OUT"
 trap - EXIT
