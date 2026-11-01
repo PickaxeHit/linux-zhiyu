@@ -7402,7 +7402,17 @@
 				#size-cells = <0x02>;
 				ranges;
 				phys = <0x26>;
-				wake-gpios = <0x66 0x68 0x00>;
+				/*
+				 * No wake-gpios: the vendor tree points WAKE# at
+				 * gpio104 with a pull-up, and the PCI core turns
+				 * that into a level-triggered wake IRQ.  The WCN
+				 * module keeps the line asserted, so the IRQ fires
+				 * for the whole life of the system: with the vendor
+				 * polarity every suspend aborts with "Wakeup
+				 * pending", with the opposite one it storms and the
+				 * machine crawls.  Mainline ath12k has no WoWLAN
+				 * wake anyway, so leave the line out.
+				 */
 				reset-gpios = <0x66 0x66 0x01>;
 
 				wifi@0 {
