@@ -325,9 +325,25 @@ data_rootfs() {
 		sleep 1
 	done
 
+	# One-shot alternate rootfs: writing "<dir>" into /data/linux.alt makes the
+	# next boot use /data/<dir> and consumes the marker, so a broken alternate
+	# install cannot lock the board out of its normal rootfs.
+	sub=linux
+	if [ -f /mnt/data/linux.alt ]; then
+		alt=$(cat /mnt/data/linux.alt 2>/dev/null)
+		if [ -n "$alt" ] && [ -d "/mnt/data/$alt" ]; then
+			sub=$alt
+			rm -f /mnt/data/linux.alt
+			cmsg "one-shot alternate rootfs: /data/$sub"
+		else
+			cmsg "ignoring /data/linux.alt (\"$alt\" is not a directory)"
+			rm -f /mnt/data/linux.alt
+		fi
+	fi
+
 	mkdir -p /newroot
-	mount --bind /mnt/data/linux /newroot || { cmsg "bind of /data/linux failed"; umount /mnt/data; return 1; }
-	cmsg "data rootfs $ud:/linux mounted"
+	mount --bind "/mnt/data/$sub" /newroot || { cmsg "bind of /data/$sub failed"; umount /mnt/data; return 1; }
+	cmsg "data rootfs $ud:/$sub mounted"
 	finish_rootfs || { umount /newroot; umount /mnt/data; return 1; }
 	return 0
 }
