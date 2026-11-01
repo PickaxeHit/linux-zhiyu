@@ -201,14 +201,14 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 3b. WLAN factory MAC
+# 3b. Factory MAC addresses (WLAN from wlan_mac.bin, BT from bd_addr.bin)
 # mainline ath12k never reads the vendor's factory MAC file, so the firmware
 # hands out a fresh random address on every boot. DHCP leases and captive
 # portal sessions are keyed by MAC, so apply the factory value taken from the
 # persist partition (mounted read-only) before userspace starts. Nothing
 # device-unique is stored in the image itself.
 # ---------------------------------------------------------------------------
-wlan_apply_factory_mac() {
+apply_factory_macs() {
 	iface=
 	i=0
 	while [ -z "$iface" ] && [ "$i" -lt 40 ]; do
@@ -246,6 +246,15 @@ wlan_apply_factory_mac() {
 		return 0
 	fi
 
+	# The factory Bluetooth address.  It is the phone's own identity, so it
+	# stays here in persist instead of being written into the device tree; the
+	# kernel takes it through the management command btaddr sends.
+	bt=
+	if [ -r /mnt/persist/bd_addr.bin ]; then
+		bt=$(tr -d '\0' < /mnt/persist/bd_addr.bin | head -c 17)
+		[ ${#bt} -eq 17 ] || bt=
+	fi
+
 	mac=
 	if [ -r /mnt/persist/peach_v2/wlan_mac.bin ]; then
 		hex=$(sed -n 's/^Intf0MacAddress=\([0-9a-fA-F]\{12\}\).*/\1/p' \
@@ -253,20 +262,44 @@ wlan_apply_factory_mac() {
 		[ -n "$hex" ] && mac=$(printf '%s' "$hex" |
 			sed 's/\(..\)\(..\)\(..\)\(..\)\(..\)\(..\)/\1:\2:\3:\4:\5:\6/')
 	fi
-	if [ -z "$mac" ] && [ -r /mnt/persist/bd_addr.bin ]; then
-		bt=$(tr -d '\0' < /mnt/persist/bd_addr.bin | head -c 17)
-		if [ ${#bt} -eq 17 ]; then
-			o5=$(echo "$bt" | cut -d: -f5)
-			o6=$(echo "$bt" | cut -d: -f6)
-			n=$((16#$o6 + 1))
-			o6=$(printf '%02x' $((n & 0xff)))
-			if [ $((n >> 8)) -ne 0 ]; then
-				m=$((16#$o5 + 1))
-				o5=$(printf '%02x' $((m & 0xff)))
+	# No wlan_mac.bin: the vendor derives the WLAN address from the BT one.
+	if [ -z "$mac" ] && [ -n "$bt" ]; then
+		o5=$(echo "$bt" | cut -d: -f5)
+		o6=$(echo "$bt" | cut -d: -f6)
+		n=$((16#$o6 + 1))
+		o6=$(printf '%02x' $((n & 0xff)))
+		if [ $((n >> 8)) -ne 0 ]; then
+			m=$((16#$o5 + 1))
+			o5=$(printf '%02x' $((m & 0xff)))
+		fi
+		mac=${bt%:*:*}:$o5:$o6
+	fi
+	# Bluetooth: the controller is still down at this point (bluetoothd has not
+	# started yet), which is the only state the kernel accepts an address in.
+	# The controller only accepts an address while it is down, and right after
+	# the modules load it is still being set up (firmware download), so retry
+	# until the kernel takes it.
+	if [ -n "$bt" ] && [ -x /bin/btaddr ]; then
+		i=0
+		bt_err=
+		while [ "$i" -lt 30 ]; do
+			i=$((i + 1))
+			if bt_err=$(/bin/btaddr hci0 "$bt" 2>&1); then
+				bt_err=
+				break
 			fi
-			mac=${bt%:*:*}:$o5:$o6
+			case "$bt_err" in
+			*"no reply"*|*socket*|*bind*) ;;	# hci0 not there yet
+			esac
+			sleep 1
+		done
+		if [ -z "$bt_err" ]; then
+			log "BT: factory address $bt set (after ${i}s)"
+		else
+			log "BT: factory address not applied: $bt_err"
 		fi
 	fi
+
 	umount /mnt/persist 2>/dev/null || true
 
 	if [ -z "$mac" ]; then
@@ -423,7 +456,7 @@ finish_rootfs() {
 	}
 	cmsg "root init: $init"
 
-	wlan_apply_factory_mac
+	apply_factory_macs
 
 	cmsg "switching to the Linux rootfs"
 	mount -o move /proc /newroot/proc 2>/dev/null

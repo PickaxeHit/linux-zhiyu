@@ -35,6 +35,7 @@ if [ ! -x "$BB" ] || [ "${REBUILD_BB:-0}" = 1 ]; then
 fi
 file -b "$BB" | grep -q "statically linked" || die "$BB is not statically linked"
 
+
 # ---- 2. staging tree ------------------------------------------------------
 stage=$(mktemp -d "$here/.stage.XXXXXX")
 trap 'rm -rf "$stage"' EXIT
@@ -53,6 +54,22 @@ while read -r a; do
 	ln -sf busybox "$stage/bin/$a"
 	applets=$((applets + 1))
 done < "$here/busybox-applets.txt"
+
+# ---- 2b. small static helpers --------------------------------------------
+# busybox has no bluetooth code at all, but the board's factory BD address
+# lives in the persist partition exactly like the WLAN address does.  btaddr
+# sends the single management command that hands the address to the kernel, so
+# the value never has to be written into the device tree.
+CC_AARCH64=${CC_AARCH64:-aarch64-linux-gnu-gcc}
+for src in "$here"/src/*.c; do
+	[ -f "$src" ] || continue
+	tool=$stage/bin/$(basename "$src" .c)
+	"$CC_AARCH64" -static -Os -Wall -Wextra -o "$tool" "$src" \
+		|| die "cannot build $src (need ${CC_AARCH64})"
+	file -b "$tool" | grep -q "statically linked" \
+		|| die "$tool is not statically linked"
+	echo "helper : $(basename "$tool") ($(stat -c %s "$tool") bytes)"
+done
 
 # ---- 3. firmware blobs ----------------------------------------------------
 cp -a "$here"/blobs/firmware/. "$stage/lib/firmware/"
