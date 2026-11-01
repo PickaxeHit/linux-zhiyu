@@ -21,7 +21,7 @@ OS_PATCH=2026-09
 # Boot command line.  Keep in sync with the flashed image: console stays alive
 # across suspend so a failed resume is captured in pstore, and genpd/clk are
 # not allowed to shut down unused blocks (io mappings we poke by hand).
-CMDLINE=${CMDLINE:-"rdinit=/init console=tty0 loglevel=7 ignore_loglevel log_buf_len=4M keep_bootcon fbcon=nodefer panic=15 clk_ignore_unused pd_ignore_unused androidboot.slot_suffix=_b androidboot.bootdevice=1d84000.ufshc msm_drm.dsi_display0=qcom,mdss_dsi_zhiyu_nt36526_csot_dsc_vid: hqsysfs.pcba_stage=PVT ufsffu.boot_mode=normal rootwait ro init=/sbin/init silent_boot.mode=nonsilent no_console_suspend pm_debug_messages"}
+CMDLINE=${CMDLINE:-"rdinit=/init console=tty0 loglevel=7 ignore_loglevel log_buf_len=4M keep_bootcon fbcon=nodefer panic=15 clk_ignore_unused pd_ignore_unused androidboot.slot_suffix=_b androidboot.bootdevice=1d84000.ufshc msm_drm.dsi_display0=qcom,mdss_dsi_zhiyu_nt36526_csot_dsc_vid: hqsysfs.pcba_stage=PVT ufsffu.boot_mode=normal rootwait ro init=/sbin/init silent_boot.mode=nonsilent no_console_suspend pm_debug_messages mem_sleep_default=s2idle"}
 
 MKBOOTIMG=${MKBOOTIMG:-/usr/bin/mkbootimg}
 AVBTOOL=${AVBTOOL:-/usr/bin/avbtool}
