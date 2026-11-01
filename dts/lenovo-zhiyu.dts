@@ -3269,7 +3269,16 @@
 
 				bluetooth {
 					compatible = "qcom,wcn7860-bt";
-					local-bd-address = [78 55 00 01 5a ad];
+					/*
+					 * No local-bd-address: this board's factory
+					 * address lives in the persist partition
+					 * (bd_addr.bin) like the WLAN address does, and
+					 * the initramfs hands it to the kernel through
+					 * the management interface before bluetoothd
+					 * starts.  A placeholder here would only make
+					 * the controller "configured" with the wrong
+					 * identity.
+					 */
 					vddio-supply = <0x42>;
 					vddaon-supply = <0x43>;
 					vdddig-supply = <0x44>;
