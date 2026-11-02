@@ -39,6 +39,9 @@ install -d "$work/root/DEBIAN"
 	if [ -n "${PKG_DEB_PROVIDES:-}" ]; then
 		printf 'Provides: %s\n' "$PKG_DEB_PROVIDES"
 	fi
+	if [ -n "${PKG_DEB_CONFLICTS:-}" ]; then
+		printf 'Conflicts: %s\n' "$PKG_DEB_CONFLICTS"
+	fi
 	printf 'Description: %s\n' "$desc"
 } > "$work/root/DEBIAN/control"
 dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${ver}_arm64.deb" >/dev/null
@@ -69,6 +72,9 @@ size=$(du -sb "$stage" | cut -f1)
 	done
 	for p in ${PKG_ARCH_PROVIDES:-}; do
 		printf 'provides = %s\n' "$p"
+	done
+	for p in ${PKG_ARCH_CONFLICTS:-}; do
+		printf 'conflicts = %s\n' "$p"
 	done
 } > "$work/arch/.PKGINFO"
 # .PKGINFO must be the first entry and must not be prefixed with "./":
