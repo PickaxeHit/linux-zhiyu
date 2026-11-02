@@ -28,6 +28,30 @@ mkdir -p "$FW/novatek"
 cp -f "$WS/stock-fw/novatek_ts_fw.bin"            "$FW/novatek/nt36526e-zhiyu.bin"
 cp -f "$WS/stock-dump/vendor/firmware/aw882xx_acf.bin" "$FW/aw882xx_acf.bin"
 
+echo "== sensor registry/config from the stock vendor image =="
+# hexagonrpcd serves these to the ADSP (file access over fastrpc).  They live
+# on the Android vendor partition, which is a logical partition inside super,
+# so they are read straight out of the dumped vendor image with debugfs.
+VIMG=$WS/stock-dump/vendor.img
+if [ -f "$VIMG" ]; then
+	tmp=$(mktemp -d)
+	debugfs -R "rdump /etc/sensors $tmp" "$VIMG" >/dev/null 2>&1 || true
+	if [ -d "$tmp/sensors" ]; then
+		rm -rf "$here/sensors"
+		mkdir -p "$here/sensors"
+		cp -a "$tmp/sensors/config" "$here/sensors/config"
+		# hexagonrpcd expects /sensors/sns_reg.conf (not sns_reg_config)
+		cp -f "$tmp/sensors/sns_reg_config" "$here/sensors/sns_reg.conf"
+		chmod 644 "$here/sensors/sns_reg.conf"
+		echo "   $(find "$here/sensors" -type f | wc -l) files from vendor.img:/etc/sensors"
+	else
+		echo "   WARNING: could not extract /etc/sensors from $VIMG"
+	fi
+	rm -rf "$tmp"
+else
+	echo "   WARNING: $VIMG missing, sensors/ blobs not refreshed"
+fi
+
 echo "== audio topology: kept as blob, sources in ../tplg =="
 [ -f "$FW/qcom/sm8750/sm8750-tplg.bin" ] || \
 	echo "   WARNING: qcom/sm8750/sm8750-tplg.bin missing (rebuild from ../tplg/*.m4)"
