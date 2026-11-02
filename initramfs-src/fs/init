@@ -310,16 +310,20 @@ apply_factory_macs() {
 	cur=$(cat "/sys/class/net/$iface/address")
 	if [ "$cur" = "$mac" ]; then
 		log "WLAN: $iface MAC already $mac"
-		return 0
-	fi
-	ip link set dev "$iface" down
-	if ip link set dev "$iface" address "$mac"; then
-		ip link set dev "$iface" up
-		log "WLAN: $iface MAC $cur -> $mac"
 	else
-		ip link set dev "$iface" up
-		log "WLAN: failed to set $iface MAC to $mac"
+		ip link set dev "$iface" down
+		if ip link set dev "$iface" address "$mac"; then
+			log "WLAN: $iface MAC $cur -> $mac"
+		else
+			log "WLAN: failed to set $iface MAC to $mac (staying on $cur)"
+		fi
 	fi
+	# Leave the interface up either way.  NetworkManager brings it up by
+	# itself when it activates a connection, but a radio that is down makes
+	# "nmcli device status" report the device as unavailable, which is a
+	# confusing place to debug from.
+	ip link set dev "$iface" up 2>/dev/null ||
+		log "WLAN: cannot bring $iface up"
 }
 
 # ---------------------------------------------------------------------------
