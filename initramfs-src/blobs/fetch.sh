@@ -1,60 +1,124 @@
 #!/bin/bash
-# fetch.sh — (re)populate blobs/ from their documented origins.
+# fetch.sh — (re)populate blobs/ from MANIFEST.tsv.
 #
-#   blobs/firmware/{ath12k,qca,qcom}   Arch linux-firmware package on the device
-#   blobs/firmware/novatek/*.bin       stock firmware dump (stock-fw/)
-#   blobs/firmware/aw882xx_acf.bin     stock vendor partition (stock-dump/)
-#   blobs/firmware/qcom/sm8750/sm8750-tplg.bin{,.v2}
-#                                      built from tplg/*.m4 (kept as blob, see MANIFEST)
+# Every file under blobs/ comes from exactly one of two places, named in
+# column 3 of MANIFEST.tsv:
 #
-# Running this is only needed when blobs/ is missing or the device firmware
-# package was updated; the normal build (../build.sh) uses blobs/ as-is.
+#   zuxos:<image>:<path>   a file inside a ZUXOS factory image
+#                          (FAT images: BTFM.bin, NON-HLOS.bin are unpacked
+#                           with 7z; ext4 images: super_*.img are read with
+#                           debugfs, so nothing has to be mounted)
+#   online:<url>           a download; if the URL is a package the row's
+#                          target path is read from usr/lib/firmware/ inside
+#                          it (that is how the ath12k firmware comes in)
+#
+# The audio topology is deliberately not in the manifest: initramfs-src/tplg
+# builds it from the .m4 sources there, and the result is only committed as a
+# blob so that normal builds do not need the AudioReach tooling.
+#
+# Running this is only needed when blobs/ is missing or the stock images were
+# updated; build.sh uses blobs/ as it is.
 set -euo pipefail
+
 here=$(cd "$(dirname "$0")" && pwd)
-DEV=${DEV:-root@192.168.31.156}       # device with Arch linux-firmware installed
 WS=${WS:-/nosnap/gt13-port}
-FW=$here/firmware
+IMAGES=${ZUXOS_IMAGES:-$WS/TB378_ZUXOS_2.0.10.252_Tool/image}
+CACHE=${CACHE:-${TMPDIR:-/tmp}/zhiyu-blobs-cache}
+MANIFEST=$here/MANIFEST.tsv
 
-mkdir -p "$FW"
+die() { echo "fetch: $*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || die "$1 not found"; }
+need debugfs
+need 7z
+need curl
 
-echo "== firmware subtrees from $DEV:/usr/lib/firmware =="
-for d in ath12k qca qcom; do
-	echo "   $d"
-	ssh -o BatchMode=yes "$DEV" "cd /usr/lib/firmware && tar -cf - $d" | tar -xf - -C "$FW"
-done
+[ -f "$MANIFEST" ] || die "no $MANIFEST"
+mkdir -p "$CACHE"
 
-echo "== vendor blobs from the stock dumps =="
-mkdir -p "$FW/novatek"
-cp -f "$WS/stock-fw/novatek_ts_fw.bin"            "$FW/novatek/nt36526e-zhiyu.bin"
-cp -f "$WS/stock-dump/vendor/firmware/aw882xx_acf.bin" "$FW/aw882xx_acf.bin"
+is_fat() {
+	case $(file -b "$IMAGES/$1" 2>/dev/null) in
+	*FAT*|*MSDOS*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
 
-echo "== sensor registry/config from the stock vendor image =="
-# hexagonrpcd serves these to the ADSP (file access over fastrpc).  They live
-# on the Android vendor partition, which is a logical partition inside super,
-# so they are read straight out of the dumped vendor image with debugfs.
-VIMG=$WS/stock-dump/vendor.img
-if [ -f "$VIMG" ]; then
-	tmp=$(mktemp -d)
-	debugfs -R "rdump /etc/sensors $tmp" "$VIMG" >/dev/null 2>&1 || true
-	if [ -d "$tmp/sensors" ]; then
-		rm -rf "$here/sensors"
-		mkdir -p "$here/sensors"
-		cp -a "$tmp/sensors/config" "$here/sensors/config"
-		# hexagonrpcd expects /sensors/sns_reg.conf (not sns_reg_config)
-		cp -f "$tmp/sensors/sns_reg_config" "$here/sensors/sns_reg.conf"
-		chmod 644 "$here/sensors/sns_reg.conf"
-		echo "   $(find "$here/sensors" -type f | wc -l) files from vendor.img:/etc/sensors"
+# fat_dir <image> — one-time extraction of a FAT image, cached.  7z exits 2
+# on these images because the file is shorter than the FAT geometry; the
+# files still come out fine.
+fat_dir() {
+	local img=$1 dir
+	dir=$CACHE/fat-$img
+	[ -d "$dir" ] && { echo "$dir"; return; }
+	mkdir -p "$dir"
+	7z x -y -o"$dir" "$IMAGES/$img" >/dev/null 2>&1 || [ $? -eq 2 ] || \
+		die "cannot unpack $IMAGES/$img"
+	[ -n "$(ls -A "$dir")" ] || die "$IMAGES/$img extracted to nothing"
+	echo "$dir"
+}
+
+fetch_zuxos() {
+	local img=$1 inner=$2 dst=$3 dir
+	if is_fat "$img"; then
+		dir=$(fat_dir "$img")
+		[ -f "$dir$inner" ] || die "$img:$inner not found"
+		cp -f "$dir$inner" "$dst"
 	else
-		echo "   WARNING: could not extract /etc/sensors from $VIMG"
+		rm -f "$dst"
+		debugfs -R "dump $inner $dst" "$IMAGES/$img" >/dev/null 2>&1 || true
+		[ -s "$dst" ] || die "cannot read $inner from $img"
 	fi
-	rm -rf "$tmp"
-else
-	echo "   WARNING: $VIMG missing, sensors/ blobs not refreshed"
-fi
+}
 
-echo "== audio topology: kept as blob, sources in ../tplg =="
-[ -f "$FW/qcom/sm8750/sm8750-tplg.bin" ] || \
-	echo "   WARNING: qcom/sm8750/sm8750-tplg.bin missing (rebuild from ../tplg/*.m4)"
+fetch_online() {
+	local url=$1 dst=$2 target=$3 pkg
+	pkg=$CACHE/$(basename "$url")
+	if [ ! -f "$pkg" ]; then
+		echo "   downloading $(basename "$url")"
+		curl -fsSL "$url" -o "$pkg.part" || die "download failed: $url"
+		mv -f "$pkg.part" "$pkg"
+	fi
+	case $pkg in
+	*.pkg.tar.zst)
+		tar --zstd -xO -f "$pkg" "usr/lib/firmware/$target" > "$dst" || \
+			die "$target not in $(basename "$pkg")"
+		;;
+	*)
+		cp -f "$pkg" "$dst"
+		;;
+	esac
+}
 
-echo "== summary =="
-echo "   $(find "$FW" -type f | wc -l) firmware files, $(du -sh "$FW" | cut -f1)"
+total=0
+while IFS=$'\t' read -r target bytes source note; do
+	case ${target:-} in
+	''|'#'*) continue ;;
+	esac
+	[ -n "${source:-}" ] || die "no source for $target"
+	dst=$here/$target
+	mkdir -p "$(dirname "$dst")"
+	case $source in
+	zuxos:*)
+		rest=${source#zuxos:}
+		img=${rest%%:*}
+		inner=${rest#*:}
+		case $inner in
+		/*) ;;
+		*) inner=/$inner ;;
+		esac
+		fetch_zuxos "$img" "$inner" "$dst"
+		;;
+	online:*)
+		fetch_online "${source#online:}" "$dst" "$target"
+		;;
+	*)
+		die "unknown source kind: $source (row: $target)"
+		;;
+	esac
+	size=$(stat -c %s "$dst")
+	if [ -n "${bytes:-}" ] && [ "$bytes" != "$size" ]; then
+		echo "   WARNING: $target is $size bytes, manifest says $bytes"
+	fi
+	total=$((total + 1))
+done < "$MANIFEST"
+
+echo "== $total files, $(du -sh "$here/firmware" 2>/dev/null | cut -f1) firmware, $(du -sh "$here/sensors" 2>/dev/null | cut -f1) sensors =="
