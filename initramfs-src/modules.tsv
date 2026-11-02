@@ -128,6 +128,9 @@ aux-hpd-bridge.ko	drivers/gpu/drm/bridge/aux-hpd-bridge.ko
 qcom-spmi-temp-alarm.ko	drivers/thermal/qcom/qcom-spmi-temp-alarm.ko
 led-class-flash.ko	drivers/leds/led-class-flash.ko
 leds-qcom-flash.ko	drivers/leds/flash/leds-qcom-flash.ko
+# fastrpc: hexagonrpcd needs /dev/fastrpc-adsp, and the sensor stack
+# (hexagonrpcd + sensh + zhiyu-sensord) has to work right after boot
+fastrpc.ko	drivers/misc/fastrpc.ko
 rpmsg-ctrl.ko	drivers/rpmsg/rpmsg_ctrl.ko
 rpmsg-char.ko	drivers/rpmsg/rpmsg_char.ko
 dm-mod.ko	drivers/md/dm-mod.ko
