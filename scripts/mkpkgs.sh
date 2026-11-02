@@ -61,5 +61,10 @@ size=$(du -sb "$stage" | cut -f1)
 		printf 'depend = %s\n' "$d"
 	done
 } > "$work/arch/.PKGINFO"
-( cd "$work/arch" && tar --zstd --numeric-owner -cf "$out/${archpkg}.pkg.tar.zst" . )
+# .PKGINFO must be the first entry and must not be prefixed with "./":
+# libalpm looks for that exact name and otherwise reports "missing package
+# metadata" and refuses to install the package.
+( cd "$work/arch" &&
+  tar --zstd --numeric-owner -cf "$out/${archpkg}.pkg.tar.zst" .PKGINFO \
+      $(find . -mindepth 1 -maxdepth 1 ! -name .PKGINFO -printf '%f\n') )
 echo "wrote $out/${archpkg}.pkg.tar.zst"
