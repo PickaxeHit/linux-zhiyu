@@ -29,6 +29,7 @@ grep -q '^CONFIG_STATIC=y' .config || die "CONFIG_STATIC is not set in .config"
 echo "== building busybox (static, aarch64) =="
 make -j"$jobs" ARCH=arm64 CROSS_COMPILE="$CROSS" busybox >/dev/null
 file busybox | sed 's/^/   /'
-cp -f busybox "$out"
+# out defaults to the build output itself, so only copy when they differ.
+[ "$out" -ef busybox ] || cp -f busybox "$out"
 aarch64-linux-gnu-strip "$out" 2>/dev/null || true
 echo "== $out: $(stat -c %s "$out") bytes, md5 $(md5sum "$out" | cut -d' ' -f1) =="
