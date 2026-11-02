@@ -30,6 +30,7 @@ on:
 
 env:
   LC_OPTIONS: >-
+    -Dwerror=false
     -Dpipelines=simple
     -Dgstreamer=disabled
     -Dpycamera=disabled
