@@ -74,7 +74,7 @@ size=$(du -sb "$stage" | cut -f1)
 		printf 'provides = %s\n' "$p"
 	done
 	for p in ${PKG_ARCH_CONFLICTS:-}; do
-		printf 'conflicts = %s\n' "$p"
+		printf 'conflict = %s\n' "$p"
 	done
 } > "$work/arch/.PKGINFO"
 # .PKGINFO must be the first entry and must not be prefixed with "./":
