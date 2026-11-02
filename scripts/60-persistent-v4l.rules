@@ -1,0 +1,31 @@
+# Copy of the distribution rule with one addition: v4l_id is not run on
+# v4l-subdev* nodes (see the guard below).  It shadows
+# /usr/lib/udev/rules.d/60-persistent-v4l.rules by name.
+
+ACTION=="remove", GOTO="persistent_v4l_end"
+SUBSYSTEM!="video4linux", GOTO="persistent_v4l_end"
+ENV{MAJOR}=="", GOTO="persistent_v4l_end"
+
+# libcamera's focus lens is a v4l-subdev, and opening a sub-device powers the
+# actuator up and runs its power-on ramp.  udev's v4l_id opens every
+# video4linux node on boot and on resume, which made the lens move every time
+# the device woke up; v4l_id has nothing to report for a sub-device, so skip
+# them.
+KERNEL=="v4l-subdev*", GOTO="persistent_v4l_end"
+
+IMPORT{program}="v4l_id $devnode"
+
+SUBSYSTEMS=="usb", IMPORT{builtin}="usb_id"
+KERNEL=="video*", ENV{ID_SERIAL}=="?*", SYMLINK+="v4l/by-id/$env{ID_BUS}-$env{ID_SERIAL}-video-index$attr{index}"
+
+# check for valid "index" number
+TEST!="index", GOTO="persistent_v4l_end"
+ATTR{index}!="?*", GOTO="persistent_v4l_end"
+
+IMPORT{builtin}="path_id"
+KERNEL=="video*|vbi*", ENV{ID_PATH}=="?*",                   SYMLINK+="v4l/by-path/$env{ID_PATH}-video-index$attr{index}"
+KERNEL=="video*|vbi*", ENV{ID_PATH_WITH_USB_REVISION}=="?*", SYMLINK+="v4l/by-path/$env{ID_PATH_WITH_USB_REVISION}-video-index$attr{index}"
+KERNEL=="audio*",      ENV{ID_PATH}=="?*",                   SYMLINK+="v4l/by-path/$env{ID_PATH}-audio-index$attr{index}"
+KERNEL=="audio*",      ENV{ID_PATH_WITH_USB_REVISION}=="?*", SYMLINK+="v4l/by-path/$env{ID_PATH_WITH_USB_REVISION}-audio-index$attr{index}"
+
+LABEL="persistent_v4l_end"
