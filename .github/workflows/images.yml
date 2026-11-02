@@ -159,7 +159,8 @@ jobs:
           # A prepared build tree, which is what out-of-tree module builds
           # need (UAPI only would be useless for that).
           make -C "$KS" ARCH=arm64 LLVM=1 prepare modules_prepare
-          H="stage/linux-zhiyu-headers/usr/src/linux-headers-$VER"
+          # absolute: the copies below run from inside the kernel tree
+          H="$PWD/stage/linux-zhiyu-headers/usr/src/linux-headers-$VER"
           install -d "$H/arch/arm64"
           ( cd "$KS" && cp -a include "$H"/include &&
               cp -a arch/arm64/include "$H"/arch/arm64/include &&
