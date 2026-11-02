@@ -36,6 +36,9 @@ install -d "$work/root/DEBIAN"
 	if [ -n "${PKG_DEB_DEPENDS:-}" ]; then
 		printf 'Depends: %s\n' "$PKG_DEB_DEPENDS"
 	fi
+	if [ -n "${PKG_DEB_PROVIDES:-}" ]; then
+		printf 'Provides: %s\n' "$PKG_DEB_PROVIDES"
+	fi
 	printf 'Description: %s\n' "$desc"
 } > "$work/root/DEBIAN/control"
 dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${ver}_arm64.deb" >/dev/null
@@ -63,6 +66,9 @@ size=$(du -sb "$stage" | cut -f1)
 	printf 'license = GPL-2.0-only\n'
 	for d in ${PKG_ARCH_DEPENDS:-}; do
 		printf 'depend = %s\n' "$d"
+	done
+	for p in ${PKG_ARCH_PROVIDES:-}; do
+		printf 'provides = %s\n' "$p"
 	done
 } > "$work/arch/.PKGINFO"
 # .PKGINFO must be the first entry and must not be prefixed with "./":
