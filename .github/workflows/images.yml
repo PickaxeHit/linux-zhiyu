@@ -51,10 +51,21 @@ jobs:
             build-essential git pkg-config bc bison flex cpio \
             libssl-dev libelf-dev libncurses-dev lz4 zstd xz-utils \
             device-tree-compiler clang lld llvm pahole \
-            mkbootimg \
             meson ninja-build \
             libudev-dev libdrm-dev libevent-dev libyaml-dev libjpeg-dev \
             libglib2.0-dev python3-jinja2 python3-ply python3-yaml
+          # Ubuntu's mkbootimg package ships the script without the gki module
+          # it imports ("ModuleNotFoundError: No module named 'gki'"), so use
+          # the AOSP tree directly: its script finds gki/ next to itself.
+          sudo git clone --depth 1 \
+            https://android.googlesource.com/platform/system/tools/mkbootimg \
+            /usr/local/lib/mkbootimg
+          sudo tee /usr/bin/mkbootimg >/dev/null <<'EOF'
+          #!/bin/sh
+          exec python3 /usr/local/lib/mkbootimg/mkbootimg.py "$@"
+          EOF
+          sudo chmod 755 /usr/bin/mkbootimg
+
           # Ubuntu has no avbtool package (and android-tools-mkbootimg was
           # replaced by mkbootimg); the AOSP script is what the image scripts
           # expect at /usr/bin/avbtool.
