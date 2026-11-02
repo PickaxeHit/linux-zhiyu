@@ -10315,7 +10315,13 @@
 					dovdd-supply = <&cam_vio>;
 					avdd-supply = <&cam_vana>;
 					dvdd-supply = <&cam_vdig>;
-					rotation = <270>;
+					/* The sensor reads out landscape and the frame is
+					 * upright as it comes (qcam shows it straight), so
+					 * report no rotation; 270 made every app that honours
+					 * the Rotation property (plasma-camera) show it on its
+					 * side.
+					 */
+					rotation = <0>;
 					orientation = <0>;
 					status = "okay";
 					port {
