@@ -27,6 +27,14 @@ on:
         type: choice
         options: [zstd, xz]
         default: zstd
+      release:
+        description: Publish the rolling "packages" release
+        type: boolean
+        default: true
+
+# The release job uploads assets to the repository's releases.
+permissions:
+  contents: write
 
 env:
   LC_OPTIONS: >-
@@ -291,6 +299,53 @@ jobs:
           fi
           sha256sum images-and-packages.tar.* > images-and-packages.sha256
           ls -lh dist images-and-packages.*
+
+      # Rolling release with stable asset names, so the rootfs builders can
+      # install them straight from
+      #   https://github.com/PickaxeHit/linux-zhiyu/releases/latest/download/<name>
+      # instead of carrying their own copy of the firmware and rebuilding
+      # libcamera/sensord.  Assets are replaced on every build.
+      - name: Publish rolling release
+        if: ${{ inputs.release }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p rel
+          cp_pkg() {   # cp_pkg <glob> <stable name>; missing sources are fine
+            local src
+            src=$(ls $1 2>/dev/null | head -1) || true
+            if [ -n "${src:-}" ] && [ -f "$src" ]; then
+              cp -f "$src" "rel/$2"
+            fi
+            return 0
+          }
+          cp_pkg 'out/pkgs/linux-zhiyu-modules-*.pkg.tar.zst'  zhiyu-modules.pkg.tar.zst
+          cp_pkg 'out/pkgs/linux-zhiyu-headers-*.pkg.tar.zst'  zhiyu-headers.pkg.tar.zst
+          cp_pkg 'out/pkgs/linux-zhiyu-firmware-*.pkg.tar.zst' zhiyu-firmware.pkg.tar.zst
+          cp_pkg 'out/pkgs/libcamera-*.pkg.tar.zst'            zhiyu-libcamera.pkg.tar.zst
+          cp_pkg 'out/pkgs/zhiyu-sensord-*.pkg.tar.zst'        zhiyu-sensord.pkg.tar.zst
+          cp_pkg 'out/pkgs/linux-zhiyu-modules_*.deb'          zhiyu-modules.deb
+          cp_pkg 'out/pkgs/linux-zhiyu-headers_*.deb'          zhiyu-headers.deb
+          cp_pkg 'out/pkgs/linux-zhiyu-firmware_*.deb'         zhiyu-firmware.deb
+          cp_pkg 'out/pkgs/libcamera_*.deb'                    zhiyu-libcamera.deb
+          cp_pkg 'out/pkgs/zhiyu-sensord_*.deb'                zhiyu-sensord.deb
+          cp_pkg 'out/boot.img'                                zhiyu-boot.img
+          cp_pkg 'out/vendor_boot.img'                         zhiyu-vendor_boot.img
+          cp_pkg 'out/init_boot.img'                           zhiyu-init_boot.img
+          ls -l rel
+          tag=packages
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --title "CI packages (rolling)" \
+              --notes "Packages and images built by images.yml. Asset names are stable; each build replaces them."
+          fi
+          shopt -s nullglob
+          files=(rel/*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "nothing to publish"
+            exit 0
+          fi
+          gh release upload "$tag" "${files[@]}" --clobber
 
       - uses: actions/upload-artifact@v4
         with:
