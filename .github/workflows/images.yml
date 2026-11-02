@@ -120,7 +120,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: kernel-source
-          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config', '.gitmodules') }}
+          # Only the kernel commit and its config matter here: touching
+          # .gitmodules (adding an unrelated submodule) must not throw away
+          # 20 minutes of compilation.
+          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config') }}
 
       - name: Fix submodule URLs for CI
         run: |
@@ -148,7 +151,10 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: kernel-source
-          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config', '.gitmodules') }}
+          # Only the kernel commit and its config matter here: touching
+          # .gitmodules (adding an unrelated submodule) must not throw away
+          # 20 minutes of compilation.
+          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config') }}
 
       - name: Package kernel modules, headers and firmware
         if: ${{ inputs.kernel }}
