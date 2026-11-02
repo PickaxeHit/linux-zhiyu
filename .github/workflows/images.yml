@@ -149,7 +149,7 @@ jobs:
           echo "kernel release: $VER"
 
           # ---- modules ----
-          make -C "$KS" ARCH=arm64 LLVM=1 \
+          make -C "$KS" ARCH=arm64 \
             INSTALL_MOD_PATH="$PWD/stage/linux-zhiyu-modules" modules_install
           # modules_install writes lib/modules; on Arch /lib is a symlink to
           # usr/lib owned by the filesystem package, so packaging lib/... both
@@ -175,7 +175,7 @@ jobs:
           # ---- headers ----
           # A prepared build tree, which is what out-of-tree module builds
           # need (UAPI only would be useless for that).
-          make -C "$KS" ARCH=arm64 LLVM=1 prepare modules_prepare
+          make -C "$KS" ARCH=arm64 prepare modules_prepare
           # absolute: the copies below run from inside the kernel tree
           H="$PWD/stage/linux-zhiyu-headers/usr/src/linux-headers-$VER"
           install -d "$H/arch/arm64"
