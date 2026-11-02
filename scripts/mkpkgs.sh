@@ -42,6 +42,10 @@ install -d "$work/root/DEBIAN"
 	if [ -n "${PKG_DEB_CONFLICTS:-}" ]; then
 		printf 'Conflicts: %s\n' "$PKG_DEB_CONFLICTS"
 	fi
+	if [ -n "${PKG_DEB_REPLACES:-}" ]; then
+		printf 'Replaces: %s\n' "$PKG_DEB_REPLACES"
+		printf 'Breaks: %s\n' "$PKG_DEB_REPLACES"
+	fi
 	printf 'Description: %s\n' "$desc"
 } > "$work/root/DEBIAN/control"
 dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${ver}_arm64.deb" >/dev/null
@@ -75,6 +79,9 @@ size=$(du -sb "$stage" | cut -f1)
 	done
 	for p in ${PKG_ARCH_CONFLICTS:-}; do
 		printf 'conflict = %s\n' "$p"
+	done
+	for p in ${PKG_ARCH_REPLACES:-}; do
+		printf 'replaces = %s\n' "$p"
 	done
 } > "$work/arch/.PKGINFO"
 # .PKGINFO must be the first entry and must not be prefixed with "./":
