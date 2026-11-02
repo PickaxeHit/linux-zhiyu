@@ -188,11 +188,16 @@ jobs:
           ln -sfn "../../../src/linux-headers-$VER" \
             "stage/linux-zhiyu-headers/usr/lib/modules/$VER/build"
           du -sh "$H"
+          # provides linux-headers: AUR/out-of-tree module builds depend on
+          # that name, and without it pacman would pull Arch's official
+          # linux-headers (for the wrong kernel) instead of this tree.
           PKG_NAME=linux-zhiyu-headers \
           PKG_VERSION="$VER" \
           PKG_DESC="Linux $VER headers for the zhiyu port" \
           PKG_DEB_DEPENDS="gcc-14" \
+          PKG_DEB_PROVIDES="linux-headers" \
           PKG_ARCH_DEPENDS="gcc" \
+          PKG_ARCH_PROVIDES="linux-headers" \
           scripts/mkpkgs.sh stage/linux-zhiyu-headers out/pkgs
 
           # ---- firmware ----
