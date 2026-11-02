@@ -86,6 +86,22 @@ jobs:
           lfs: true
           fetch-depth: 1
 
+      - name: Resolve kernel revision
+        id: krev
+        run: |
+          echo "sha=$(git ls-remote https://github.com/PickaxeHit/linux-kernel-zhiyu.git \
+            refs/heads/zhiyu | cut -f1)" >> "$GITHUB_OUTPUT"
+
+      # The kernel is by far the slowest part (LTO on 4 vCPUs, ~40 min), and
+      # most iterations only touch scripts or packages.  Keep the built tree
+      # around so a run with the same kernel commit and config skips it.
+      - name: Restore kernel build tree
+        if: ${{ inputs.kernel }}
+        uses: actions/cache@v4
+        with:
+          path: kernel-source
+          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config', '.gitmodules') }}
+
       - name: Fix submodule URLs for CI
         run: |
           # .gitmodules uses git@github.com: for libcamera; CI has no SSH key.
