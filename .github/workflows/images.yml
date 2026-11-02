@@ -76,13 +76,15 @@ jobs:
             sudo git clone --depth 1 \
               https://android.googlesource.com/platform/external/avb \
               /usr/local/lib/avb
-            sudo tee /usr/bin/avbtool >/dev/null <<'EOF'
-          #!/bin/sh
-          exec python3 /usr/local/lib/avb/avbtool "$@"
-          EOF
+            # the script is not always called plain "avbtool" (and it may be a
+            # symlink), so locate whatever the tree actually ships
+            AVB=$(sudo find /usr/local/lib/avb -maxdepth 2 -name 'avbtool*' | head -1)
+            echo "avbtool script: $AVB"
+            printf '#!/bin/sh\nexec python3 %s "$@"\n' "$AVB" | sudo tee /usr/bin/avbtool >/dev/null
             sudo chmod 755 /usr/bin/avbtool
           fi
           command -v mkbootimg avbtool dtc clang ld.lld
+          avbtool version
           clang --version | head -1
           df -h /
 
