@@ -6,7 +6,7 @@ Before=iio-sensor-proxy.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/sensord
+ExecStart=/usr/local/bin/zhiyu-sensord
 Restart=always
 RestartSec=2
 
