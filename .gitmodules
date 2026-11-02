@@ -10,3 +10,6 @@
 	path = libcamera
 	url = git@github.com:PickaxeHit/libcamera-zhiyu.git
 	branch = tb378fc
+[submodule "initramfs-src/tplg/vendor-audioreach"]
+	path = initramfs-src/tplg/vendor-audioreach
+	url = https://github.com/linux-msm/audioreach-topology

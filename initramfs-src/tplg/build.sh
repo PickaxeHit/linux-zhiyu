@@ -4,8 +4,8 @@
 # Chain:  Zhiyu-vendorprops.m4  --m4-->  sm8750-tplg.conf  --alsatplg-->  sm8750-tplg.bin
 #
 # The top-level .m4 is ours; it includes the vendor base tree
-# (audioreach/*.m4, util/*.m4) which is vendored under vendor-audioreach/
-# (linux-msm/audioreach-topology, BSD-3-Clause, commit in VENDOR-COMMIT.txt).
+# (audioreach/*.m4, util/*.m4) which comes from the linux-msm/audioreach-topology
+# submodule at vendor-audioreach/ (the submodule records the pinned commit).
 #
 # output: ./sm8750-tplg.bin  (ALSA topology, magic "CoSA")
 set -euo pipefail
