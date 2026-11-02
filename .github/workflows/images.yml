@@ -222,10 +222,17 @@ jobs:
           cp -a initramfs-src/blobs/firmware/. "$F"/
           install -Dm644 initramfs-src/tplg/sm8750-tplg.bin \
             "$F/qcom/sm8750/sm8750-tplg.bin"
+          # The SNS config/registry hexagonrpcd serves to the ADSP belongs with
+          # the firmware: the rootfs then gets it from this package instead of
+          # copying initramfs-src/blobs/sensors itself.
+          Q=stage/linux-zhiyu-firmware/usr/share/qcom
+          install -d "$Q"
+          cp -a initramfs-src/blobs/sensors "$Q"/
           find "$F" -type f | wc -l
+          find "$Q" -type f | wc -l
           PKG_NAME=linux-zhiyu-firmware \
           PKG_VERSION="$VER" \
-          PKG_DESC="Firmware blobs and AudioReach topology for the zhiyu port" \
+          PKG_DESC="Firmware blobs, AudioReach topology and SNS registry for the zhiyu port" \
           PKG_DEB_DEPENDS="" \
           PKG_ARCH_DEPENDS="" \
           scripts/mkpkgs.sh stage/linux-zhiyu-firmware out/pkgs
