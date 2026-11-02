@@ -12,6 +12,9 @@ set -euo pipefail
 
 stage=${1:?usage: mkpkgs.sh <stagedir> <outdir>}
 out=${2:?usage: mkpkgs.sh <stagedir> <outdir>}
+# The Arch step cds into the package tree, so both paths have to be absolute.
+stage=$(realpath "$stage")
+out=$(realpath -m "$out")
 name=${PKG_NAME:?PKG_NAME}
 ver=${PKG_VERSION:?PKG_VERSION}
 desc=${PKG_DESC:-$name}
