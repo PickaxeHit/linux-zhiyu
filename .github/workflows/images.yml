@@ -51,12 +51,13 @@ jobs:
             build-essential git pkg-config bc bison flex cpio \
             libssl-dev libelf-dev libncurses-dev lz4 zstd xz-utils \
             device-tree-compiler clang lld llvm pahole \
-            android-tools-mkbootimg avbtool \
+            mkbootimg \
             meson ninja-build \
             libudev-dev libdrm-dev libevent-dev libyaml-dev libjpeg-dev \
             libglib2.0-dev python3-jinja2 python3-ply python3-yaml
-          # avbtool is not in every Ubuntu release; the AOSP copy is the same
-          # script the image scripts expect at /usr/bin/avbtool.
+          # Ubuntu has no avbtool package (and android-tools-mkbootimg was
+          # replaced by mkbootimg); the AOSP script is what the image scripts
+          # expect at /usr/bin/avbtool.
           if ! command -v avbtool >/dev/null; then
             sudo curl -fsSL \
               "https://android.googlesource.com/platform/external/avb/+/refs/heads/main/avbtool?format=TEXT" |
