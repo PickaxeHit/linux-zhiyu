@@ -42,14 +42,18 @@ dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${ver}_arm64.deb"
 echo "wrote $out/${name}_${ver}_arm64.deb"
 
 # ---- Arch ---------------------------------------------------------------
-archpkg="${name}-${ver}-1-${arch}"
+# pacman's pkgver may not contain "-" (it separates the pkgrel), and our
+# kernel version is 7.3.1-zhiyu+: Arch gets 7.3.1_zhiyu+ while the Debian
+# package keeps the original string.
+archver=$(printf '%s' "$ver" | tr '-' '_')
+archpkg="${name}-${archver}-1-${arch}"
 install -d "$work/arch"
 cp -a "$stage/." "$work/arch/"
 size=$(du -sb "$stage" | cut -f1)
 {
 	printf 'pkgname = %s\n' "$name"
 	printf 'pkgbase = %s\n' "$name"
-	printf 'pkgver = %s-1\n' "$ver"
+	printf 'pkgver = %s-1\n' "$archver"
 	printf 'pkgdesc = %s\n' "$desc"
 	printf 'url = %s\n' "$url"
 	printf 'builddate = %s\n' "$(date +%s)"
