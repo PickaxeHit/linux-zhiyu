@@ -165,7 +165,7 @@ jobs:
           rm -f "stage/linux-zhiyu-modules/usr/lib/modules/$VER/build" \
                 "stage/linux-zhiyu-modules/usr/lib/modules/$VER/source"
           if command -v depmod >/dev/null; then
-            depmod -b "stage/linux-zhiyu-modules" "$VER" || true
+            depmod -b "stage/linux-zhiyu-modules/usr" "$VER" || true
           fi
           PKG_NAME=linux-zhiyu-modules \
           PKG_VERSION="$VER" \
@@ -227,16 +227,17 @@ jobs:
           DESTDIR="$PWD/../stage/libcamera" meson install -C build --no-rebuild
           cd ..
           # libcamera ships udev rules and the IPA modules; keep them.
-          PKG_NAME=libcamera \
-          PKG_VERSION=$(meson introspect libcamera/build --projectinfo | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])') \
-          PKG_DESC="Camera stack for the zhiyu port (simple pipeline, EGL debayer, CDAF)" \
-          PKG_DEB_DEPENDS="libc6, libstdc++6, libudev1, libdrm2, libyaml-0-2, libevent-2.1-7, libjpeg62-turbo, libqt6widgets6" \
+          #
           # Our build already contains what the distributions split out into
           # libcamera-tools (cam, libcamerify, ...) and libcamera-ipa (the
           # hardware IPA modules, which this board does not use).  Claim both
           # names and conflict with them so that "pacman -U" / "dpkg -i"
           # replaces the distro packages instead of failing on file conflicts
           # or leaving two libcamera copies behind.
+          PKG_NAME=libcamera \
+          PKG_VERSION=$(meson introspect libcamera/build --projectinfo | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])') \
+          PKG_DESC="Camera stack for the zhiyu port (simple pipeline, EGL debayer, CDAF)" \
+          PKG_DEB_DEPENDS="libc6, libstdc++6, libudev1, libdrm2, libyaml-0-2, libevent-2.1-7, libjpeg62-turbo, libqt6widgets6" \
           PKG_DEB_PROVIDES="libcamera-tools, libcamera-ipa, libcamera0.7" \
           PKG_DEB_CONFLICTS="libcamera-tools, libcamera-ipa, libcamera0.7" \
           PKG_ARCH_DEPENDS="gcc-libs glibc systemd-libs libdrm libyaml libevent libjpeg-turbo qt6-base" \
