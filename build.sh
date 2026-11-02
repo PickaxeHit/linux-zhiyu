@@ -25,8 +25,15 @@ echo "config : $CFG"
 echo "release: $VER"
 
 cp "$CFG" "$KS/.config"
-make -C "$KS" ARCH=arm64 LLVM=1 olddefconfig
-make -C "$KS" -j"$JOBS" ARCH=arm64 LLVM=1 Image modules
+# gcc, not LLVM=1: LTO is disabled in the config, and a clang-built kernel
+# makes dkms append LLVM=1 to every out-of-tree module build (it reads
+# CONFIG_CC_IS_CLANG from the kernel config), which drags the whole LLVM
+# toolchain onto the device.  Set CROSS_COMPILE when building on a host of a
+# different architecture.
+MAKE_ARGS="ARCH=arm64"
+[ -n "${CROSS_COMPILE:-}" ] && MAKE_ARGS="$MAKE_ARGS CROSS_COMPILE=$CROSS_COMPILE"
+make -C "$KS" $MAKE_ARGS olddefconfig
+make -C "$KS" -j"$JOBS" $MAKE_ARGS Image modules
 ( cd "$root" && KS="$KS" VER="$VER" ./initramfs-src/build.sh )
 ( cd "$root" && KERNEL="$KS/arch/arm64/boot/Image" ./mkbootimg )
 ( cd "$root" && ./mkvendorbootimg )
