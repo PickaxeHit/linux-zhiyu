@@ -34,7 +34,6 @@ env:
     -Dgstreamer=disabled
     -Dpycamera=disabled
     -Ddocumentation=disabled
-    -Dtests=disabled
     -Dcam=enabled
     -Dv4l2=enabled
 
@@ -69,10 +68,18 @@ jobs:
           # Ubuntu has no avbtool package (and android-tools-mkbootimg was
           # replaced by mkbootimg); the AOSP script is what the image scripts
           # expect at /usr/bin/avbtool.
-          if ! command -v avbtool >/dev/null; then
-            sudo curl -fsSL \
-              "https://android.googlesource.com/platform/external/avb/+/refs/heads/main/avbtool?format=TEXT" |
-              base64 -d | sudo tee /usr/bin/avbtool >/dev/null
+          # The ?format=TEXT download of avbtool 404s; clone the tree the same
+          # way as mkbootimg.  Note that the old version of this step left an
+          # empty /usr/bin/avbtool behind, so check for a working one.
+          if ! avbtool version >/dev/null 2>&1; then
+            sudo rm -f /usr/bin/avbtool
+            sudo git clone --depth 1 \
+              https://android.googlesource.com/platform/external/avb \
+              /usr/local/lib/avb
+            sudo tee /usr/bin/avbtool >/dev/null <<'EOF'
+          #!/bin/sh
+          exec python3 /usr/local/lib/avb/avbtool "$@"
+          EOF
             sudo chmod 755 /usr/bin/avbtool
           fi
           command -v mkbootimg avbtool dtc clang ld.lld
