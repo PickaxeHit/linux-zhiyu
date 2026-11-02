@@ -1,579 +1,579 @@
 # target	bytes	source	note
-ath12k/WCN7860/hw2.0/amss.bin	6971456	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-ath12k/WCN7860/hw2.0/aux_ucode.bin	61440	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-ath12k/WCN7860/hw2.0/bdwlan.elf	125288	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-ath12k/WCN7860/hw2.0/board-2.bin	149948	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-ath12k/WCN7860/hw2.0/m3.bin	290816	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-ath12k/WCN7860/hw2.0/qdss.cfg	6245	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-ath12k/WCN7860/hw2.0/regdb.bin	24278	postmarketos:firmware-ayn-odin-3	WCN7860 WLAN
-aw882xx_acf.bin	5204	zuxos:super_7.img:/firmware/aw882xx_acf.bin	Awinic ACF
-novatek/nt36526e-zhiyu.bin	253952	zuxos:super_7.img:/firmware/novatek_ts_fw.bin	touch firmware
-qca/brhbtfw10.tlv	225100	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtfw10.ver	35	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtfw20.mbn	267024	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtfw20.tlv	253884	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtfw20.ver	45	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b02	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b03	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b04	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b05	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b06	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b07	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b08	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b09	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b0a	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b0b	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b0c	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b0d	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b0e	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b0f	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b10	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b11	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b12	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b13	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b14	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b15	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b16	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b17	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b18	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b19	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b1a	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b1b	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b1c	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b1d	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b1e	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b1f	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b20	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b21	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b22	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b23	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b24	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.b25	11673	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv10.bin	11569	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b2e	14031	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b34	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b35	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b36	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b37	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b38	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b39	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b3e	14031	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b41	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b44	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b46	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.b47	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhbtnv20.bin	14139	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperifw10.mbn	39142	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperifw10.tlv	31294	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperifw10.ver	35	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperifw20.mbn	26904	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperifw20.tlv	20724	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperifw20.ver	45	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperinv10.bin	508	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperinv20.b43	741	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperinv20.b45	741	zuxos:BTFM.bin	WCN7860 BT
-qca/brhperinv20.bin	741	zuxos:BTFM.bin	WCN7860 BT
-qcom/gen80000_aqe.fw	25340	zuxos:super_7.img:/firmware/gen80000_aqe.fw	GPU
-qcom/gen80000_gmu.bin	88896	zuxos:super_7.img:/firmware/gen80000_gmu.bin	GPU
-qcom/gen80000_sqe.fw	111892	zuxos:super_7.img:/firmware/gen80000_sqe.fw	GPU
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b01	54562	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b02	260	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b03	728	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b04	3792	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b06	10067	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b07	728	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b01	30705	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b02	266	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b03	520	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b04	912	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b06	5352	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b07	520	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b01	57831	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b02	263	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b03	720	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b04	2272	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b06	10078	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b07	720	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b00	1940	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b01	20896	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b02	38924	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b03	110723	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b04	32756	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b05	84180	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b06	196608	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b07	368	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b08	9236	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b09	3104884	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b10	264116	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b11	2584	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b12	64436	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b13	7112	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b14	251176	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b15	160896	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b16	475136	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b17	2717956	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b18	42576	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b19	272	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b20	383637	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b21	82	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b22	32768	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b23	1354268	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b24	30049	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b25	20	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b26	36133	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b27	135168	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b28	2584440	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b29	475140	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b31	592	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b32	13656	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b33	36312	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b34	379236	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b35	173661	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b36	154364	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b37	165992	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b38	16796	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b39	8992	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b40	15564	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b41	55544	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b42	297876	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b43	647168	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b44	6648384	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b45	262152	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b46	20	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b47	25904	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b48	26312	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b49	30328	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b50	469860	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b51	10052	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b52	73888	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b53	102400	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b54	84719	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b55	247032	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b56	53248	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.b58	6584	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp.mdt	8524	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp_dtb.b00	148	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp_dtb.b01	160524	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp_dtb.b02	3896	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsp_dtb.mdt	4044	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adspr.jsn	513	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adsps.jsn	515	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adspua.jsn	703	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/adspuo.jsn	512	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/asym1p.sig	41136	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/battmgr.jsn	516	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b00	564	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b01	27644	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b02	79076	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b03	140303	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b04	1376	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b05	2405476	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b06	114696	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b07	2840	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b08	126302	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b09	786428	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b10	14016	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b11	3184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b12	114096	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b13	5600	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.b15	4520	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp.mdt	5084	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp_dtb.b00	148	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp_dtb.b01	29916	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp_dtb.b02	3896	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdsp_dtb.mdt	4044	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/cdspr.jsn	513	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/crypt1p.sig	38300	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b01	9732	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b02	216	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b03	392	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b04	904	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b06	4203	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b07	392	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/evautil64.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b01	62219	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b02	226	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b03	536	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b04	921	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b06	10689	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b07	536	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.b08	11232	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/featenabler.mdt	11800	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b01	11462356	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b02	219	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b03	386424	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b04	2458992	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b06	624710	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b07	386424	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fingerpr.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/fw_ipa_gsi_5.5_p.elf	36760	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/gptauuid.xml	11169	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b01	34525	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b02	221	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b03	544	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b04	5216	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b06	7535	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b07	544	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp1.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b01	124163	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b02	258	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b03	1776	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b04	7696	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b06	19118	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b07	1776	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.b08	11232	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcp2p2.mdt	11800	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b01	22685	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b02	228	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b03	472	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b04	904	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b06	5164	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b07	472	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/hdcpsrm.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b01	103361	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b02	235	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b03	1200	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b04	7745	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b06	6687	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b07	1200	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ic5.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ipa_fws.b00	212	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ipa_fws.b01	18456	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ipa_fws.b02	128	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ipa_fws.b03	1000	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ipa_fws.b04	3992	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ipa_fws.mdt	4204	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/keym1p.sig	124192	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b01	40452	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b02	228	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b03	424	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b04	13392	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b06	4440	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b07	424	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/loadalgota64.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/macch1p.sig	27028	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/modem_pr/mcfg/configs/mcfg_sw/oem_sw.txt	7162	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b01	9260	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b02	205	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b03	344	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b04	912	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b06	3806	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b07	344	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/ops.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/Data.msc	1819621	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/Data20.msc	1816213	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/amss.bin	7049280	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/amss20.bin	6967360	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/aux_ucode.elf	61440	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/aux_ucode20.elf	61440	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e01	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e02	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e03	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e04	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e05	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e06	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e07	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e09	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e0a	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e0b	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e0c	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e0d	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e0e	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e0f	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e10	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e11	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e12	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e13	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e14	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e15	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e16	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e17	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e18	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e19	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e1a	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e1b	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e1c	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e1d	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e1e	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e1f	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e20	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e21	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e22	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e23	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e24	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e25	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e26	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e27	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e29	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e2a	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e2b	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e2c	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e2d	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e2e	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e2f	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e30	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e31	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e32	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e33	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e34	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e35	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e36	125352	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e37	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e38	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e39	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e3a	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e3b	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e3c	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e3d	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e3e	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e3f	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e40	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.e41	125288	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/bdwlan.elf	125420	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/phy_ucode.elf	290816	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/phy_ucode20.elf	290816	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/qdss_trace_config_v1.cfg	6115	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/qdss_trace_config_v2.cfg	6237	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/peach/regdb.bin	24278	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sm8750-tplg.bin	6040	generated:initramfs-src/tplg	SM8750 audio topology
-qcom/sm8750/smplap32.b00	340	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b01	309444	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b02	204	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b03	5796	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b04	1495084	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b05	152	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b06	53585	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b07	5796	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap32.mdt	4524	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b01	368924	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b02	255	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b03	10760	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b04	1504684	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b06	99121	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b07	10760	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/smplap64.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soccp.mbn	565192	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b01	59336	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b02	221	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b03	912	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b04	1736	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b06	6751	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b07	912	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/soter64.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b01	9456	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b02	220	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b03	408	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b04	896	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b06	4271	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b07	408	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/sp_license.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spss1p.b00	148	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spss1p.b01	1359872	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spss1p.b02	3896	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spss1p.mbn	1367864	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spss1p.mdt	4044	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spu_rpmb.mbn	48096	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/spu_service.mbn	90200	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b00	568	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b01	42828	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b02	219	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b03	512	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b04	913	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b05	304	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b06	11229	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b07	512	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.b08	4184	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tianxi64.mdt	4752	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tmel_peach_10.elf	63096	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/tmel_peach_20.elf	63780	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/widevine.mbn	273376	zuxos:NON-HLOS.bin	Qualcomm signed/board
-qcom/sm8750/zhiyu/gen80000_zap.mbn	12088	zuxos:super_7.img:/firmware/gen80000_zap.mbn	device GPU zap
-sensors/sns_reg.conf	271	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_bu52053nvx_0.json	1868	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_ccd_base.json	360	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_default_sensors.json	6205	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_dynamic_sensors.json	924	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_dynamic_sensors_template.json	556	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_fcal_mmc56x3x_0.json	2643	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_hdk_lsm6dso_0.json	393	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_hdk_lsm6dso_1.json	393	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_irq.json	158	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_lps22df_0.json	3346	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_lsm6dso_0.json	7807	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_lsm6dso_1.json	7809	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_mmc56x3x_0.json	1672	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_mtp_lsm6dso_0.json	393	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_mtp_lsm6dso_1.json	393	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_mtp_mmc56x3x_0.json	404	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_power_0.json	730	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_qrd_default_sensors.json	5892	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_qrd_icm4x6xx_0.json	7660	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_qrd_mmc56x3x_0.json	3010	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_qrd_tmd3765_0.json	6075	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_qsh_ble_0.json	232	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_sht4x_0.json	2874	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_sx932x_0.json	6998	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_tmd3765_0.json	6093	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_vertigo_lsm6dso_0.json	401	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_vertigo_lsm6dso_1.json	401	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/bonito_vertigo_mmc56x3x_0.json	412	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_bu52053nvx_0.json	1853	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_ccd_base.json	353	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_default_sensors.json	6198	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_dynamic_sensors.json	917	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_dynamic_sensors_template.json	556	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_fcal_mmc56x3x_0.json	2654	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_hdk_lsm6dso_0.json	386	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_hdk_lsm6dso_1.json	386	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_irq.json	151	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_lps22df_0.json	3338	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_lsm6dso_0.json	7801	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_lsm6dso_1.json	7802	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_mmc56x3x_0.json	1665	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_mtp_lsm6dso_0.json	386	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_mtp_lsm6dso_1.json	386	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_mtp_mmc56x3x_0.json	397	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_power_0.json	722	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_qrd_default_sensors.json	5885	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_qrd_icm4x6xx_0.json	7348	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_qrd_mmc56x3x_0.json	3003	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_qrd_tmd2755_0.json	7198	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_qsh_ble_0.json	232	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_sht4x_0.json	2867	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_sx932x_0.json	6990	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_tmd2755_0.json	7219	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_vertigo_lsm6dso_0.json	394	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_vertigo_lsm6dso_1.json	394	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/eliza_vertigo_mmc56x3x_0.json	405	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/json.lst	3381	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_bu52053nvx_0.json	1860	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_ccd_base.json	353	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_default_sensors.json	6198	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_dynamic_sensors.json	521	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_dynamic_sensors_template.json	556	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_fcal_mmc56x3x_0.json	2644	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_hdk_lsm6dso_0.json	379	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_hdk_lsm6dso_1.json	379	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_icm4x6xa_0.json	7107	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_irq.json	151	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_lps22df_0.json	3338	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_lsm6dso_0.json	7800	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_lsm6dso_1.json	7801	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_lsm6dsv_0.json	10181	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_mmc56x3x_0.json	1668	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_mtp_lsm6dso_0.json	385	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_mtp_lsm6dso_1.json	385	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_mtp_mmc56x3x_0.json	396	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_power_0.json	287	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_qrd_default_sensors.json	5885	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_qrd_icm4x6xx_0.json	7645	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_qrd_mmc56x3x_0.json	3003	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_qrd_tmd3765_0.json	6060	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_qsh_ble_0.json	232	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_sht4x_0.json	2867	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_stk6b9x_0.json	5803	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_sx932x_0.json	6990	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_tmd3765_0.json	6091	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_vertigo_lsm6dso_0.json	387	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_vertigo_lsm6dso_1.json	387	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/pakala_vertigo_mmc56x3x_0.json	398	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_ble.json	1097	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_camera_common.json	11059	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_camera_common_sm8735.json	11476	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_camera_imx688_6.json	20147	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_camera_imx688_6_actuator.json	1876	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_camera_ov32c4c_4.json	22774	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/qsh_camera_ov32c4c_4_sm8735.json	23898	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_amd.json	484	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_amd_sw_enabled.json	485	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_aont.json	141	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_basic_gestures.json	1157	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_bring_to_ear.json	1163	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v1_0_amd.json	356	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v1_0_ttw.json	6124	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v2_0_walk.json	449	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v3_0_walk.json	1229	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v3_1_walk.json	1295	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v4_0_sensors.json	1134	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v4_0_te_cd_regs.json	1617	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v5_0.json	1656	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v5_0_te_cd_regs.json	1985	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v5_1_te_cd_regs.json	3114	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v6_0.json	3228	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v6_0_sensors.json	5941	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_ccd_v6_0_te_cd_regs.json	18523	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_cm.json	474	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_dae.json	893	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_device_orient.json	930	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_diag_filter.json	6816	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_direct_channel.json	164	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_distance_bound.json	861	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_dpc.json	649	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_facing.json	856	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_flight_md.json	566	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_fmv.json	1419	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_fmv_legacy.json	1583	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_gyro_cal.json	628	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_heart_rate.json	3593	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_mag_cal.json	398	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_mag_cal_legacy.json	313	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_multishake.json	862	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_offbody_detect_phone.json	173	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_pedometer.json	797	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_psd_disable.json	267	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_psd_enable.json	270	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_rmd.json	575	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_rotv.json	531	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_smd.json	1033	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_tilt.json	522	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_tilt_sw_enabled.json	452	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_tilt_to_wake.json	1265	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_transport_ppe.json	432	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
-sensors/config/sns_wrist_pedo.json	653	stock-dump/vendor.img:/etc/sensors	SNS registry + config served by hexagonrpcd
+firmware/ath12k/WCN7860/hw2.0/amss.bin	6971456	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/amss.bin	WCN7860 WLAN
+firmware/ath12k/WCN7860/hw2.0/aux_ucode.bin	61440	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/aux_ucode.bin	WCN7860 WLAN
+firmware/ath12k/WCN7860/hw2.0/bdwlan.elf	125288	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/bdwlan.elf	WCN7860 WLAN
+firmware/ath12k/WCN7860/hw2.0/board-2.bin	149948	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/board-2.bin	WCN7860 WLAN
+firmware/ath12k/WCN7860/hw2.0/m3.bin	290816	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/m3.bin	WCN7860 WLAN
+firmware/ath12k/WCN7860/hw2.0/qdss.cfg	6245	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/qdss.cfg	WCN7860 WLAN
+firmware/ath12k/WCN7860/hw2.0/regdb.bin	24278	online:https://raw.githubusercontent.com/ROCKNIX/extra-firmware/master/SM8750/ath12k/WCN7860/hw2.0/regdb.bin	WCN7860 WLAN
+firmware/aw882xx_acf.bin	5204	zuxos:super_7.img:/firmware/aw882xx_acf.bin	Awinic ACF
+firmware/novatek/nt36526e-zhiyu.bin	253952	zuxos:super_7.img:/firmware/novatek_ts_fw.bin	touch firmware
+firmware/qca/brhbtfw10.tlv	225100	zuxos:BTFM.bin:/image/brhbtfw10.tlv	WCN7860 BT
+firmware/qca/brhbtfw10.ver	35	zuxos:BTFM.bin:/image/brhbtfw10.ver	WCN7860 BT
+firmware/qca/brhbtfw20.mbn	267024	zuxos:BTFM.bin:/image/brhbtfw20.mbn	WCN7860 BT
+firmware/qca/brhbtfw20.tlv	253884	zuxos:BTFM.bin:/image/brhbtfw20.tlv	WCN7860 BT
+firmware/qca/brhbtfw20.ver	45	zuxos:BTFM.bin:/image/brhbtfw20.ver	WCN7860 BT
+firmware/qca/brhbtnv10.b02	11569	zuxos:BTFM.bin:/image/brhbtnv10.b02	WCN7860 BT
+firmware/qca/brhbtnv10.b03	11569	zuxos:BTFM.bin:/image/brhbtnv10.b03	WCN7860 BT
+firmware/qca/brhbtnv10.b04	11673	zuxos:BTFM.bin:/image/brhbtnv10.b04	WCN7860 BT
+firmware/qca/brhbtnv10.b05	11569	zuxos:BTFM.bin:/image/brhbtnv10.b05	WCN7860 BT
+firmware/qca/brhbtnv10.b06	11673	zuxos:BTFM.bin:/image/brhbtnv10.b06	WCN7860 BT
+firmware/qca/brhbtnv10.b07	11673	zuxos:BTFM.bin:/image/brhbtnv10.b07	WCN7860 BT
+firmware/qca/brhbtnv10.b08	11673	zuxos:BTFM.bin:/image/brhbtnv10.b08	WCN7860 BT
+firmware/qca/brhbtnv10.b09	11673	zuxos:BTFM.bin:/image/brhbtnv10.b09	WCN7860 BT
+firmware/qca/brhbtnv10.b0a	11673	zuxos:BTFM.bin:/image/brhbtnv10.b0a	WCN7860 BT
+firmware/qca/brhbtnv10.b0b	11673	zuxos:BTFM.bin:/image/brhbtnv10.b0b	WCN7860 BT
+firmware/qca/brhbtnv10.b0c	11569	zuxos:BTFM.bin:/image/brhbtnv10.b0c	WCN7860 BT
+firmware/qca/brhbtnv10.b0d	11673	zuxos:BTFM.bin:/image/brhbtnv10.b0d	WCN7860 BT
+firmware/qca/brhbtnv10.b0e	11673	zuxos:BTFM.bin:/image/brhbtnv10.b0e	WCN7860 BT
+firmware/qca/brhbtnv10.b0f	11673	zuxos:BTFM.bin:/image/brhbtnv10.b0f	WCN7860 BT
+firmware/qca/brhbtnv10.b10	11673	zuxos:BTFM.bin:/image/brhbtnv10.b10	WCN7860 BT
+firmware/qca/brhbtnv10.b11	11673	zuxos:BTFM.bin:/image/brhbtnv10.b11	WCN7860 BT
+firmware/qca/brhbtnv10.b12	11569	zuxos:BTFM.bin:/image/brhbtnv10.b12	WCN7860 BT
+firmware/qca/brhbtnv10.b13	11673	zuxos:BTFM.bin:/image/brhbtnv10.b13	WCN7860 BT
+firmware/qca/brhbtnv10.b14	11673	zuxos:BTFM.bin:/image/brhbtnv10.b14	WCN7860 BT
+firmware/qca/brhbtnv10.b15	11569	zuxos:BTFM.bin:/image/brhbtnv10.b15	WCN7860 BT
+firmware/qca/brhbtnv10.b16	11673	zuxos:BTFM.bin:/image/brhbtnv10.b16	WCN7860 BT
+firmware/qca/brhbtnv10.b17	11673	zuxos:BTFM.bin:/image/brhbtnv10.b17	WCN7860 BT
+firmware/qca/brhbtnv10.b18	11673	zuxos:BTFM.bin:/image/brhbtnv10.b18	WCN7860 BT
+firmware/qca/brhbtnv10.b19	11673	zuxos:BTFM.bin:/image/brhbtnv10.b19	WCN7860 BT
+firmware/qca/brhbtnv10.b1a	11673	zuxos:BTFM.bin:/image/brhbtnv10.b1a	WCN7860 BT
+firmware/qca/brhbtnv10.b1b	11673	zuxos:BTFM.bin:/image/brhbtnv10.b1b	WCN7860 BT
+firmware/qca/brhbtnv10.b1c	11673	zuxos:BTFM.bin:/image/brhbtnv10.b1c	WCN7860 BT
+firmware/qca/brhbtnv10.b1d	11569	zuxos:BTFM.bin:/image/brhbtnv10.b1d	WCN7860 BT
+firmware/qca/brhbtnv10.b1e	11569	zuxos:BTFM.bin:/image/brhbtnv10.b1e	WCN7860 BT
+firmware/qca/brhbtnv10.b1f	11673	zuxos:BTFM.bin:/image/brhbtnv10.b1f	WCN7860 BT
+firmware/qca/brhbtnv10.b20	11673	zuxos:BTFM.bin:/image/brhbtnv10.b20	WCN7860 BT
+firmware/qca/brhbtnv10.b21	11673	zuxos:BTFM.bin:/image/brhbtnv10.b21	WCN7860 BT
+firmware/qca/brhbtnv10.b22	11673	zuxos:BTFM.bin:/image/brhbtnv10.b22	WCN7860 BT
+firmware/qca/brhbtnv10.b23	11673	zuxos:BTFM.bin:/image/brhbtnv10.b23	WCN7860 BT
+firmware/qca/brhbtnv10.b24	11673	zuxos:BTFM.bin:/image/brhbtnv10.b24	WCN7860 BT
+firmware/qca/brhbtnv10.b25	11673	zuxos:BTFM.bin:/image/brhbtnv10.b25	WCN7860 BT
+firmware/qca/brhbtnv10.bin	11569	zuxos:BTFM.bin:/image/brhbtnv10.bin	WCN7860 BT
+firmware/qca/brhbtnv20.b2e	14031	zuxos:BTFM.bin:/image/brhbtnv20.b2e	WCN7860 BT
+firmware/qca/brhbtnv20.b34	14139	zuxos:BTFM.bin:/image/brhbtnv20.b34	WCN7860 BT
+firmware/qca/brhbtnv20.b35	14139	zuxos:BTFM.bin:/image/brhbtnv20.b35	WCN7860 BT
+firmware/qca/brhbtnv20.b36	14139	zuxos:BTFM.bin:/image/brhbtnv20.b36	WCN7860 BT
+firmware/qca/brhbtnv20.b37	14139	zuxos:BTFM.bin:/image/brhbtnv20.b37	WCN7860 BT
+firmware/qca/brhbtnv20.b38	14139	zuxos:BTFM.bin:/image/brhbtnv20.b38	WCN7860 BT
+firmware/qca/brhbtnv20.b39	14139	zuxos:BTFM.bin:/image/brhbtnv20.b39	WCN7860 BT
+firmware/qca/brhbtnv20.b3e	14031	zuxos:BTFM.bin:/image/brhbtnv20.b3e	WCN7860 BT
+firmware/qca/brhbtnv20.b41	14139	zuxos:BTFM.bin:/image/brhbtnv20.b41	WCN7860 BT
+firmware/qca/brhbtnv20.b44	14139	zuxos:BTFM.bin:/image/brhbtnv20.b44	WCN7860 BT
+firmware/qca/brhbtnv20.b46	14139	zuxos:BTFM.bin:/image/brhbtnv20.b46	WCN7860 BT
+firmware/qca/brhbtnv20.b47	14139	zuxos:BTFM.bin:/image/brhbtnv20.b47	WCN7860 BT
+firmware/qca/brhbtnv20.bin	14139	zuxos:BTFM.bin:/image/brhbtnv20.bin	WCN7860 BT
+firmware/qca/brhperifw10.mbn	39142	zuxos:BTFM.bin:/image/brhperifw10.mbn	WCN7860 BT
+firmware/qca/brhperifw10.tlv	31294	zuxos:BTFM.bin:/image/brhperifw10.tlv	WCN7860 BT
+firmware/qca/brhperifw10.ver	35	zuxos:BTFM.bin:/image/brhperifw10.ver	WCN7860 BT
+firmware/qca/brhperifw20.mbn	26904	zuxos:BTFM.bin:/image/brhperifw20.mbn	WCN7860 BT
+firmware/qca/brhperifw20.tlv	20724	zuxos:BTFM.bin:/image/brhperifw20.tlv	WCN7860 BT
+firmware/qca/brhperifw20.ver	45	zuxos:BTFM.bin:/image/brhperifw20.ver	WCN7860 BT
+firmware/qca/brhperinv10.bin	508	zuxos:BTFM.bin:/image/brhperinv10.bin	WCN7860 BT
+firmware/qca/brhperinv20.b43	741	zuxos:BTFM.bin:/image/brhperinv20.b43	WCN7860 BT
+firmware/qca/brhperinv20.b45	741	zuxos:BTFM.bin:/image/brhperinv20.b45	WCN7860 BT
+firmware/qca/brhperinv20.bin	741	zuxos:BTFM.bin:/image/brhperinv20.bin	WCN7860 BT
+firmware/qcom/gen80000_aqe.fw	25340	zuxos:super_7.img:/firmware/gen80000_aqe.fw	GPU
+firmware/qcom/gen80000_gmu.bin	88896	zuxos:super_7.img:/firmware/gen80000_gmu.bin	GPU
+firmware/qcom/gen80000_sqe.fw	111892	zuxos:super_7.img:/firmware/gen80000_sqe.fw	GPU
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b00	568	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b00	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b01	54562	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b01	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b02	260	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b02	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b03	728	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b03	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b04	3792	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b04	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b05	304	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b05	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b06	10067	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b06	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b07	728	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b07	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.b08	4184	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.b08	Qualcomm signed/board
+firmware/qcom/sm8750/05B04A44-BF30-42DF-9E2F-B366B980ED19.mdt	4752	zuxos:NON-HLOS.bin:/image/05B04A44-BF30-42DF-9E2F-B366B980ED19.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b00	568	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b00	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b01	30705	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b01	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b02	266	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b02	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b03	520	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b03	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b04	912	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b04	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b05	304	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b05	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b06	5352	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b06	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b07	520	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b07	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b08	4184	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.b08	Qualcomm signed/board
+firmware/qcom/sm8750/32552B22-89FE-42B4-8A45-A0C4E2DB0326.mdt	4752	zuxos:NON-HLOS.bin:/image/32552B22-89FE-42B4-8A45-A0C4E2DB0326.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b00	568	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b00	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b01	57831	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b01	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b02	263	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b02	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b03	720	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b03	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b04	2272	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b04	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b05	304	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b05	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b06	10078	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b06	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b07	720	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b07	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.b08	4184	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.b08	Qualcomm signed/board
+firmware/qcom/sm8750/FD719D50-FFFB-11EB-9A03-0242AC130003.mdt	4752	zuxos:NON-HLOS.bin:/image/FD719D50-FFFB-11EB-9A03-0242AC130003.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b00	1940	zuxos:NON-HLOS.bin:/image/adsp.b00	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b01	20896	zuxos:NON-HLOS.bin:/image/adsp.b01	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b02	38924	zuxos:NON-HLOS.bin:/image/adsp.b02	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b03	110723	zuxos:NON-HLOS.bin:/image/adsp.b03	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b04	32756	zuxos:NON-HLOS.bin:/image/adsp.b04	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b05	84180	zuxos:NON-HLOS.bin:/image/adsp.b05	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b06	196608	zuxos:NON-HLOS.bin:/image/adsp.b06	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b07	368	zuxos:NON-HLOS.bin:/image/adsp.b07	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b08	9236	zuxos:NON-HLOS.bin:/image/adsp.b08	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b09	3104884	zuxos:NON-HLOS.bin:/image/adsp.b09	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b10	264116	zuxos:NON-HLOS.bin:/image/adsp.b10	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b11	2584	zuxos:NON-HLOS.bin:/image/adsp.b11	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b12	64436	zuxos:NON-HLOS.bin:/image/adsp.b12	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b13	7112	zuxos:NON-HLOS.bin:/image/adsp.b13	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b14	251176	zuxos:NON-HLOS.bin:/image/adsp.b14	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b15	160896	zuxos:NON-HLOS.bin:/image/adsp.b15	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b16	475136	zuxos:NON-HLOS.bin:/image/adsp.b16	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b17	2717956	zuxos:NON-HLOS.bin:/image/adsp.b17	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b18	42576	zuxos:NON-HLOS.bin:/image/adsp.b18	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b19	272	zuxos:NON-HLOS.bin:/image/adsp.b19	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b20	383637	zuxos:NON-HLOS.bin:/image/adsp.b20	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b21	82	zuxos:NON-HLOS.bin:/image/adsp.b21	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b22	32768	zuxos:NON-HLOS.bin:/image/adsp.b22	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b23	1354268	zuxos:NON-HLOS.bin:/image/adsp.b23	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b24	30049	zuxos:NON-HLOS.bin:/image/adsp.b24	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b25	20	zuxos:NON-HLOS.bin:/image/adsp.b25	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b26	36133	zuxos:NON-HLOS.bin:/image/adsp.b26	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b27	135168	zuxos:NON-HLOS.bin:/image/adsp.b27	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b28	2584440	zuxos:NON-HLOS.bin:/image/adsp.b28	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b29	475140	zuxos:NON-HLOS.bin:/image/adsp.b29	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b31	592	zuxos:NON-HLOS.bin:/image/adsp.b31	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b32	13656	zuxos:NON-HLOS.bin:/image/adsp.b32	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b33	36312	zuxos:NON-HLOS.bin:/image/adsp.b33	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b34	379236	zuxos:NON-HLOS.bin:/image/adsp.b34	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b35	173661	zuxos:NON-HLOS.bin:/image/adsp.b35	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b36	154364	zuxos:NON-HLOS.bin:/image/adsp.b36	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b37	165992	zuxos:NON-HLOS.bin:/image/adsp.b37	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b38	16796	zuxos:NON-HLOS.bin:/image/adsp.b38	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b39	8992	zuxos:NON-HLOS.bin:/image/adsp.b39	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b40	15564	zuxos:NON-HLOS.bin:/image/adsp.b40	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b41	55544	zuxos:NON-HLOS.bin:/image/adsp.b41	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b42	297876	zuxos:NON-HLOS.bin:/image/adsp.b42	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b43	647168	zuxos:NON-HLOS.bin:/image/adsp.b43	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b44	6648384	zuxos:NON-HLOS.bin:/image/adsp.b44	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b45	262152	zuxos:NON-HLOS.bin:/image/adsp.b45	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b46	20	zuxos:NON-HLOS.bin:/image/adsp.b46	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b47	25904	zuxos:NON-HLOS.bin:/image/adsp.b47	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b48	26312	zuxos:NON-HLOS.bin:/image/adsp.b48	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b49	30328	zuxos:NON-HLOS.bin:/image/adsp.b49	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b50	469860	zuxos:NON-HLOS.bin:/image/adsp.b50	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b51	10052	zuxos:NON-HLOS.bin:/image/adsp.b51	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b52	73888	zuxos:NON-HLOS.bin:/image/adsp.b52	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b53	102400	zuxos:NON-HLOS.bin:/image/adsp.b53	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b54	84719	zuxos:NON-HLOS.bin:/image/adsp.b54	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b55	247032	zuxos:NON-HLOS.bin:/image/adsp.b55	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b56	53248	zuxos:NON-HLOS.bin:/image/adsp.b56	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.b58	6584	zuxos:NON-HLOS.bin:/image/adsp.b58	Qualcomm signed/board
+firmware/qcom/sm8750/adsp.mdt	8524	zuxos:NON-HLOS.bin:/image/adsp.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/adsp_dtb.b00	148	zuxos:NON-HLOS.bin:/image/adsp_dtb.b00	Qualcomm signed/board
+firmware/qcom/sm8750/adsp_dtb.b01	160524	zuxos:NON-HLOS.bin:/image/adsp_dtb.b01	Qualcomm signed/board
+firmware/qcom/sm8750/adsp_dtb.b02	3896	zuxos:NON-HLOS.bin:/image/adsp_dtb.b02	Qualcomm signed/board
+firmware/qcom/sm8750/adsp_dtb.mdt	4044	zuxos:NON-HLOS.bin:/image/adsp_dtb.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/adspr.jsn	513	zuxos:NON-HLOS.bin:/image/adspr.jsn	Qualcomm signed/board
+firmware/qcom/sm8750/adsps.jsn	515	zuxos:NON-HLOS.bin:/image/adsps.jsn	Qualcomm signed/board
+firmware/qcom/sm8750/adspua.jsn	703	zuxos:NON-HLOS.bin:/image/adspua.jsn	Qualcomm signed/board
+firmware/qcom/sm8750/adspuo.jsn	512	zuxos:NON-HLOS.bin:/image/adspuo.jsn	Qualcomm signed/board
+firmware/qcom/sm8750/asym1p.sig	41136	zuxos:NON-HLOS.bin:/image/asym1p.sig	Qualcomm signed/board
+firmware/qcom/sm8750/battmgr.jsn	516	zuxos:NON-HLOS.bin:/image/battmgr.jsn	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b00	564	zuxos:NON-HLOS.bin:/image/cdsp.b00	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b01	27644	zuxos:NON-HLOS.bin:/image/cdsp.b01	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b02	79076	zuxos:NON-HLOS.bin:/image/cdsp.b02	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b03	140303	zuxos:NON-HLOS.bin:/image/cdsp.b03	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b04	1376	zuxos:NON-HLOS.bin:/image/cdsp.b04	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b05	2405476	zuxos:NON-HLOS.bin:/image/cdsp.b05	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b06	114696	zuxos:NON-HLOS.bin:/image/cdsp.b06	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b07	2840	zuxos:NON-HLOS.bin:/image/cdsp.b07	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b08	126302	zuxos:NON-HLOS.bin:/image/cdsp.b08	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b09	786428	zuxos:NON-HLOS.bin:/image/cdsp.b09	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b10	14016	zuxos:NON-HLOS.bin:/image/cdsp.b10	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b11	3184	zuxos:NON-HLOS.bin:/image/cdsp.b11	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b12	114096	zuxos:NON-HLOS.bin:/image/cdsp.b12	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b13	5600	zuxos:NON-HLOS.bin:/image/cdsp.b13	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.b15	4520	zuxos:NON-HLOS.bin:/image/cdsp.b15	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp.mdt	5084	zuxos:NON-HLOS.bin:/image/cdsp.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp_dtb.b00	148	zuxos:NON-HLOS.bin:/image/cdsp_dtb.b00	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp_dtb.b01	29916	zuxos:NON-HLOS.bin:/image/cdsp_dtb.b01	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp_dtb.b02	3896	zuxos:NON-HLOS.bin:/image/cdsp_dtb.b02	Qualcomm signed/board
+firmware/qcom/sm8750/cdsp_dtb.mdt	4044	zuxos:NON-HLOS.bin:/image/cdsp_dtb.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/cdspr.jsn	513	zuxos:NON-HLOS.bin:/image/cdspr.jsn	Qualcomm signed/board
+firmware/qcom/sm8750/crypt1p.sig	38300	zuxos:NON-HLOS.bin:/image/crypt1p.sig	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b00	568	zuxos:NON-HLOS.bin:/image/evautil64.b00	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b01	9732	zuxos:NON-HLOS.bin:/image/evautil64.b01	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b02	216	zuxos:NON-HLOS.bin:/image/evautil64.b02	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b03	392	zuxos:NON-HLOS.bin:/image/evautil64.b03	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b04	904	zuxos:NON-HLOS.bin:/image/evautil64.b04	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b05	304	zuxos:NON-HLOS.bin:/image/evautil64.b05	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b06	4203	zuxos:NON-HLOS.bin:/image/evautil64.b06	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b07	392	zuxos:NON-HLOS.bin:/image/evautil64.b07	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.b08	4184	zuxos:NON-HLOS.bin:/image/evautil64.b08	Qualcomm signed/board
+firmware/qcom/sm8750/evautil64.mdt	4752	zuxos:NON-HLOS.bin:/image/evautil64.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b00	568	zuxos:NON-HLOS.bin:/image/featenabler.b00	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b01	62219	zuxos:NON-HLOS.bin:/image/featenabler.b01	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b02	226	zuxos:NON-HLOS.bin:/image/featenabler.b02	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b03	536	zuxos:NON-HLOS.bin:/image/featenabler.b03	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b04	921	zuxos:NON-HLOS.bin:/image/featenabler.b04	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b05	304	zuxos:NON-HLOS.bin:/image/featenabler.b05	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b06	10689	zuxos:NON-HLOS.bin:/image/featenabler.b06	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b07	536	zuxos:NON-HLOS.bin:/image/featenabler.b07	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.b08	11232	zuxos:NON-HLOS.bin:/image/featenabler.b08	Qualcomm signed/board
+firmware/qcom/sm8750/featenabler.mdt	11800	zuxos:NON-HLOS.bin:/image/featenabler.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b00	568	zuxos:NON-HLOS.bin:/image/fingerpr.b00	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b01	11462356	zuxos:NON-HLOS.bin:/image/fingerpr.b01	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b02	219	zuxos:NON-HLOS.bin:/image/fingerpr.b02	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b03	386424	zuxos:NON-HLOS.bin:/image/fingerpr.b03	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b04	2458992	zuxos:NON-HLOS.bin:/image/fingerpr.b04	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b05	304	zuxos:NON-HLOS.bin:/image/fingerpr.b05	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b06	624710	zuxos:NON-HLOS.bin:/image/fingerpr.b06	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b07	386424	zuxos:NON-HLOS.bin:/image/fingerpr.b07	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.b08	4184	zuxos:NON-HLOS.bin:/image/fingerpr.b08	Qualcomm signed/board
+firmware/qcom/sm8750/fingerpr.mdt	4752	zuxos:NON-HLOS.bin:/image/fingerpr.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/fw_ipa_gsi_5.5_p.elf	36760	zuxos:NON-HLOS.bin:/image/fw_ipa_gsi_5.5_p.elf	Qualcomm signed/board
+firmware/qcom/sm8750/gptauuid.xml	11169	zuxos:NON-HLOS.bin:/image/gptauuid.xml	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b00	568	zuxos:NON-HLOS.bin:/image/hdcp1.b00	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b01	34525	zuxos:NON-HLOS.bin:/image/hdcp1.b01	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b02	221	zuxos:NON-HLOS.bin:/image/hdcp1.b02	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b03	544	zuxos:NON-HLOS.bin:/image/hdcp1.b03	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b04	5216	zuxos:NON-HLOS.bin:/image/hdcp1.b04	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b05	304	zuxos:NON-HLOS.bin:/image/hdcp1.b05	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b06	7535	zuxos:NON-HLOS.bin:/image/hdcp1.b06	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b07	544	zuxos:NON-HLOS.bin:/image/hdcp1.b07	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.b08	4184	zuxos:NON-HLOS.bin:/image/hdcp1.b08	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp1.mdt	4752	zuxos:NON-HLOS.bin:/image/hdcp1.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b00	568	zuxos:NON-HLOS.bin:/image/hdcp2p2.b00	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b01	124163	zuxos:NON-HLOS.bin:/image/hdcp2p2.b01	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b02	258	zuxos:NON-HLOS.bin:/image/hdcp2p2.b02	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b03	1776	zuxos:NON-HLOS.bin:/image/hdcp2p2.b03	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b04	7696	zuxos:NON-HLOS.bin:/image/hdcp2p2.b04	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b05	304	zuxos:NON-HLOS.bin:/image/hdcp2p2.b05	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b06	19118	zuxos:NON-HLOS.bin:/image/hdcp2p2.b06	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b07	1776	zuxos:NON-HLOS.bin:/image/hdcp2p2.b07	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.b08	11232	zuxos:NON-HLOS.bin:/image/hdcp2p2.b08	Qualcomm signed/board
+firmware/qcom/sm8750/hdcp2p2.mdt	11800	zuxos:NON-HLOS.bin:/image/hdcp2p2.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b00	568	zuxos:NON-HLOS.bin:/image/hdcpsrm.b00	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b01	22685	zuxos:NON-HLOS.bin:/image/hdcpsrm.b01	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b02	228	zuxos:NON-HLOS.bin:/image/hdcpsrm.b02	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b03	472	zuxos:NON-HLOS.bin:/image/hdcpsrm.b03	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b04	904	zuxos:NON-HLOS.bin:/image/hdcpsrm.b04	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b05	304	zuxos:NON-HLOS.bin:/image/hdcpsrm.b05	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b06	5164	zuxos:NON-HLOS.bin:/image/hdcpsrm.b06	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b07	472	zuxos:NON-HLOS.bin:/image/hdcpsrm.b07	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.b08	4184	zuxos:NON-HLOS.bin:/image/hdcpsrm.b08	Qualcomm signed/board
+firmware/qcom/sm8750/hdcpsrm.mdt	4752	zuxos:NON-HLOS.bin:/image/hdcpsrm.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b00	568	zuxos:NON-HLOS.bin:/image/ic5.b00	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b01	103361	zuxos:NON-HLOS.bin:/image/ic5.b01	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b02	235	zuxos:NON-HLOS.bin:/image/ic5.b02	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b03	1200	zuxos:NON-HLOS.bin:/image/ic5.b03	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b04	7745	zuxos:NON-HLOS.bin:/image/ic5.b04	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b05	304	zuxos:NON-HLOS.bin:/image/ic5.b05	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b06	6687	zuxos:NON-HLOS.bin:/image/ic5.b06	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b07	1200	zuxos:NON-HLOS.bin:/image/ic5.b07	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.b08	4184	zuxos:NON-HLOS.bin:/image/ic5.b08	Qualcomm signed/board
+firmware/qcom/sm8750/ic5.mdt	4752	zuxos:NON-HLOS.bin:/image/ic5.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/ipa_fws.b00	212	zuxos:NON-HLOS.bin:/image/ipa_fws.b00	Qualcomm signed/board
+firmware/qcom/sm8750/ipa_fws.b01	18456	zuxos:NON-HLOS.bin:/image/ipa_fws.b01	Qualcomm signed/board
+firmware/qcom/sm8750/ipa_fws.b02	128	zuxos:NON-HLOS.bin:/image/ipa_fws.b02	Qualcomm signed/board
+firmware/qcom/sm8750/ipa_fws.b03	1000	zuxos:NON-HLOS.bin:/image/ipa_fws.b03	Qualcomm signed/board
+firmware/qcom/sm8750/ipa_fws.b04	3992	zuxos:NON-HLOS.bin:/image/ipa_fws.b04	Qualcomm signed/board
+firmware/qcom/sm8750/ipa_fws.mdt	4204	zuxos:NON-HLOS.bin:/image/ipa_fws.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/keym1p.sig	124192	zuxos:NON-HLOS.bin:/image/keym1p.sig	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b00	568	zuxos:NON-HLOS.bin:/image/loadalgota64.b00	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b01	40452	zuxos:NON-HLOS.bin:/image/loadalgota64.b01	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b02	228	zuxos:NON-HLOS.bin:/image/loadalgota64.b02	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b03	424	zuxos:NON-HLOS.bin:/image/loadalgota64.b03	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b04	13392	zuxos:NON-HLOS.bin:/image/loadalgota64.b04	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b05	304	zuxos:NON-HLOS.bin:/image/loadalgota64.b05	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b06	4440	zuxos:NON-HLOS.bin:/image/loadalgota64.b06	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b07	424	zuxos:NON-HLOS.bin:/image/loadalgota64.b07	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.b08	4184	zuxos:NON-HLOS.bin:/image/loadalgota64.b08	Qualcomm signed/board
+firmware/qcom/sm8750/loadalgota64.mdt	4752	zuxos:NON-HLOS.bin:/image/loadalgota64.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/macch1p.sig	27028	zuxos:NON-HLOS.bin:/image/macch1p.sig	Qualcomm signed/board
+firmware/qcom/sm8750/modem_pr/mcfg/configs/mcfg_sw/oem_sw.txt	7162	zuxos:NON-HLOS.bin:/image/modem_pr/mcfg/configs/mcfg_sw/oem_sw.txt	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b00	568	zuxos:NON-HLOS.bin:/image/ops.b00	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b01	9260	zuxos:NON-HLOS.bin:/image/ops.b01	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b02	205	zuxos:NON-HLOS.bin:/image/ops.b02	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b03	344	zuxos:NON-HLOS.bin:/image/ops.b03	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b04	912	zuxos:NON-HLOS.bin:/image/ops.b04	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b05	304	zuxos:NON-HLOS.bin:/image/ops.b05	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b06	3806	zuxos:NON-HLOS.bin:/image/ops.b06	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b07	344	zuxos:NON-HLOS.bin:/image/ops.b07	Qualcomm signed/board
+firmware/qcom/sm8750/ops.b08	4184	zuxos:NON-HLOS.bin:/image/ops.b08	Qualcomm signed/board
+firmware/qcom/sm8750/ops.mdt	4752	zuxos:NON-HLOS.bin:/image/ops.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/peach/Data.msc	1819621	zuxos:NON-HLOS.bin:/image/peach/Data.msc	Qualcomm signed/board
+firmware/qcom/sm8750/peach/Data20.msc	1816213	zuxos:NON-HLOS.bin:/image/peach/Data20.msc	Qualcomm signed/board
+firmware/qcom/sm8750/peach/amss.bin	7049280	zuxos:NON-HLOS.bin:/image/peach/amss.bin	Qualcomm signed/board
+firmware/qcom/sm8750/peach/amss20.bin	6967360	zuxos:NON-HLOS.bin:/image/peach/amss20.bin	Qualcomm signed/board
+firmware/qcom/sm8750/peach/aux_ucode.elf	61440	zuxos:NON-HLOS.bin:/image/peach/aux_ucode.elf	Qualcomm signed/board
+firmware/qcom/sm8750/peach/aux_ucode20.elf	61440	zuxos:NON-HLOS.bin:/image/peach/aux_ucode20.elf	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e01	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e01	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e02	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e02	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e03	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e03	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e04	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e04	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e05	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e05	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e06	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e06	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e07	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e07	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e09	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e09	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e0a	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e0a	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e0b	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e0b	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e0c	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e0c	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e0d	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e0d	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e0e	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e0e	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e0f	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e0f	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e10	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e10	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e11	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e11	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e12	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e12	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e13	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e13	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e14	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e14	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e15	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e15	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e16	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e16	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e17	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e17	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e18	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e18	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e19	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e19	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e1a	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e1a	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e1b	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e1b	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e1c	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e1c	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e1d	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e1d	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e1e	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e1e	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e1f	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e1f	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e20	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e20	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e21	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e21	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e22	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e22	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e23	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e23	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e24	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e24	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e25	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e25	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e26	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e26	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e27	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e27	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e29	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e29	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e2a	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e2a	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e2b	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e2b	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e2c	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e2c	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e2d	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e2d	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e2e	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e2e	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e2f	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e2f	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e30	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e30	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e31	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e31	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e32	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e32	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e33	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e33	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e34	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e34	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e35	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e35	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e36	125352	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e36	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e37	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e37	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e38	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e38	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e39	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e39	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e3a	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e3a	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e3b	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e3b	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e3c	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e3c	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e3d	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e3d	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e3e	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e3e	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e3f	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e3f	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e40	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e40	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.e41	125288	zuxos:NON-HLOS.bin:/image/peach/bdwlan.e41	Qualcomm signed/board
+firmware/qcom/sm8750/peach/bdwlan.elf	125420	zuxos:NON-HLOS.bin:/image/peach/bdwlan.elf	Qualcomm signed/board
+firmware/qcom/sm8750/peach/phy_ucode.elf	290816	zuxos:NON-HLOS.bin:/image/peach/phy_ucode.elf	Qualcomm signed/board
+firmware/qcom/sm8750/peach/phy_ucode20.elf	290816	zuxos:NON-HLOS.bin:/image/peach/phy_ucode20.elf	Qualcomm signed/board
+firmware/qcom/sm8750/peach/qdss_trace_config_v1.cfg	6115	zuxos:NON-HLOS.bin:/image/peach/qdss_trace_config_v1.cfg	Qualcomm signed/board
+firmware/qcom/sm8750/peach/qdss_trace_config_v2.cfg	6237	zuxos:NON-HLOS.bin:/image/peach/qdss_trace_config_v2.cfg	Qualcomm signed/board
+firmware/qcom/sm8750/peach/regdb.bin	24278	zuxos:NON-HLOS.bin:/image/peach/regdb.bin	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b00	340	zuxos:NON-HLOS.bin:/image/smplap32.b00	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b01	309444	zuxos:NON-HLOS.bin:/image/smplap32.b01	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b02	204	zuxos:NON-HLOS.bin:/image/smplap32.b02	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b03	5796	zuxos:NON-HLOS.bin:/image/smplap32.b03	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b04	1495084	zuxos:NON-HLOS.bin:/image/smplap32.b04	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b05	152	zuxos:NON-HLOS.bin:/image/smplap32.b05	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b06	53585	zuxos:NON-HLOS.bin:/image/smplap32.b06	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b07	5796	zuxos:NON-HLOS.bin:/image/smplap32.b07	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.b08	4184	zuxos:NON-HLOS.bin:/image/smplap32.b08	Qualcomm signed/board
+firmware/qcom/sm8750/smplap32.mdt	4524	zuxos:NON-HLOS.bin:/image/smplap32.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b00	568	zuxos:NON-HLOS.bin:/image/smplap64.b00	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b01	368924	zuxos:NON-HLOS.bin:/image/smplap64.b01	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b02	255	zuxos:NON-HLOS.bin:/image/smplap64.b02	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b03	10760	zuxos:NON-HLOS.bin:/image/smplap64.b03	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b04	1504684	zuxos:NON-HLOS.bin:/image/smplap64.b04	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b05	304	zuxos:NON-HLOS.bin:/image/smplap64.b05	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b06	99121	zuxos:NON-HLOS.bin:/image/smplap64.b06	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b07	10760	zuxos:NON-HLOS.bin:/image/smplap64.b07	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.b08	4184	zuxos:NON-HLOS.bin:/image/smplap64.b08	Qualcomm signed/board
+firmware/qcom/sm8750/smplap64.mdt	4752	zuxos:NON-HLOS.bin:/image/smplap64.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/soccp.mbn	565192	zuxos:NON-HLOS.bin:/image/soccp.mbn	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b00	568	zuxos:NON-HLOS.bin:/image/soter64.b00	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b01	59336	zuxos:NON-HLOS.bin:/image/soter64.b01	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b02	221	zuxos:NON-HLOS.bin:/image/soter64.b02	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b03	912	zuxos:NON-HLOS.bin:/image/soter64.b03	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b04	1736	zuxos:NON-HLOS.bin:/image/soter64.b04	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b05	304	zuxos:NON-HLOS.bin:/image/soter64.b05	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b06	6751	zuxos:NON-HLOS.bin:/image/soter64.b06	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b07	912	zuxos:NON-HLOS.bin:/image/soter64.b07	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.b08	4184	zuxos:NON-HLOS.bin:/image/soter64.b08	Qualcomm signed/board
+firmware/qcom/sm8750/soter64.mdt	4752	zuxos:NON-HLOS.bin:/image/soter64.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b00	568	zuxos:NON-HLOS.bin:/image/sp_license.b00	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b01	9456	zuxos:NON-HLOS.bin:/image/sp_license.b01	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b02	220	zuxos:NON-HLOS.bin:/image/sp_license.b02	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b03	408	zuxos:NON-HLOS.bin:/image/sp_license.b03	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b04	896	zuxos:NON-HLOS.bin:/image/sp_license.b04	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b05	304	zuxos:NON-HLOS.bin:/image/sp_license.b05	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b06	4271	zuxos:NON-HLOS.bin:/image/sp_license.b06	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b07	408	zuxos:NON-HLOS.bin:/image/sp_license.b07	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.b08	4184	zuxos:NON-HLOS.bin:/image/sp_license.b08	Qualcomm signed/board
+firmware/qcom/sm8750/sp_license.mdt	4752	zuxos:NON-HLOS.bin:/image/sp_license.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/spss1p.b00	148	zuxos:NON-HLOS.bin:/image/spss1p.b00	Qualcomm signed/board
+firmware/qcom/sm8750/spss1p.b01	1359872	zuxos:NON-HLOS.bin:/image/spss1p.b01	Qualcomm signed/board
+firmware/qcom/sm8750/spss1p.b02	3896	zuxos:NON-HLOS.bin:/image/spss1p.b02	Qualcomm signed/board
+firmware/qcom/sm8750/spss1p.mbn	1367864	zuxos:NON-HLOS.bin:/image/spss1p.mbn	Qualcomm signed/board
+firmware/qcom/sm8750/spss1p.mdt	4044	zuxos:NON-HLOS.bin:/image/spss1p.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/spu_rpmb.mbn	48096	zuxos:NON-HLOS.bin:/image/spu_rpmb.mbn	Qualcomm signed/board
+firmware/qcom/sm8750/spu_service.mbn	90200	zuxos:NON-HLOS.bin:/image/spu_service.mbn	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b00	568	zuxos:NON-HLOS.bin:/image/tianxi64.b00	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b01	42828	zuxos:NON-HLOS.bin:/image/tianxi64.b01	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b02	219	zuxos:NON-HLOS.bin:/image/tianxi64.b02	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b03	512	zuxos:NON-HLOS.bin:/image/tianxi64.b03	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b04	913	zuxos:NON-HLOS.bin:/image/tianxi64.b04	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b05	304	zuxos:NON-HLOS.bin:/image/tianxi64.b05	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b06	11229	zuxos:NON-HLOS.bin:/image/tianxi64.b06	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b07	512	zuxos:NON-HLOS.bin:/image/tianxi64.b07	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.b08	4184	zuxos:NON-HLOS.bin:/image/tianxi64.b08	Qualcomm signed/board
+firmware/qcom/sm8750/tianxi64.mdt	4752	zuxos:NON-HLOS.bin:/image/tianxi64.mdt	Qualcomm signed/board
+firmware/qcom/sm8750/tmel_peach_10.elf	63096	zuxos:NON-HLOS.bin:/image/tmel_peach_10.elf	Qualcomm signed/board
+firmware/qcom/sm8750/tmel_peach_20.elf	63780	zuxos:NON-HLOS.bin:/image/tmel_peach_20.elf	Qualcomm signed/board
+firmware/qcom/sm8750/widevine.mbn	273376	zuxos:NON-HLOS.bin:/image/widevine.mbn	Qualcomm signed/board
+firmware/qcom/sm8750/zhiyu/gen80000_zap.mbn	12088	zuxos:super_7.img:/firmware/gen80000_zap.mbn	device GPU zap
+sensors/sns_reg.conf	271	zuxos:super_7.img:/etc/sensors/sns_reg_config	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_bu52053nvx_0.json	1868	zuxos:super_7.img:/etc/sensors/config/bonito_bu52053nvx_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_ccd_base.json	360	zuxos:super_7.img:/etc/sensors/config/bonito_ccd_base.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_default_sensors.json	6205	zuxos:super_7.img:/etc/sensors/config/bonito_default_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_dynamic_sensors.json	924	zuxos:super_7.img:/etc/sensors/config/bonito_dynamic_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_dynamic_sensors_template.json	556	zuxos:super_7.img:/etc/sensors/config/bonito_dynamic_sensors_template.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_fcal_mmc56x3x_0.json	2643	zuxos:super_7.img:/etc/sensors/config/bonito_fcal_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_hdk_lsm6dso_0.json	393	zuxos:super_7.img:/etc/sensors/config/bonito_hdk_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_hdk_lsm6dso_1.json	393	zuxos:super_7.img:/etc/sensors/config/bonito_hdk_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_irq.json	158	zuxos:super_7.img:/etc/sensors/config/bonito_irq.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_lps22df_0.json	3346	zuxos:super_7.img:/etc/sensors/config/bonito_lps22df_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_lsm6dso_0.json	7807	zuxos:super_7.img:/etc/sensors/config/bonito_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_lsm6dso_1.json	7809	zuxos:super_7.img:/etc/sensors/config/bonito_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_mmc56x3x_0.json	1672	zuxos:super_7.img:/etc/sensors/config/bonito_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_mtp_lsm6dso_0.json	393	zuxos:super_7.img:/etc/sensors/config/bonito_mtp_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_mtp_lsm6dso_1.json	393	zuxos:super_7.img:/etc/sensors/config/bonito_mtp_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_mtp_mmc56x3x_0.json	404	zuxos:super_7.img:/etc/sensors/config/bonito_mtp_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_power_0.json	730	zuxos:super_7.img:/etc/sensors/config/bonito_power_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_qrd_default_sensors.json	5892	zuxos:super_7.img:/etc/sensors/config/bonito_qrd_default_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_qrd_icm4x6xx_0.json	7660	zuxos:super_7.img:/etc/sensors/config/bonito_qrd_icm4x6xx_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_qrd_mmc56x3x_0.json	3010	zuxos:super_7.img:/etc/sensors/config/bonito_qrd_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_qrd_tmd3765_0.json	6075	zuxos:super_7.img:/etc/sensors/config/bonito_qrd_tmd3765_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_qsh_ble_0.json	232	zuxos:super_7.img:/etc/sensors/config/bonito_qsh_ble_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_sht4x_0.json	2874	zuxos:super_7.img:/etc/sensors/config/bonito_sht4x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_sx932x_0.json	6998	zuxos:super_7.img:/etc/sensors/config/bonito_sx932x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_tmd3765_0.json	6093	zuxos:super_7.img:/etc/sensors/config/bonito_tmd3765_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_vertigo_lsm6dso_0.json	401	zuxos:super_7.img:/etc/sensors/config/bonito_vertigo_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_vertigo_lsm6dso_1.json	401	zuxos:super_7.img:/etc/sensors/config/bonito_vertigo_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/bonito_vertigo_mmc56x3x_0.json	412	zuxos:super_7.img:/etc/sensors/config/bonito_vertigo_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_bu52053nvx_0.json	1853	zuxos:super_7.img:/etc/sensors/config/eliza_bu52053nvx_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_ccd_base.json	353	zuxos:super_7.img:/etc/sensors/config/eliza_ccd_base.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_default_sensors.json	6198	zuxos:super_7.img:/etc/sensors/config/eliza_default_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_dynamic_sensors.json	917	zuxos:super_7.img:/etc/sensors/config/eliza_dynamic_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_dynamic_sensors_template.json	556	zuxos:super_7.img:/etc/sensors/config/eliza_dynamic_sensors_template.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_fcal_mmc56x3x_0.json	2654	zuxos:super_7.img:/etc/sensors/config/eliza_fcal_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_hdk_lsm6dso_0.json	386	zuxos:super_7.img:/etc/sensors/config/eliza_hdk_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_hdk_lsm6dso_1.json	386	zuxos:super_7.img:/etc/sensors/config/eliza_hdk_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_irq.json	151	zuxos:super_7.img:/etc/sensors/config/eliza_irq.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_lps22df_0.json	3338	zuxos:super_7.img:/etc/sensors/config/eliza_lps22df_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_lsm6dso_0.json	7801	zuxos:super_7.img:/etc/sensors/config/eliza_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_lsm6dso_1.json	7802	zuxos:super_7.img:/etc/sensors/config/eliza_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_mmc56x3x_0.json	1665	zuxos:super_7.img:/etc/sensors/config/eliza_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_mtp_lsm6dso_0.json	386	zuxos:super_7.img:/etc/sensors/config/eliza_mtp_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_mtp_lsm6dso_1.json	386	zuxos:super_7.img:/etc/sensors/config/eliza_mtp_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_mtp_mmc56x3x_0.json	397	zuxos:super_7.img:/etc/sensors/config/eliza_mtp_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_power_0.json	722	zuxos:super_7.img:/etc/sensors/config/eliza_power_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_qrd_default_sensors.json	5885	zuxos:super_7.img:/etc/sensors/config/eliza_qrd_default_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_qrd_icm4x6xx_0.json	7348	zuxos:super_7.img:/etc/sensors/config/eliza_qrd_icm4x6xx_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_qrd_mmc56x3x_0.json	3003	zuxos:super_7.img:/etc/sensors/config/eliza_qrd_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_qrd_tmd2755_0.json	7198	zuxos:super_7.img:/etc/sensors/config/eliza_qrd_tmd2755_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_qsh_ble_0.json	232	zuxos:super_7.img:/etc/sensors/config/eliza_qsh_ble_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_sht4x_0.json	2867	zuxos:super_7.img:/etc/sensors/config/eliza_sht4x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_sx932x_0.json	6990	zuxos:super_7.img:/etc/sensors/config/eliza_sx932x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_tmd2755_0.json	7219	zuxos:super_7.img:/etc/sensors/config/eliza_tmd2755_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_vertigo_lsm6dso_0.json	394	zuxos:super_7.img:/etc/sensors/config/eliza_vertigo_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_vertigo_lsm6dso_1.json	394	zuxos:super_7.img:/etc/sensors/config/eliza_vertigo_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/eliza_vertigo_mmc56x3x_0.json	405	zuxos:super_7.img:/etc/sensors/config/eliza_vertigo_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/json.lst	3381	zuxos:super_7.img:/etc/sensors/config/json.lst	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_bu52053nvx_0.json	1860	zuxos:super_7.img:/etc/sensors/config/pakala_bu52053nvx_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_ccd_base.json	353	zuxos:super_7.img:/etc/sensors/config/pakala_ccd_base.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_default_sensors.json	6198	zuxos:super_7.img:/etc/sensors/config/pakala_default_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_dynamic_sensors.json	521	zuxos:super_7.img:/etc/sensors/config/pakala_dynamic_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_dynamic_sensors_template.json	556	zuxos:super_7.img:/etc/sensors/config/pakala_dynamic_sensors_template.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_fcal_mmc56x3x_0.json	2644	zuxos:super_7.img:/etc/sensors/config/pakala_fcal_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_hdk_lsm6dso_0.json	379	zuxos:super_7.img:/etc/sensors/config/pakala_hdk_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_hdk_lsm6dso_1.json	379	zuxos:super_7.img:/etc/sensors/config/pakala_hdk_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_icm4x6xa_0.json	7107	zuxos:super_7.img:/etc/sensors/config/pakala_icm4x6xa_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_irq.json	151	zuxos:super_7.img:/etc/sensors/config/pakala_irq.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_lps22df_0.json	3338	zuxos:super_7.img:/etc/sensors/config/pakala_lps22df_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_lsm6dso_0.json	7800	zuxos:super_7.img:/etc/sensors/config/pakala_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_lsm6dso_1.json	7801	zuxos:super_7.img:/etc/sensors/config/pakala_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_lsm6dsv_0.json	10181	zuxos:super_7.img:/etc/sensors/config/pakala_lsm6dsv_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_mmc56x3x_0.json	1668	zuxos:super_7.img:/etc/sensors/config/pakala_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_mtp_lsm6dso_0.json	385	zuxos:super_7.img:/etc/sensors/config/pakala_mtp_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_mtp_lsm6dso_1.json	385	zuxos:super_7.img:/etc/sensors/config/pakala_mtp_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_mtp_mmc56x3x_0.json	396	zuxos:super_7.img:/etc/sensors/config/pakala_mtp_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_power_0.json	287	zuxos:super_7.img:/etc/sensors/config/pakala_power_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_qrd_default_sensors.json	5885	zuxos:super_7.img:/etc/sensors/config/pakala_qrd_default_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_qrd_icm4x6xx_0.json	7645	zuxos:super_7.img:/etc/sensors/config/pakala_qrd_icm4x6xx_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_qrd_mmc56x3x_0.json	3003	zuxos:super_7.img:/etc/sensors/config/pakala_qrd_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_qrd_tmd3765_0.json	6060	zuxos:super_7.img:/etc/sensors/config/pakala_qrd_tmd3765_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_qsh_ble_0.json	232	zuxos:super_7.img:/etc/sensors/config/pakala_qsh_ble_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_sht4x_0.json	2867	zuxos:super_7.img:/etc/sensors/config/pakala_sht4x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_stk6b9x_0.json	5803	zuxos:super_7.img:/etc/sensors/config/pakala_stk6b9x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_sx932x_0.json	6990	zuxos:super_7.img:/etc/sensors/config/pakala_sx932x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_tmd3765_0.json	6091	zuxos:super_7.img:/etc/sensors/config/pakala_tmd3765_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_vertigo_lsm6dso_0.json	387	zuxos:super_7.img:/etc/sensors/config/pakala_vertigo_lsm6dso_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_vertigo_lsm6dso_1.json	387	zuxos:super_7.img:/etc/sensors/config/pakala_vertigo_lsm6dso_1.json	SNS registry + config served by hexagonrpcd
+sensors/config/pakala_vertigo_mmc56x3x_0.json	398	zuxos:super_7.img:/etc/sensors/config/pakala_vertigo_mmc56x3x_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_ble.json	1097	zuxos:super_7.img:/etc/sensors/config/qsh_ble.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_camera_common.json	11059	zuxos:super_7.img:/etc/sensors/config/qsh_camera_common.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_camera_common_sm8735.json	11476	zuxos:super_7.img:/etc/sensors/config/qsh_camera_common_sm8735.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_camera_imx688_6.json	20147	zuxos:super_7.img:/etc/sensors/config/qsh_camera_imx688_6.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_camera_imx688_6_actuator.json	1876	zuxos:super_7.img:/etc/sensors/config/qsh_camera_imx688_6_actuator.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_camera_ov32c4c_4.json	22774	zuxos:super_7.img:/etc/sensors/config/qsh_camera_ov32c4c_4.json	SNS registry + config served by hexagonrpcd
+sensors/config/qsh_camera_ov32c4c_4_sm8735.json	23898	zuxos:super_7.img:/etc/sensors/config/qsh_camera_ov32c4c_4_sm8735.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_amd.json	484	zuxos:super_7.img:/etc/sensors/config/sns_amd.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_amd_sw_enabled.json	485	zuxos:super_7.img:/etc/sensors/config/sns_amd_sw_enabled.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_aont.json	141	zuxos:super_7.img:/etc/sensors/config/sns_aont.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_basic_gestures.json	1157	zuxos:super_7.img:/etc/sensors/config/sns_basic_gestures.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_bring_to_ear.json	1163	zuxos:super_7.img:/etc/sensors/config/sns_bring_to_ear.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v1_0_amd.json	356	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v1_0_amd.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v1_0_ttw.json	6124	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v1_0_ttw.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v2_0_walk.json	449	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v2_0_walk.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v3_0_walk.json	1229	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v3_0_walk.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v3_1_walk.json	1295	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v3_1_walk.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v4_0_sensors.json	1134	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v4_0_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v4_0_te_cd_regs.json	1617	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v4_0_te_cd_regs.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v5_0.json	1656	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v5_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v5_0_te_cd_regs.json	1985	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v5_0_te_cd_regs.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v5_1_te_cd_regs.json	3114	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v5_1_te_cd_regs.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v6_0.json	3228	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v6_0.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v6_0_sensors.json	5941	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v6_0_sensors.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_ccd_v6_0_te_cd_regs.json	18523	zuxos:super_7.img:/etc/sensors/config/sns_ccd_v6_0_te_cd_regs.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_cm.json	474	zuxos:super_7.img:/etc/sensors/config/sns_cm.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_dae.json	893	zuxos:super_7.img:/etc/sensors/config/sns_dae.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_device_orient.json	930	zuxos:super_7.img:/etc/sensors/config/sns_device_orient.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_diag_filter.json	6816	zuxos:super_7.img:/etc/sensors/config/sns_diag_filter.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_direct_channel.json	164	zuxos:super_7.img:/etc/sensors/config/sns_direct_channel.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_distance_bound.json	861	zuxos:super_7.img:/etc/sensors/config/sns_distance_bound.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_dpc.json	649	zuxos:super_7.img:/etc/sensors/config/sns_dpc.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_facing.json	856	zuxos:super_7.img:/etc/sensors/config/sns_facing.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_flight_md.json	566	zuxos:super_7.img:/etc/sensors/config/sns_flight_md.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_fmv.json	1419	zuxos:super_7.img:/etc/sensors/config/sns_fmv.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_fmv_legacy.json	1583	zuxos:super_7.img:/etc/sensors/config/sns_fmv_legacy.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_gyro_cal.json	628	zuxos:super_7.img:/etc/sensors/config/sns_gyro_cal.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_heart_rate.json	3593	zuxos:super_7.img:/etc/sensors/config/sns_heart_rate.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_mag_cal.json	398	zuxos:super_7.img:/etc/sensors/config/sns_mag_cal.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_mag_cal_legacy.json	313	zuxos:super_7.img:/etc/sensors/config/sns_mag_cal_legacy.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_multishake.json	862	zuxos:super_7.img:/etc/sensors/config/sns_multishake.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_offbody_detect_phone.json	173	zuxos:super_7.img:/etc/sensors/config/sns_offbody_detect_phone.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_pedometer.json	797	zuxos:super_7.img:/etc/sensors/config/sns_pedometer.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_psd_disable.json	267	zuxos:super_7.img:/etc/sensors/config/sns_psd_disable.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_psd_enable.json	270	zuxos:super_7.img:/etc/sensors/config/sns_psd_enable.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_rmd.json	575	zuxos:super_7.img:/etc/sensors/config/sns_rmd.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_rotv.json	531	zuxos:super_7.img:/etc/sensors/config/sns_rotv.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_smd.json	1033	zuxos:super_7.img:/etc/sensors/config/sns_smd.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_tilt.json	522	zuxos:super_7.img:/etc/sensors/config/sns_tilt.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_tilt_sw_enabled.json	452	zuxos:super_7.img:/etc/sensors/config/sns_tilt_sw_enabled.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_tilt_to_wake.json	1265	zuxos:super_7.img:/etc/sensors/config/sns_tilt_to_wake.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_transport_ppe.json	432	zuxos:super_7.img:/etc/sensors/config/sns_transport_ppe.json	SNS registry + config served by hexagonrpcd
+sensors/config/sns_wrist_pedo.json	653	zuxos:super_7.img:/etc/sensors/config/sns_wrist_pedo.json	SNS registry + config served by hexagonrpcd
+firmware/qcom/sm8750/vpu35_4v.mbn	2409160	zuxos:super_7.img:/firmware/vpu35_4v.mbn	VPU 3.5 firmware
