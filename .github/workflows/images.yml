@@ -120,6 +120,16 @@ jobs:
           ls -l out/boot.img out/vendor_boot.img out/init_boot.img
           sha256sum out/boot.img out/vendor_boot.img out/init_boot.img
 
+      # actions/cache only saves on success, and a run that fails afterwards
+      # (packaging, upload) must not throw away 40 minutes of LTO.  Save the
+      # tree explicitly, unconditionally.
+      - name: Save kernel build tree
+        if: always() && inputs.kernel
+        uses: actions/cache/save@v4
+        with:
+          path: kernel-source
+          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config', '.gitmodules') }}
+
       - name: Package kernel modules, headers and firmware
         if: ${{ inputs.kernel }}
         run: |
