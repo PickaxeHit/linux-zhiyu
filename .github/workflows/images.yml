@@ -151,6 +151,13 @@ jobs:
           # ---- modules ----
           make -C "$KS" ARCH=arm64 LLVM=1 \
             INSTALL_MOD_PATH="$PWD/stage/linux-zhiyu-modules" modules_install
+          # modules_install writes lib/modules; on Arch /lib is a symlink to
+          # usr/lib owned by the filesystem package, so packaging lib/... both
+          # conflicts with it and would claim the symlink itself.
+          mkdir -p "stage/linux-zhiyu-modules/usr"
+          if [ -d "stage/linux-zhiyu-modules/lib" ]; then
+            mv "stage/linux-zhiyu-modules/lib" "stage/linux-zhiyu-modules/usr/lib"
+          fi
           # build/source point into the CI tree; useless (and dangling) in a
           # package.
           rm -f "stage/linux-zhiyu-modules/usr/lib/modules/$VER/build" \
