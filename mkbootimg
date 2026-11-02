@@ -52,7 +52,15 @@ echo "kernel : $KERNEL ($(stat -c %s "$KERNEL") bytes, md5 $(md5sum "$KERNEL" | 
 	--prop "com.android.build.boot.security_patch:$OS_PATCH" >/dev/null
 "$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
 
-echo "--- self check ---"
-( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) | grep -E "kernel_size|ramdisk size|command line" | head -3
+if [ -x "$UNPACK" ]; then
+	echo "--- self check ---"
+	# unpack_bootimg is optional (it comes with some, but not all, mkbootimg
+	# packages), and the pipeline must not fail the build when it prints
+	# nothing: sed is used instead of head so the consumer never closes the
+	# pipe early under "set -o pipefail".
+	( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) |
+		grep -E "kernel_size|ramdisk size|command line" |
+		sed -n '1,3p' || true
+fi
 echo "$img: $(stat -c %s "$img") bytes  md5 $(md5sum "$img" | cut -d' ' -f1)"
 echo "flash: dd if=$img of=/dev/disk/by-partlabel/boot_b bs=4M conv=fsync"

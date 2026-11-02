@@ -91,7 +91,11 @@ img=$OUT/vendor_boot.img
 	--prop "com.android.build.boot.security_patch:$OS_PATCH" >/dev/null
 "$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
 
-echo "--- self check ---"
-( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) | grep -E "pagesize|vendor_ramdisk|dtb|bootconfig" | head -4
+if [ -x "$UNPACK" ]; then
+	echo "--- self check ---"
+	( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) |
+		grep -E "pagesize|vendor_ramdisk|dtb|bootconfig" |
+		sed -n '1,4p' || true
+fi
 echo "$img: $(stat -c %s "$img") bytes  md5 $(md5sum "$img" | cut -d' ' -f1)"
 echo "flash: dd if=$img of=/dev/disk/by-partlabel/vendor_boot_b bs=4M conv=fsync"
