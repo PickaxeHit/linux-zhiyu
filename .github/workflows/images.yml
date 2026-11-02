@@ -1,0 +1,220 @@
+name: Build images and packages
+
+# Builds everything this port ships from the main tree:
+#   - boot.img, vendor_boot.img, init_boot.img (kernel + initramfs + AVB)
+#   - linux-zhiyu-modules: the kernel modules for the rootfs (re-probing; the
+#     boot critical ones also live in the vendor ramdisk)
+#   - linux-zhiyu-headers: a prepared tree for out-of-tree module builds
+#   - linux-zhiyu-firmware: the board blobs plus the built AudioReach topology
+#   - libcamera (the tb378fc fork: simple pipeline, EGL debayer, CDAF)
+#   - sensord (SensorProxy daemon backed by sensh/SNS Client)
+# Everything is packaged as both Debian (.deb) and Arch (.pkg.tar.zst) so any
+# of the rootfs images can install it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      kernel:
+        description: Build the kernel and the three images
+        type: boolean
+        default: true
+      packages:
+        description: Build the libcamera and sensord packages
+        type: boolean
+        default: true
+      image_compression:
+        description: Compression for the uploaded image tarball
+        type: choice
+        options: [zstd, xz]
+        default: zstd
+
+env:
+  LC_OPTIONS: >-
+    -Dpipelines=simple
+    -Dgstreamer=disabled
+    -Dpycamera=disabled
+    -Ddocumentation=disabled
+    -Dtests=disabled
+    -Dcam=enabled
+    -Dv4l2=enabled
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 300
+    steps:
+      - name: Free disk space and install host tools
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/hostedtoolcache /usr/local/lib/android || true
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential git pkg-config bc bison flex cpio \
+            libssl-dev libelf-dev libncurses-dev lz4 zstd xz-utils \
+            device-tree-compiler clang lld llvm pahole \
+            android-tools-mkbootimg avbtool \
+            meson ninja-build \
+            libudev-dev libdrm-dev libevent-dev libyaml-dev libjpeg-dev \
+            libglib2.0-dev python3-jinja2 python3-ply python3-yaml
+          # avbtool is not in every Ubuntu release; the AOSP copy is the same
+          # script the image scripts expect at /usr/bin/avbtool.
+          if ! command -v avbtool >/dev/null; then
+            sudo curl -fsSL \
+              "https://android.googlesource.com/platform/external/avb/+/refs/heads/main/avbtool?format=TEXT" |
+              base64 -d | sudo tee /usr/bin/avbtool >/dev/null
+            sudo chmod 755 /usr/bin/avbtool
+          fi
+          command -v mkbootimg avbtool dtc clang ld.lld
+          clang --version | head -1
+          df -h /
+
+      - name: Checkout linux-zhiyu with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+          fetch-depth: 1
+
+      - name: Fix submodule URLs for CI
+        run: |
+          # .gitmodules uses git@github.com: for libcamera; CI has no SSH key.
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git submodule sync --recursive
+          git submodule update --init --recursive
+          git -C kernel-source log --oneline -1
+          git -C libcamera log --oneline -1
+
+      - name: Build kernel, initramfs and the three images
+        if: ${{ inputs.kernel }}
+        run: |
+          set -euo pipefail
+          JOBS=$(nproc) ./build.sh
+          ./mkinitbootimg
+          ls -l out/boot.img out/vendor_boot.img out/init_boot.img
+          sha256sum out/boot.img out/vendor_boot.img out/init_boot.img
+
+      - name: Package kernel modules, headers and firmware
+        if: ${{ inputs.kernel }}
+        run: |
+          set -euo pipefail
+          KS=kernel-source
+          VER="$(make -s -C "$KS" ARCH=arm64 kernelversion)-zhiyu+"
+          echo "kernel release: $VER"
+
+          # ---- modules ----
+          make -C "$KS" ARCH=arm64 LLVM=1 \
+            INSTALL_MOD_PATH="$PWD/stage/linux-zhiyu-modules" modules_install
+          # build/source point into the CI tree; useless (and dangling) in a
+          # package.
+          rm -f "stage/linux-zhiyu-modules/usr/lib/modules/$VER/build" \
+                "stage/linux-zhiyu-modules/usr/lib/modules/$VER/source"
+          if command -v depmod >/dev/null; then
+            depmod -b "stage/linux-zhiyu-modules" "$VER" || true
+          fi
+          PKG_NAME=linux-zhiyu-modules \
+          PKG_VERSION="$VER" \
+          PKG_DESC="Linux $VER modules for the zhiyu port" \
+          PKG_DEB_DEPENDS="kmod" \
+          PKG_ARCH_DEPENDS="kmod" \
+          scripts/mkpkgs.sh stage/linux-zhiyu-modules out/pkgs
+
+          # ---- headers ----
+          # A prepared build tree, which is what out-of-tree module builds
+          # need (UAPI only would be useless for that).
+          make -C "$KS" ARCH=arm64 LLVM=1 prepare modules_prepare
+          H="stage/linux-zhiyu-headers/usr/src/linux-headers-$VER"
+          install -d "$H/arch/arm64"
+          ( cd "$KS" && cp -a include "$H"/include &&
+              cp -a arch/arm64/include "$H"/arch/arm64/include &&
+              cp -a arch/arm64/Makefile "$H"/arch/arm64/Makefile &&
+              cp -a scripts "$H"/scripts &&
+              cp -a Module.symvers .config Makefile "$H"/ )
+          install -d "stage/linux-zhiyu-headers/usr/lib/modules/$VER"
+          ln -sfn "../../../src/linux-headers-$VER" \
+            "stage/linux-zhiyu-headers/usr/lib/modules/$VER/build"
+          du -sh "$H"
+          PKG_NAME=linux-zhiyu-headers \
+          PKG_VERSION="$VER" \
+          PKG_DESC="Linux $VER headers for the zhiyu port" \
+          PKG_DEB_DEPENDS="gcc-14" \
+          PKG_ARCH_DEPENDS="gcc" \
+          scripts/mkpkgs.sh stage/linux-zhiyu-headers out/pkgs
+
+          # ---- firmware ----
+          F=stage/linux-zhiyu-firmware/usr/lib/firmware
+          install -d "$F"
+          cp -a initramfs-src/blobs/firmware/. "$F"/
+          install -Dm644 initramfs-src/tplg/sm8750-tplg.bin \
+            "$F/qcom/sm8750/sm8750-tplg.bin"
+          find "$F" -type f | wc -l
+          PKG_NAME=linux-zhiyu-firmware \
+          PKG_VERSION="$VER" \
+          PKG_DESC="Firmware blobs and AudioReach topology for the zhiyu port" \
+          PKG_DEB_DEPENDS="" \
+          PKG_ARCH_DEPENDS="" \
+          scripts/mkpkgs.sh stage/linux-zhiyu-firmware out/pkgs
+          ls -l out/pkgs
+
+      - name: Build libcamera and package it
+        if: ${{ inputs.packages }}
+        run: |
+          set -euo pipefail
+          cd libcamera
+          meson setup build --buildtype=release --prefix=/usr --libdir=lib $LC_OPTIONS
+          meson compile -C build
+          DESTDIR="$PWD/../stage/libcamera" meson install -C build --no-rebuild
+          cd ..
+          # libcamera ships udev rules and the IPA modules; keep them.
+          PKG_NAME=libcamera \
+          PKG_VERSION=$(meson introspect libcamera/build --projectinfo | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])') \
+          PKG_DESC="Camera stack for the zhiyu port (simple pipeline, EGL debayer, CDAF)" \
+          PKG_DEB_DEPENDS="libc6, libstdc++6, libudev1, libdrm2, libyaml-0-2, libevent-2.1-7, libjpeg62-turbo" \
+          PKG_ARCH_DEPENDS="gcc-libs glibc systemd-libs libdrm libyaml libevent libjpeg-turbo" \
+          scripts/mkpkgs.sh stage/libcamera out/pkgs
+
+      - name: Build sensord and package it
+        if: ${{ inputs.packages }}
+        run: |
+          set -euo pipefail
+          make -C sensors
+          install -Dm755 sensors/sensord stage/sensord/usr/bin/sensord
+          # The unit in the tree points at /usr/local/bin for hand installs;
+          # the package owns /usr/bin.
+          install -Dm644 sensors/sensord.service \
+            stage/sensord/usr/lib/systemd/system/sensord.service
+          sed -i 's#^ExecStart=.*#ExecStart=/usr/bin/sensord#' \
+            stage/sensord/usr/lib/systemd/system/sensord.service
+          PKG_NAME=sensord \
+          PKG_VERSION=1.0.0 \
+          PKG_DESC="SensorProxy daemon backed by sensh/SNS Client" \
+          PKG_DEB_DEPENDS="libc6, libglib2.0-0" \
+          PKG_ARCH_DEPENDS="glibc glib2" \
+          scripts/mkpkgs.sh stage/sensord out/pkgs
+          ls -l out/pkgs
+
+      - name: Collect artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          if [ "${{ inputs.kernel }}" = "true" ]; then
+            cp out/boot.img out/vendor_boot.img out/init_boot.img dist/
+          fi
+          if [ "${{ inputs.packages }}" = "true" ]; then
+            cp out/pkgs/* dist/
+          fi
+          if [ "${{ inputs.image_compression }}" = "xz" ]; then
+            tar -C dist -I 'xz -9e -T0' -cf images-and-packages.tar.xz .
+          else
+            tar -C dist -I 'zstd -T0 -19' -cf images-and-packages.tar.zst .
+          fi
+          sha256sum images-and-packages.tar.* > images-and-packages.sha256
+          ls -lh dist images-and-packages.*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zhiyu-images-and-packages
+          path: |
+            dist/*
+            images-and-packages.tar.*
+            images-and-packages.sha256
+          compression-level: 0
+          retention-days: 7
