@@ -40,6 +40,15 @@ PHASES = {
 AUDIO_PHASE = 5
 REST_PHASE = 4
 
+# Modules that have to come last inside their phase even though nothing links
+# against them at module level.  The machine driver probes the card and binds
+# its DAI links to the codec and SoundWire components one by one; if it probes
+# before them, the links that need those components are dropped and the PCMs
+# they would have exported (the capture one, for example) never appear.
+PHASE_LAST = {
+    AUDIO_PHASE: "snd-soc-sm8750",
+}
+
 
 def norm(name):
     return name.replace("-", "_")
@@ -107,6 +116,21 @@ def main():
         print("order-modules: warning: %s is pulled in before the ADSP "
               "because a non-audio module depends on it" % mod,
               file=sys.stderr)
+
+    # Move the "must be last" modules to the end of their phase, in the order
+    # they are listed.
+    for ph, names in PHASE_LAST.items():
+        wanted = [norm(n) for n in names.split()]
+        moved = []
+        for want in wanted:
+            path = by_name.get(want)
+            if path is None:
+                continue
+            entry = (ph, path)
+            if entry in order:
+                order.remove(entry)
+                moved.append(entry)
+        order.extend(moved)
 
     for ph, mod in order:
         print("%d\t%s" % (ph, mod))
