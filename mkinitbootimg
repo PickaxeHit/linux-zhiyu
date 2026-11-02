@@ -48,7 +48,11 @@ img=$OUT/init_boot.img
 	--prop "com.android.build.boot.security_patch:$OS_PATCH" >/dev/null
 "$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
 
-echo "--- self check ---"
-( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) | grep -E "kernel_size|ramdisk size" | head -2
+if [ -x "$UNPACK" ]; then
+	echo "--- self check ---"
+	( cd "$work" && "$UNPACK" --boot_img "$img" 2>/dev/null ) |
+		grep -E "kernel_size|ramdisk size" |
+		sed -n '1,2p' || true
+fi
 echo "$img: $(stat -c %s "$img") bytes  md5 $(md5sum "$img" | cut -d' ' -f1)"
 echo "flash: dd if=$img of=/dev/disk/by-partlabel/init_boot_b bs=4M conv=fsync"
