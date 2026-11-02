@@ -4236,6 +4236,12 @@
 				fastrpc {
 					compatible = "qcom,fastrpc";
 					qcom,glink-channels = "fastrpcglink-apps-dsp";
+					/* Without this the driver registers the DSP as a
+					 * secure domain and only exposes /dev/fastrpc-adsp-secure;
+					 * hexagonrpcd (and therefore sensh) needs the plain
+					 * /dev/fastrpc-adsp node.  Every other board in this
+					 * tree (e.g. hamoa/sm8650) sets it. */
+					qcom,non-secure-domain;
 					label = "adsp";
 					memory-region = <0x88>;
 					qcom,vmids = <0x16 0x25>;

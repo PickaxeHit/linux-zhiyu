@@ -8,6 +8,9 @@ Before=iio-sensor-proxy.service
 
 [Service]
 Type=simple
+# The fastrpc driver only autoloads on machine-specific udev events; loading
+# it here guarantees /dev/fastrpc-adsp exists before sensh talks to the ADSP.
+ExecStartPre=-/usr/bin/modprobe -q fastrpc
 ExecStart=/usr/local/bin/zhiyu-sensord
 Restart=always
 RestartSec=2
