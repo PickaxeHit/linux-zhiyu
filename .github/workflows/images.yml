@@ -225,19 +225,21 @@ jobs:
         run: |
           set -euo pipefail
           make -C sensors
-          install -Dm755 sensors/sensord stage/sensord/usr/bin/sensord
+          # zhiyu-sensord, not sensord: lm_sensors owns /usr/bin/sensord and
+          # its unit, and pacman refuses to overwrite another package's files.
+          install -Dm755 sensors/sensord stage/zhiyu-sensord/usr/bin/zhiyu-sensord
           # The unit in the tree points at /usr/local/bin for hand installs;
           # the package owns /usr/bin.
-          install -Dm644 sensors/sensord.service \
-            stage/sensord/usr/lib/systemd/system/sensord.service
-          sed -i 's#^ExecStart=.*#ExecStart=/usr/bin/sensord#' \
-            stage/sensord/usr/lib/systemd/system/sensord.service
-          PKG_NAME=sensord \
+          install -Dm644 sensors/zhiyu-sensord.service \
+            stage/zhiyu-sensord/usr/lib/systemd/system/zhiyu-sensord.service
+          sed -i 's#^ExecStart=.*#ExecStart=/usr/bin/zhiyu-sensord#' \
+            stage/zhiyu-sensord/usr/lib/systemd/system/zhiyu-sensord.service
+          PKG_NAME=zhiyu-sensord \
           PKG_VERSION=1.0.0 \
           PKG_DESC="SensorProxy daemon backed by sensh/SNS Client" \
           PKG_DEB_DEPENDS="libc6, libglib2.0-0" \
           PKG_ARCH_DEPENDS="glibc glib2" \
-          scripts/mkpkgs.sh stage/sensord out/pkgs
+          scripts/mkpkgs.sh stage/zhiyu-sensord out/pkgs
           ls -l out/pkgs
 
       - name: Collect artifacts

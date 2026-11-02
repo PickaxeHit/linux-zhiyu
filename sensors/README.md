@@ -15,11 +15,11 @@ make -C sensors
 ## Install
 
 ```sh
-install -Dm755 sensors/sensord /usr/local/bin/sensord
-install -Dm644 sensors/sensord.service /etc/systemd/system/sensord.service
+install -Dm755 sensors/sensord /usr/local/bin/zhiyu-sensord
+install -Dm644 sensors/zhiyu-sensord.service /etc/systemd/system/zhiyu-sensord.service
 systemctl daemon-reload
 systemctl disable --now iio-sensor-proxy
-systemctl enable --now sensord.service
+systemctl enable --now zhiyu-sensord.service
 ```
 
 The accelerometer stream is exposed as `AccelerometerOrientation`; the gyro
