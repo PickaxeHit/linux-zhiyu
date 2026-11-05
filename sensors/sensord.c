@@ -6,13 +6,19 @@
  * SNS Client QMI/protobuf work; this daemon publishes the desktop
  * SensorProxy D-Bus API.
  */
+#include <errno.h>
 #include <fcntl.h>
 #include <gio/gio.h>
 #include <glib.h>
+#include <linux/uinput.h>
 #include <math.h>
+#include <poll.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define BUS_NAME "net.hadess.SensorProxy"
@@ -44,6 +50,8 @@ typedef enum {
 	STREAM_LIGHT,
 	STREAM_ACCEL,
 	STREAM_GYRO,
+	STREAM_HALL,
+	STREAM_COUNT,
 } StreamType;
 
 typedef struct Sensord Sensord;
@@ -78,8 +86,41 @@ struct Sensord {
 	gint candidate_quadrant;
 	gint64 candidate_since_us;
 
-	Stream *streams[3];
+	gboolean ready_notified;
+	int lid_fd;
+	int lid_state;
+	Stream *streams[STREAM_COUNT];
 };
+
+/* KDE caches lid presence at startup. Order desktop/UPower startup after
+ * the virtual switch exists; do not block login indefinitely if SSC is down. */
+static gboolean notify_ready(gpointer user_data)
+{
+	Sensord *self = user_data;
+	GError *error = NULL;
+	gint status;
+	if (self->ready_notified)
+		return G_SOURCE_REMOVE;
+	if (!g_getenv("NOTIFY_SOCKET")) {
+		self->ready_notified = TRUE;
+		return G_SOURCE_REMOVE;
+	}
+	if (!g_spawn_command_line_sync("/usr/bin/systemd-notify --ready", NULL,
+				      NULL, &status, &error)) {
+		g_warning("notify readiness: %s", error->message);
+		g_clear_error(&error);
+		return G_SOURCE_CONTINUE;
+	}
+	if (!g_spawn_check_wait_status(status, &error)) {
+		g_warning("notify readiness: %s", error->message);
+		g_clear_error(&error);
+		return G_SOURCE_CONTINUE;
+	}
+	self->ready_notified = TRUE;
+	if (self->lid_fd < 0)
+		g_warning("Hall input unavailable; allowing desktop startup without it");
+	return G_SOURCE_REMOVE;
+}
 
 static void set_orientation(Sensord *self, const gchar *orientation);
 
@@ -265,6 +306,118 @@ static void set_orientation(Sensord *self, const gchar *orientation)
 			      g_variant_new_string(self->orientation));
 }
 
+/* sns_hall_event (message 770): field 1 is FAR=0 / NEAR=1,
+ * field 2 is sample quality (0=unreliable, 1..3=valid). The Android HAL
+ * reverses the reported float; SSC's raw NEAR value is already SW_LID. */
+static gboolean read_varint(const guint8 **p, const guint8 *end, guint64 *value)
+{
+	*value = 0;
+	for (unsigned shift = 0; shift < 64 && *p < end; shift += 7) {
+		guint8 b = *(*p)++;
+		if (shift == 63 && b > 1)
+			return FALSE;
+		*value |= (guint64)(b & 0x7f) << shift;
+		if (!(b & 0x80))
+			return TRUE;
+	}
+	return FALSE;
+}
+
+static int decode_hall(const gchar *line)
+{
+	const gchar *hex = strstr(line, "received unknown event 770, raw: ");
+	guint8 data[256];
+	guint64 state = 2, quality = 0;
+	gboolean have_state = FALSE, have_quality = FALSE;
+	if (!hex)
+		return -1;
+	hex += strlen("received unknown event 770, raw: ");
+	gsize len = strlen(hex);
+	if (!len || len % 2 || len / 2 > sizeof(data))
+		return -1;
+	for (gsize i = 0; i < len / 2; i++) {
+		int hi = g_ascii_xdigit_value(hex[2 * i]);
+		int lo = g_ascii_xdigit_value(hex[2 * i + 1]);
+		if (hi < 0 || lo < 0)
+			return -1;
+		data[i] = (hi << 4) | lo;
+	}
+	const guint8 *p = data, *end = data + len / 2;
+	while (p < end) {
+		guint64 tag, value;
+		if (!read_varint(&p, end, &tag) || !(tag >> 3))
+			return -1;
+		if ((tag & 7) == 0) {
+			if (!read_varint(&p, end, &value))
+				return -1;
+			if ((tag >> 3) == 1) {
+				state = value;
+				have_state = TRUE;
+			} else if ((tag >> 3) == 2) {
+				quality = value;
+				have_quality = TRUE;
+			}
+		} else {
+			guint64 skip;
+			switch (tag & 7) {
+			case 1: skip = 8; break;
+			case 5: skip = 4; break;
+			case 2:
+				if (!read_varint(&p, end, &skip))
+					return -1;
+				break;
+			default: return -1;
+			}
+			if (skip > (guint64)(end - p))
+				return -1;
+			p += skip;
+		}
+	}
+	return have_state && have_quality && state <= 1 && quality >= 1 && quality <= 3
+		? (int)state : -1;
+}
+
+static void update_lid(Sensord *self, int closed)
+{
+	if (self->lid_state == closed && self->lid_fd >= 0)
+		return;
+	if (self->lid_fd < 0) {
+		struct uinput_setup setup = { .id.bustype = BUS_HOST };
+		g_strlcpy(setup.name, "Zhiyu Folio Lid", sizeof(setup.name));
+		int fd = open("/dev/uinput", O_WRONLY | O_CLOEXEC);
+		if (fd < 0 || ioctl(fd, UI_SET_EVBIT, EV_SW) < 0 ||
+		    ioctl(fd, UI_SET_SWBIT, SW_LID) < 0 ||
+		    ioctl(fd, UI_DEV_SETUP, &setup) < 0 ||
+		    ioctl(fd, UI_DEV_CREATE) < 0) {
+			g_warning("create folio input: %s", g_strerror(errno));
+			if (fd >= 0)
+				close(fd);
+			self->lid_state = closed;
+			return;
+		}
+		self->lid_fd = fd;
+	}
+	struct input_event events[2] = {
+		{ .type = EV_SW, .code = SW_LID, .value = closed },
+		{ .type = EV_SYN, .code = SYN_REPORT },
+	};
+	ssize_t n;
+	do {
+		n = write(self->lid_fd, events, sizeof(events));
+	} while (n < 0 && errno == EINTR);
+	if (n != sizeof(events)) {
+		g_warning("write folio input: %s", n < 0 ? g_strerror(errno) : "short write");
+		ioctl(self->lid_fd, UI_DEV_DESTROY);
+		close(self->lid_fd);
+		self->lid_fd = -1;
+		self->lid_state = closed;
+		return;
+	}
+	self->lid_state = closed;
+	g_message("Folio lid %s (SW_LID=%d)", closed ? "closed" : "open", closed);
+	notify_ready(self);
+}
+
 static void read_stream_cb(GObject *source, GAsyncResult *res, gpointer user_data)
 {
 	Stream *stream = user_data;
@@ -279,9 +432,25 @@ static void read_stream_cb(GObject *source, GAsyncResult *res, gpointer user_dat
 			g_warning("sensh stream read: %s", error->message);
 			g_error_free(error);
 		}
+		if (stream->type == STREAM_HALL) {
+			g_warning("Hall stream ended; retrying subscription");
+			stream->self->streams[STREAM_HALL] = NULL;
+			/* Keep the input device and last known state across reconnects.
+			 * Replacing it can leave UPower caching the removed lid state. */
+			g_subprocess_force_exit(stream->proc);
+			g_subprocess_wait(stream->proc, NULL, NULL);
+			g_object_unref(stream->proc);
+			g_object_unref(stream->out);
+			g_free(stream);
+		}
 		return;
 	}
 
+	if (stream->type == STREAM_HALL) {
+		int closed = decode_hall(line);
+		if (closed >= 0)
+			update_lid(stream->self, closed);
+	}
 	const gchar *p = strstr(line, "sensor data:");
 	if (p) {
 		p += strlen("sensor data:");
@@ -313,33 +482,64 @@ static void read_stream_cb(GObject *source, GAsyncResult *res, gpointer user_dat
 
 static gchar *lookup_suid(const gchar *type)
 {
-	gchar *cmd = g_strdup_printf("timeout 2 %s lookup %s", SENSH, type);
-	gchar *out = NULL;
-	gint status = 0;
+	gchar *argv[] = { (gchar *)SENSH, "lookup", (gchar *)type, NULL };
 	GError *error = NULL;
+	GPid pid;
+	gint fd, status;
 	gchar *suid = NULL;
+	GString *out = g_string_new(NULL);
 
-	if (!g_spawn_command_line_sync(cmd, &out, NULL, &status, &error)) {
+	if (!g_spawn_async_with_pipes(NULL, argv, NULL,
+			G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_STDERR_TO_DEV_NULL,
+			NULL, NULL, &pid, NULL, &fd, NULL, &error)) {
 		g_warning("sensh lookup %s: %s", type, error->message);
 		g_error_free(error);
-		g_free(cmd);
+		g_string_free(out, TRUE);
 		return NULL;
 	}
-	if (out) {
-		gchar *p = strstr(out, "sensor found:");
-		if (p) {
-			p += strlen("sensor found:");
-			while (*p == ' ' || *p == '\t')
-				p++;
-			gchar *end = p;
-			while (*end && *end != '\n' && *end != ' ' && *end != '\t')
+	/* sensh keeps its lookup connection alive after returning a SUID.
+	 * Stop it as soon as a complete result arrives, instead of waiting
+	 * two seconds per sensor before desktop startup can proceed. */
+	gint64 deadline = g_get_monotonic_time() + 2 * G_TIME_SPAN_SECOND;
+	while (g_get_monotonic_time() < deadline) {
+		struct pollfd pfd = { .fd = fd, .events = POLLIN };
+		int ms = (int)((deadline - g_get_monotonic_time() + 999) / 1000);
+		if (ms <= 0)
+			break;
+		int result = poll(&pfd, 1, ms);
+		if (result < 0 && errno == EINTR)
+			continue;
+		if (result <= 0 || !(pfd.revents & (POLLIN | POLLHUP)))
+			break;
+		gchar buf[512];
+		ssize_t n = read(fd, buf, sizeof(buf));
+		if (n < 0 && errno == EINTR)
+			continue;
+		if (n <= 0)
+			break;
+		g_string_append_len(out, buf, n);
+		gchar *start = strstr(out->str, "sensor found:");
+		if (start) {
+			start += strlen("sensor found:");
+			while (*start == ' ' || *start == '\t')
+				start++;
+			gchar *end = start;
+			while (*end && !g_ascii_isspace(*end))
 				end++;
-			if (end != p)
-				suid = g_strndup(p, end - p);
+			if (*end && end != start) {
+				suid = g_strndup(start, end - start);
+				break;
+			}
 		}
+		if (out->len > 8192)
+			break;
 	}
-	g_free(out);
-	g_free(cmd);
+	close(fd);
+	kill(pid, SIGKILL);
+	while (waitpid(pid, &status, 0) < 0 && errno == EINTR)
+		;
+	g_spawn_close_pid(pid);
+	g_string_free(out, TRUE);
 	return suid;
 }
 
@@ -351,9 +551,15 @@ static Stream *start_stream(Sensord *self, StreamType type, const gchar *suid,
 
 	stream->self = self;
 	stream->type = type;
-	stream->proc = g_subprocess_new(G_SUBPROCESS_FLAGS_STDOUT_PIPE |
-					G_SUBPROCESS_FLAGS_STDERR_SILENCE,
-					&error, SENSH, "config", suid, rate, NULL);
+	if (type == STREAM_HALL) {
+		stream->proc = g_subprocess_new(G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+				G_SUBPROCESS_FLAGS_STDERR_SILENCE, &error,
+				"/usr/bin/stdbuf", "-oL", SENSH, "watch", suid, NULL);
+	} else {
+		stream->proc = g_subprocess_new(G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+				G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+				&error, SENSH, "config", suid, rate, NULL);
+	}
 	if (!stream->proc) {
 		g_warning("sensh config %s: %s", suid, error->message);
 		g_error_free(error);
@@ -404,6 +610,24 @@ static void start_sensor(Sensord *self)
 			start_stream(self, STREAM_GYRO, gyro, "50");
 		g_free(gyro);
 	}
+}
+
+
+static gboolean maintain_hall(gpointer user_data)
+{
+	Sensord *self = user_data;
+	if (!self->streams[STREAM_HALL]) {
+		gchar *hall = lookup_suid("hall");
+		if (hall) {
+			g_message("hall SUID %s", hall);
+			self->streams[STREAM_HALL] =
+				start_stream(self, STREAM_HALL, hall, NULL);
+			g_free(hall);
+		}
+	} else if (self->lid_fd < 0 && self->lid_state >= 0) {
+		update_lid(self, self->lid_state);
+	}
+	return G_SOURCE_CONTINUE;
 }
 
 static GVariant *get_property(GDBusConnection *connection,
@@ -494,11 +718,12 @@ static void on_name_acquired(GDBusConnection *connection, const gchar *name,
 			     gpointer user_data)
 {
 	start_sensor(user_data);
+	maintain_hall(user_data);
 }
 
 int main(void)
 {
-	Sensord self = { 0 };
+	Sensord self = { .lid_fd = -1, .lid_state = -1 };
 	GMainLoop *loop;
 
 	loop = g_main_loop_new(NULL, FALSE);
@@ -508,6 +733,8 @@ int main(void)
 				       on_bus_acquired, on_name_acquired, NULL,
 				       &self, NULL);
 
+	g_timeout_add_seconds(5, maintain_hall, &self);
+	g_timeout_add_seconds(20, notify_ready, &self);
 	g_main_loop_run(loop);
 	g_main_loop_unref(loop);
 	return 0;
