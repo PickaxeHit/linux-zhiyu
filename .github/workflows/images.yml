@@ -60,7 +60,7 @@ jobs:
             build-essential git pkg-config bc bison flex cpio \
             libssl-dev libelf-dev libncurses-dev lz4 zstd xz-utils \
             device-tree-compiler clang lld llvm pahole \
-            meson ninja-build \
+            meson ninja-build cmake cargo curl dpkg-dev \
             libudev-dev libdrm-dev libevent-dev libyaml-dev libjpeg-dev \
             libglib2.0-dev python3-jinja2 python3-ply python3-yaml \
             qt6-base-dev libgl1-mesa-dev
@@ -134,6 +134,10 @@ jobs:
           git -C kernel-source log --oneline -1
           git -C libcamera log --oneline -1
 
+      - name: Set up native Rust for the IDL compiler
+        if: ${{ inputs.kernel }}
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Build kernel, initramfs and the three images
         if: ${{ inputs.kernel }}
         run: |
@@ -161,7 +165,7 @@ jobs:
         run: |
           set -euo pipefail
           KS=kernel-source
-          VER="$(make -s -C "$KS" ARCH=arm64 kernelversion)-zhiyu+"
+          VER="$(make -s -C "$KS" ARCH=arm64 kernelrelease)"
           echo "kernel release: $VER"
 
           # ---- modules ----

@@ -14,3 +14,7 @@
 /initramfs-src/busybox/*.a
 /initramfs-src/busybox/*.cmd
 *.bak
+
+/keymint/bin/
+/keymint/__pycache__/
+/keymint/.deps/

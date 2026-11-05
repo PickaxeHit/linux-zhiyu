@@ -1,0 +1,3 @@
+# Ubuntu 24.04 LTS noble-updates ARM64; hash checked against signed package index.
+# Only headers/static libcrypto are used; no shared libraries are staged.
+libssl-dev 3.0.13-0ubuntu3.16 a5026a035b9461fa9783e26a027f8c91bad7606ef0eeb7250382a532308bf61d pool/main/o/openssl/libssl-dev_3.0.13-0ubuntu3.16_arm64.deb

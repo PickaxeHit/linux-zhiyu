@@ -10,19 +10,16 @@ KS=${KS:-$root/kernel-source}
 JOBS=${JOBS:-$(nproc)}
 
 [ -d "$KS" ] || { echo "kernel-source submodule is not initialized" >&2; exit 1; }
-
 # The board config is kept per stable series, and the branch we build (zhiyu)
 # is a merge target for it, so pulling in v7.3.2 or v7.4 keeps working here
 # without an edit: only a new series needs a new configs/linux-<X.Y> file.
 KVER=${KVER:-$(make -s -C "$KS" ARCH=arm64 kernelversion)}
 SERIES=${SERIES:-${KVER%.*}}
 CFG=${CFG:-$root/configs/linux-$SERIES-zhiyu.config}
-VER=${VER:-$KVER-zhiyu+}
 [ -f "$CFG" ] || { echo "no kernel config for $SERIES: $CFG" >&2; exit 1; }
 
 echo "kernel : $KS ($KVER)"
 echo "config : $CFG"
-echo "release: $VER"
 
 cp "$CFG" "$KS/.config"
 # gcc, not LLVM=1: LTO is disabled in the config, and a clang-built kernel
@@ -33,7 +30,10 @@ cp "$CFG" "$KS/.config"
 MAKE_ARGS="ARCH=arm64"
 [ -n "${CROSS_COMPILE:-}" ] && MAKE_ARGS="$MAKE_ARGS CROSS_COMPILE=$CROSS_COMPILE"
 make -C "$KS" $MAKE_ARGS olddefconfig
+VER=${VER:-$(make -s -C "$KS" $MAKE_ARGS kernelrelease)}
+echo "release: $VER"
 make -C "$KS" -j"$JOBS" $MAKE_ARGS Image modules
+"$root/keymint/build-deps.sh"
 ( cd "$root" && KS="$KS" VER="$VER" ./initramfs-src/build.sh )
 ( cd "$root" && KERNEL="$KS/arch/arm64/boot/Image" ./mkbootimg )
 ( cd "$root" && ./mkvendorbootimg )
