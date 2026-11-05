@@ -19,8 +19,9 @@
 #   3. Mount the Linux rootfs and switch_root into its init (/sbin/init,
 #      or the NixOS system generation's init).
 #
-# The target rootfs is treated as read-only: this script never writes a file
-# into it, it only moves /proc, /sys and /dev into it before switch_root.
+# Prepare Linux mountpoints, then move /proc, /sys, /dev and /run before
+# switch_root. Android's /data root permissions and encryption policies stay
+# unchanged; the full userdata view has a Linux-only protected parent.
 #
 # If step 3 fails we drop to a diagnostic shell instead of panicking, so a
 # broken image can never make the board unreachable.
@@ -52,7 +53,7 @@ mount -t tmpfs tmpfs /run
 # same way every other initramfs does it.  Writing to stdout as well would
 # bypass loglevel and paint the panel even when quiet is set.
 log() { echo "<6>ZHIYU: $*" >/dev/kmsg; }
-cmsg() { log "SD-ROOTFS: $*"; }
+cmsg() { log "ROOTFS: $*"; }
 
 log "INIT $(uname -r)"
 
@@ -329,10 +330,13 @@ apply_factory_macs() {
 # ---------------------------------------------------------------------------
 # 4. rootfs (userdata/linux or microSD) -> switch_root into /sbin/init.
 # ---------------------------------------------------------------------------
-# 4a. Android userdata (f2fs, unencrypted) -> /data/linux.
+# 4a. Android userdata (plain F2FS or metadata-encrypted F2FS) -> /data/linux.
 # The Linux rootfs is a plain directory on the shared f2fs, so the space is
 # shared dynamically with Android instead of being split into partitions.
 data_rootfs() {
+	case " $(cat /proc/cmdline) " in
+		*" zhiyu.root=sd "*) cmsg "SD root requested"; return 1 ;;
+	esac
 	# The UFS probe is asynchronous: the partitions show up a moment after the
 	# module is in, so wait for the userdata one instead of looking once.  A
 	# single look used to be enough only because the old module loop happened
@@ -354,13 +358,38 @@ data_rootfs() {
 	[ "$i" -gt 0 ] && cmsg "userdata $ud after ${i}s"
 
 	mkdir -p /mnt/data
-	i=0
-	until mount -t f2fs -o rw "$ud" /mnt/data; do
-		i=$((i + 1))
-		[ "$i" -ge 3 ] && { cmsg "f2fs mount of $ud failed"; return 1; }
-		cmsg "f2fs mount of $ud failed, retry $i"
-		sleep 1
-	done
+	data_encrypted=0
+	if mount -t f2fs -o ro,norecovery,inlinecrypt "$ud" /mnt/data; then
+		if ! /bin/userdata-map check-writable "$ud"; then
+			cmsg "plain userdata is not ready for writing"
+			umount /mnt/data
+			return 1
+		fi
+		umount /mnt/data || return 1
+		mount -t f2fs -o rw,noatime,inlinecrypt,nodiscard,barrier,fsync_mode=posix,background_gc=off "$ud" /mnt/data || return 1
+		if ! /bin/userdata-map quota-check "$ud"; then
+			cmsg "plain userdata quotas unavailable"
+			umount /mnt/data
+			return 1
+		fi
+		cmsg "plain userdata mounted"
+	else
+		metadata=
+		for b in /sys/class/block/*; do
+			if grep -q '^PARTNAME=metadata$' "$b/uevent" 2>/dev/null; then
+				metadata=/dev/${b##*/}
+				break
+			fi
+		done
+		[ -n "$metadata" ] || { cmsg "no metadata partition"; return 1; }
+		cmsg "plain mount failed; trying metadata decryption"
+		if ! /libexec/metadata-root "$ud" "$metadata" /mnt/data >/dev/kmsg 2>&1; then
+			cmsg "metadata decryption/mount failed; falling back to SD"
+			return 1
+		fi
+		data_encrypted=1
+		cmsg "metadata-encrypted userdata mounted"
+	fi
 
 	# One-shot alternate rootfs: writing "<dir>" into /data/linux.alt makes the
 	# next boot use /data/<dir> and consumes the marker, so a broken alternate
@@ -379,10 +408,16 @@ data_rootfs() {
 	fi
 
 	mkdir -p /newroot
-	mount --bind "/mnt/data/$sub" /newroot || { cmsg "bind of /data/$sub failed"; umount /mnt/data; return 1; }
+	mount --bind "/mnt/data/$sub" /newroot || { cmsg "bind of /data/$sub failed"; release_data; return 1; }
 	cmsg "data rootfs $ud:/$sub mounted"
-	finish_rootfs || { umount /newroot; umount /mnt/data; return 1; }
+	root_on_userdata=1
+	finish_rootfs || { root_on_userdata=0; umount /newroot; release_data; return 1; }
 	return 0
+}
+
+release_data() {
+	umount /mnt/data || return 1
+	[ "$data_encrypted" -eq 0 ] || /bin/userdata-map remove
 }
 
 sd_rootfs() {
@@ -461,11 +496,29 @@ finish_rootfs() {
 	cmsg "root init: $init"
 
 	apply_factory_macs
+	# Keep the whole filesystem visible after switching into its linux subdir.
+	# systemd can then track/remount it during shutdown instead of leaving an
+	# unreachable writable mount behind in the discarded initramfs.
+	if [ "${root_on_userdata:-0}" -eq 1 ]; then
+		# Android owns the filesystem root as uid 1000, which is also the
+		# usual Linux desktop uid. Protect this view through a Linux-only
+		# parent directory; never chmod/chown Android's /data root.
+		mkdir -p /newroot/root/android-data /newroot/mnt
+		chmod 0700 /newroot/root
+		if [ -L /newroot/mnt/android-data ]; then
+			[ "$(readlink /newroot/mnt/android-data)" = /root/android-data ] || return 1
+		else
+			[ ! -e /newroot/mnt/android-data ] || rmdir /newroot/mnt/android-data || return 1
+			ln -s /root/android-data /newroot/mnt/android-data || return 1
+		fi
+		mount -o move /mnt/data /newroot/root/android-data || return 1
+	fi
 
 	cmsg "switching to the Linux rootfs"
 	mount -o move /proc /newroot/proc 2>/dev/null
 	mount -o move /sys  /newroot/sys  2>/dev/null
 	mount -o move /dev  /newroot/dev  2>/dev/null
+	mount -o move /run  /newroot/run  2>/dev/null
 
 
 	exec switch_root /newroot "$init"

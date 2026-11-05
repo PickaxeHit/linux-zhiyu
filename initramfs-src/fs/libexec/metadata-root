@@ -1,0 +1,68 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Recover only metadata encryption. /data/linux has no fscrypt policy.
+set -eu
+[ "$#" -eq 3 ] || exit 2
+userdata=$1
+metadata=$2
+target=$3
+umask 077
+state=$(mktemp -d /run/keymint-root.XXXXXX)
+mkdir "$state/metadata"
+time_pid=
+rpmb_pid=
+meta_mounted=0
+data_mounted=0
+mapping=0
+success=0
+cleanup() {
+	[ -z "$time_pid" ] || kill "$time_pid" 2>/dev/null || true
+	[ -z "$rpmb_pid" ] || kill "$rpmb_pid" 2>/dev/null || true
+	[ -z "$time_pid" ] || wait "$time_pid" 2>/dev/null || true
+	[ -z "$rpmb_pid" ] || wait "$rpmb_pid" 2>/dev/null || true
+	rm -f "$state/metadata.eph"
+	if [ "$success" -ne 1 ]; then
+		[ "$data_mounted" -eq 0 ] || umount "$target" || true
+		[ "$mapping" -eq 0 ] || /bin/userdata-map remove || true
+	fi
+	[ "$meta_mounted" -eq 0 ] || umount "$state/metadata" || true
+}
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
+if mount -t f2fs -o ro,norecovery "$metadata" "$state/metadata"; then
+	meta_mounted=1
+elif mount -t ext4 -o ro,noload "$metadata" "$state/metadata"; then
+	meta_mounted=1
+else
+	echo 'Cannot mount metadata read-only' >&2
+	exit 1
+fi
+
+: >"$state/time.log"
+: >"$state/rpmb.log"
+/bin/keymint-time >"$state/time.log" 2>&1 & time_pid=$!
+/bin/keymint-rpmb >"$state/rpmb.log" 2>&1 & rpmb_pid=$!
+i=0
+while [ "$i" -lt 50 ]; do
+	if grep -q 'TIME_LISTENER init=0' "$state/time.log" &&
+	   grep -q 'READY read-only' "$state/rpmb.log"; then break; fi
+	kill -0 "$time_pid" && kill -0 "$rpmb_pid" || { cat "$state/"*.log >&2; exit 1; }
+	i=$((i + 1))
+	sleep 0.1
+done
+grep -q 'TIME_LISTENER init=0' "$state/time.log"
+grep -q 'READY read-only' "$state/rpmb.log"
+/bin/keymint-recover "$state/metadata/vold/metadata_encryption/key" "$state/metadata.eph"
+/bin/userdata-map create "$userdata" "$state/metadata.eph"
+mapping=1
+rm -f "$state/metadata.eph"
+umount "$state/metadata"
+meta_mounted=0
+mkdir -p "$target"
+/bin/userdata-map check-writable /dev/mapper/android-data-root
+mount -t f2fs -o rw,noatime,inlinecrypt,nodiscard,barrier,fsync_mode=posix,background_gc=off \
+	/dev/mapper/android-data-root "$target"
+data_mounted=1
+/bin/userdata-map quota-check /dev/mapper/android-data-root
+success=1

@@ -146,3 +146,9 @@ qcom-camss.ko	drivers/media/platform/qcom/camss/qcom-camss.ko
 ov13b10.ko	drivers/media/i2c/ov13b10.ko
 gc08a8.ko	drivers/media/i2c/gc08a8.ko
 dw9807-vcm.ko	drivers/media/i2c/dw9807-vcm.ko
+
+# Android metadata / hardware-wrapped fscrypt support
+qcomtee.ko	drivers/tee/qcomtee/qcomtee.ko
+dm-inlinecrypt.ko	drivers/md/dm-inlinecrypt.ko
+quota_tree.ko	fs/quota/quota_tree.ko
+quota_v2.ko	fs/quota/quota_v2.ko

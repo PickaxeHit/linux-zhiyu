@@ -23,7 +23,7 @@ for cand in "${KS:-}" "$here/../kernel-source" /nosnap/gt13-port/linux/kernel-so
 	if [ -f "$cand/$first_src" ]; then KS=$cand; break; fi
 done
 KS=${KS:-$here/../kernel-source}
-VER=${VER:-7.2.11-zhiyu-diag-dirty}
+VER=${VER:-$(make -s -C "$KS" ARCH=arm64 kernelrelease)}
 BB=$here/busybox/busybox
 
 die() { echo "build.sh: $*" >&2; exit 1; }
@@ -45,6 +45,8 @@ mkdir -p "$stage"/bin "$stage"/dev/pts "$stage"/etc/modprobe.d \
 
 # our init script
 install -m 0755 "$here/fs/init" "$stage/init"
+mkdir -p "$stage/libexec"
+install -m 0755 "$here/fs/libexec/metadata-root" "$stage/libexec/metadata-root"
 
 # busybox + its applet symlinks
 install -m 0755 "$BB" "$stage/bin/busybox"
@@ -70,6 +72,9 @@ for src in "$here"/src/*.c; do
 		|| die "$tool is not statically linked"
 	echo "helper : $(basename "$tool") ($(stat -c %s "$tool") bytes)"
 done
+
+# Stage fully static clients built from source and verified static libraries.
+"$here/../keymint/stage-initramfs.sh" "$stage"
 
 # ---- 3. firmware blobs ----------------------------------------------------
 cp -a "$here"/blobs/firmware/. "$stage/lib/firmware/"
