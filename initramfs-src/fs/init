@@ -147,7 +147,28 @@ fi
 # 3. Everything else the ramdisk carries, in dependency order: phase 4 is the
 #    top level, phase 5 the audio tree (loaded below, once the ADSP runs).
 # ---------------------------------------------------------------------------
-[ -f "$load_order" ] && load_phase 4 MODULES
+# Phase 4 without the display stack first: msm can block (or hang) while it
+# probes, and init must not wait for it -- the rest of the boot (and the rootfs)
+# has to come up even if the panel never does.
+DISPLAY_MODULES="msm.ko panel-novatek-nt36526.ko nt36526e-thp.ko"
+if [ -f "$load_order" ]; then
+	while IFS="$tab" read -r phase rel; do
+		[ "$phase" = 4 ] || continue
+		[ -n "$rel" ] || continue
+		case $rel in msm.ko|panel-novatek-nt36526.ko|nt36526e-thp.ko) continue ;; esac
+		load_mod "$rel" || load_failed "$rel" MODULES
+	done < "$load_order"
+	log "MODULES: phase 4 loaded without the display stack"
+fi
+
+# Fire and forget: if this blocks, the boot continues without a panel.
+(
+	for m in $DISPLAY_MODULES; do
+		[ -f "$moddir/$m" ] || continue
+		load_mod "$m" || load_failed "$m" DISPLAY
+	done
+	log "DISPLAY: stack loaded"
+) &
 
 
 # The topology parser runs when the machine driver probes, so its debug output
@@ -283,9 +304,12 @@ apply_factory_macs() {
 	if [ -n "$bt" ] && [ -x /bin/btaddr ]; then
 		i=0
 		bt_err=
-		while [ "$i" -lt 30 ]; do
+		# A controller that is still downloading firmware never answers the
+		# management command, and btaddr then blocks: waiting for it here cost
+		# 30 s of every boot.  Give up after ~5 s and let userspace do it.
+		while [ "$i" -lt 5 ]; do
 			i=$((i + 1))
-			if bt_err=$(/bin/btaddr hci0 "$bt" 2>&1); then
+			if bt_err=$(timeout 2 /bin/btaddr hci0 "$bt" 2>&1); then
 				bt_err=
 				break
 			fi
