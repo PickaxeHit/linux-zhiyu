@@ -349,6 +349,20 @@ apply_factory_macs() {
 	# confusing place to debug from.
 	ip link set dev "$iface" up 2>/dev/null ||
 		log "WLAN: cannot bring $iface up"
+
+	# Name it here, while nothing else is looking.  systemd's predictable
+	# naming runs from the rootfs's udev, which starts after NetworkManager
+	# has already begun scanning; the rename then lands mid-scan ("renamed
+	# from wlan0 (while UP)") and the first scan comes back without the low
+	# 5 GHz channels.  Doing it in here means userspace only ever sees the
+	# final name.  The name is what "udevadm test-builtin net_id" reports.
+	if [ "$iface" = wlan0 ] && [ ! -e /sys/class/net/wlp1s0 ]; then
+		if ip link set dev wlan0 name wlp1s0 2>/dev/null; then
+			log "WLAN: renamed wlan0 -> wlp1s0"
+		else
+			log "WLAN: could not rename wlan0"
+		fi
+	fi
 }
 
 # ---------------------------------------------------------------------------

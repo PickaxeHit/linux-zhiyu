@@ -577,3 +577,5 @@ sensors/config/sns_tilt_to_wake.json	1265	zuxos:super_7.img:/etc/sensors/config/
 sensors/config/sns_transport_ppe.json	432	zuxos:super_7.img:/etc/sensors/config/sns_transport_ppe.json	SNS registry + config served by hexagonrpcd
 sensors/config/sns_wrist_pedo.json	653	zuxos:super_7.img:/etc/sensors/config/sns_wrist_pedo.json	SNS registry + config served by hexagonrpcd
 firmware/qcom/sm8750/vpu35_4v.mbn	2409160	zuxos:super_7.img:/firmware/vpu35_4v.mbn	VPU 3.5 firmware
+firmware/regulatory.db	6348	online:https://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2026.09.03.tar.xz	wireless-regdb country rules for the WLAN phy
+firmware/regulatory.db.p7s	1085	online:https://www.kernel.org/pub/software/network/wireless-regdb/wireless-regdb-2026.09.03.tar.xz	wireless-regdb signature

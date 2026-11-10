@@ -82,6 +82,12 @@ fetch_online() {
 		tar --zstd -xO -f "$pkg" "usr/lib/firmware/$target" > "$dst" || \
 			die "$target not in $(basename "$pkg")"
 		;;
+	*.tar.xz)
+		# wireless-regdb ships the built databases next to db.txt inside a
+		# versioned top-level directory.
+		tar -xJO -f "$pkg" --wildcards "*/$(basename "$target")" > "$dst" || \
+			die "$target not in $(basename "$pkg")"
+		;;
 	*)
 		cp -f "$pkg" "$dst"
 		;;
