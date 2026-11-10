@@ -5249,7 +5249,7 @@
 				phys = <0x27 0x01>;
 				phy-names = "dp";
 				#sound-dai-cells = <0x00>;
-				status = "disabled";
+				status = "okay";
 
 				opp-table {
 					compatible = "operating-points-v2";
