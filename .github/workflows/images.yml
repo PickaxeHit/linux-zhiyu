@@ -144,8 +144,8 @@ jobs:
           set -euo pipefail
           JOBS=$(nproc) ./build.sh
           ./mkinitbootimg
-          ls -l out/boot.img out/vendor_boot.img out/init_boot.img
-          sha256sum out/boot.img out/vendor_boot.img out/init_boot.img
+          ls -l out/boot*.img out/vendor_boot.img out/init_boot.img
+          sha256sum out/boot*.img out/vendor_boot.img out/init_boot.img
 
       # actions/cache only saves on success, and a run that fails afterwards
       # (packaging, upload) must not throw away 40 minutes of LTO.  Save the
@@ -313,7 +313,7 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           if [ "${{ inputs.kernel }}" = "true" ]; then
-            cp out/boot.img out/vendor_boot.img out/init_boot.img dist/
+            cp out/boot*.img out/vendor_boot.img out/init_boot.img dist/
           fi
           if [ "${{ inputs.packages }}" = "true" ]; then
             cp out/pkgs/* dist/
@@ -356,7 +356,12 @@ jobs:
           cp_pkg 'out/pkgs/linux-zhiyu-firmware_*.deb'         zhiyu-firmware.deb
           cp_pkg 'out/pkgs/libcamera_*.deb'                    zhiyu-libcamera.deb
           cp_pkg 'out/pkgs/zhiyu-sensord_*.deb'                zhiyu-sensord.deb
+          # boot.img is the default (no lsm= override) variant; the lsm
+          # variants only differ in the command line, the kernel is identical.
+          cp_pkg 'out/boot-none.img'                           zhiyu-boot-none.img
           cp_pkg 'out/boot.img'                                zhiyu-boot.img
+          cp_pkg 'out/boot-selinux.img'                        zhiyu-boot-selinux.img
+          cp_pkg 'out/boot-apparmor.img'                       zhiyu-boot-apparmor.img
           cp_pkg 'out/vendor_boot.img'                         zhiyu-vendor_boot.img
           cp_pkg 'out/init_boot.img'                           zhiyu-init_boot.img
           ls -l rel
