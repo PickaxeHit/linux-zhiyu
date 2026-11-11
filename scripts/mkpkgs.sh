@@ -77,6 +77,20 @@ size=$(du -sb "$stage" | cut -f1)
 	for p in ${PKG_ARCH_PROVIDES:-}; do
 		printf 'provides = %s\n' "$p"
 	done
+	# Versioned shared libraries: makepkg records a "provides" entry for every
+	# SONAME (libfoo.so.1.2.3 -> libfoo.so=1.2.3-64), which is what dependents
+	# such as gst-plugin-libcamera actually require (libcamera.so=0.7-64).
+	# mkpkgs writes .PKGINFO by hand, so derive the same entries here.
+	find "$work/arch" -type f \( -name '*.so' -o -name '*.so.*' \) -print0 |
+	while IFS= read -r -d '' sofile; do
+		soname=$(readelf -d "$sofile" 2>/dev/null |
+			sed -n 's/.*(SONAME).*\[\(.*\)\]/\1/p')
+		case $soname in
+		*.so.*) ;;
+		*) continue ;;	# unversioned or no SONAME: nothing to provide
+		esac
+		printf 'provides = %s=%s-64\n' "${soname%%.so.*}.so" "${soname#*.so.}"
+	done | sort -u
 	for p in ${PKG_ARCH_CONFLICTS:-}; do
 		printf 'conflict = %s\n' "$p"
 	done
