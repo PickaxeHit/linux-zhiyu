@@ -94,7 +94,6 @@ qrtr-smd.ko	net/qrtr/qrtr-smd.ko
 rfcomm.ko	net/bluetooth/rfcomm/rfcomm.ko
 rfkill.ko	net/rfkill/rfkill.ko
 rtc-pm8xxx.ko	drivers/rtc/rtc-pm8xxx.ko
-sdhci-msm.ko	drivers/mmc/host/sdhci-msm.ko
 typec_ucsi.ko	drivers/usb/typec/ucsi/typec_ucsi.ko
 ubwc_config.ko	drivers/soc/qcom/ubwc_config.ko
 ucsi_glink.ko	drivers/usb/typec/ucsi/ucsi_glink.ko
@@ -109,7 +108,6 @@ videobuf2-vmalloc.ko	drivers/media/common/videobuf2/videobuf2-vmalloc.ko
 videocc-sm8750.ko	drivers/clk/qcom/videocc-sm8750.ko
 videodev.ko	drivers/media/v4l2-core/videodev.ko
 wcd939x-usbss.ko	drivers/usb/typec/mux/wcd939x-usbss.ko
-system_heap.ko	drivers/dma-buf/heaps/system_heap.ko
 # ---------------------------------------------------------------------------
 # Everything the machine needs to come up, so that a boot needs nothing from
 # /lib/modules on the rootfs (rootfs copies are only for re-probing a driver
@@ -133,7 +131,6 @@ leds-qcom-flash.ko	drivers/leds/flash/leds-qcom-flash.ko
 fastrpc.ko	drivers/misc/fastrpc.ko
 rpmsg-ctrl.ko	drivers/rpmsg/rpmsg_ctrl.ko
 rpmsg-char.ko	drivers/rpmsg/rpmsg_char.ko
-dm-mod.ko	drivers/md/dm-mod.ko
 af-alg.ko	crypto/af_alg.ko
 zstd.ko	crypto/zstd.ko
 audio/snd-seq.ko	sound/core/seq/snd-seq.ko
@@ -149,6 +146,5 @@ dw9807-vcm.ko	drivers/media/i2c/dw9807-vcm.ko
 
 # Android metadata / hardware-wrapped fscrypt support
 qcomtee.ko	drivers/tee/qcomtee/qcomtee.ko
-dm-inlinecrypt.ko	drivers/md/dm-inlinecrypt.ko
 quota_tree.ko	fs/quota/quota_tree.ko
 quota_v2.ko	fs/quota/quota_v2.ko

@@ -185,6 +185,20 @@ else
 	done
 fi
 
+# q6apm fetches the topology asynchronously, once the ADSP's GPR service
+# shows up, and the kernel resolves firmware paths through its own root —
+# which switch_root empties.  The request used to land a few tens of
+# milliseconds after the switch and failed with -ENOENT ("failed to probe aux
+# component"), leaving the card unregistered.  Give it a moment here, while
+# the initramfs still carries qcom/sm8750/sm8750-tplg.bin.
+i=0
+while [ "$i" -lt 3 ]; do
+	grep -q '^ [0-9]' /proc/asound/cards 2>/dev/null && break
+	i=$((i + 1))
+	sleep 1
+done
+log "AUDIO: card ready after ${i}s"
+
 printf 'file qdsp6/topology.c +p\nfile qdsp6/q6apm.c +p\nfile qdsp6/audioreach.c +p\n' \
 	>> /sys/kernel/debug/dynamic_debug/control 2>/dev/null || true
 
