@@ -32,13 +32,29 @@ UNPACK=${UNPACK:-/usr/bin/unpack_bootimg}
 
 die() { echo "mkbootimg: $*" >&2; exit 1; }
 
+# Which LSM set the image activates.  All of them are built into the kernel;
+# the command line only picks the active ones, so one kernel still serves every
+# variant and testing SELinux or AppArmor does not need a rebuild.  "none"
+# leaves lsm= alone and uses CONFIG_LSM (landlock,yama,integrity).
+LSM_VARIANT=${LSM_VARIANT:-none}
+case $LSM_VARIANT in
+none)		LSM_ARG="" ;;
+selinux|se)	LSM_VARIANT=selinux; LSM_ARG="lsm=landlock,yama,selinux" ;;
+apparmor|aa)	LSM_VARIANT=apparmor; LSM_ARG="lsm=landlock,yama,apparmor" ;;
+*)		die "unknown LSM_VARIANT: $LSM_VARIANT (none|selinux|apparmor)" ;;
+esac
+[ -n "$LSM_ARG" ] && CMDLINE="$CMDLINE $LSM_ARG"
+
 [ -f "$KERNEL" ] || die "kernel image not found: $KERNEL (build it: make -C kernel-source ARCH=arm64 LLVM=1 Image)"
 [ -f "$KEY" ]    || die "AVB key not found: $KEY"
 [ "$SIZE" -ge "$(stat -c %s "$KERNEL")" ] || die "kernel larger than partition"
 mkdir -p "$OUT"
 work=$(mktemp -d "$OUT/.build.XXXXXX"); trap 'rm -rf "$work"' EXIT
 
-img=$OUT/boot.img
+# avbtool derives the file it re-opens for verification from the hash
+# descriptor's partition name (<dir>/boot.img), so build under that name and
+# only rename the finished image.
+img=$work/boot.img
 echo "kernel : $KERNEL ($(stat -c %s "$KERNEL") bytes, md5 $(md5sum "$KERNEL" | cut -d' ' -f1))"
 
 "$MKBOOTIMG" --header_version 4 --pagesize $PAGESIZE \
@@ -62,5 +78,11 @@ if [ -x "$UNPACK" ]; then
 		grep -E "kernel_size|ramdisk size|command line" |
 		sed -n '1,3p' || true
 fi
-echo "$img: $(stat -c %s "$img") bytes  md5 $(md5sum "$img" | cut -d' ' -f1)"
-echo "flash: dd if=$img of=/dev/disk/by-partlabel/boot_b bs=4M conv=fsync"
+final=$OUT/boot-$LSM_VARIANT.img
+cp -f "$img" "$final"
+# Keep the historical name for the default variant so flashing instructions
+# that only mention boot.img keep working.
+[ "$LSM_VARIANT" = none ] && cp -f "$img" "$OUT/boot.img"
+
+echo "$final: $(stat -c %s "$final") bytes  md5 $(md5sum "$final" | cut -d' ' -f1)"
+echo "flash: dd if=$final of=/dev/disk/by-partlabel/boot_b bs=4M conv=fsync"

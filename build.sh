@@ -35,5 +35,10 @@ echo "release: $VER"
 make -C "$KS" -j"$JOBS" $MAKE_ARGS Image modules
 "$root/keymint/build-deps.sh"
 ( cd "$root" && KS="$KS" VER="$VER" ./initramfs-src/build.sh )
-( cd "$root" && KERNEL="$KS/arch/arm64/boot/Image" ./mkbootimg )
+# One kernel, three command lines: all LSMs are built in and only the active
+# set is selected at boot, so SELinux and AppArmor can be tried without a rebuild.
+for variant in none selinux apparmor; do
+	( cd "$root" && KERNEL="$KS/arch/arm64/boot/Image" \
+		LSM_VARIANT="$variant" ./mkbootimg )
+done
 ( cd "$root" && ./mkvendorbootimg )
