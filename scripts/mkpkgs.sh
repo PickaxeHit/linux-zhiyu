@@ -83,8 +83,13 @@ size=$(du -sb "$stage" | cut -f1)
 	# mkpkgs writes .PKGINFO by hand, so derive the same entries here.
 	find "$work/arch" -type f \( -name '*.so' -o -name '*.so.*' \) -print0 |
 	while IFS= read -r -d '' sofile; do
+		# IPA modules are signed and come with .sign/.prov sidecars; only
+		# real ELF files have a SONAME.  readelf exits non-zero on anything
+		# else, and with pipefail + set -e that used to abort the script.
+		[ "$(head -c4 "$sofile" 2>/dev/null)" = "$(printf '\177ELF')" ] ||
+			continue
 		soname=$(readelf -d "$sofile" 2>/dev/null |
-			sed -n 's/.*(SONAME).*\[\(.*\)\]/\1/p')
+			sed -n 's/.*(SONAME).*\[\(.*\)\]/\1/p' || true)
 		case $soname in
 		*.so.*) ;;
 		*) continue ;;	# unversioned or no SONAME: nothing to provide
