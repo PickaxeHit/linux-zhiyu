@@ -28,8 +28,8 @@
 3. 前往[Releases](https://github.com/PickaxeHit/linux-zhiyu/releases/tag/packages)下载最新分区镜像，包含  
    * [zhiyu-boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot.img)（默认 LSM）  
    * [zhiyu-boot-none.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-none.img)（不额外指定 lsm=）  
-   * [zhiyu-boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-selinux.img)（`lsm=landlock,yama,selinux`）  
-   * [zhiyu-boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-apparmor.img)（`lsm=landlock,yama,apparmor`）  
+   * [zhiyu-boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-selinux.img)（RedHat系，如Fedora等发行版使用。`lsm=landlock,yama,selinux`）  
+   * [zhiyu-boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-apparmor.img)（Debian系，如Ubuntu等发行版使用`lsm=landlock,yama,apparmor`）  
    * [zhiyu-init_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-init_boot.img)  
    * [zhiyu-vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vendor_boot.img)  
 4. 前往[rootfs仓库](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder)，[fork](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder/fork)该仓库到自己账号下，并启用Action  
