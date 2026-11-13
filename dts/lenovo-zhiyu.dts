@@ -7,6 +7,7 @@
 #include <dt-bindings/interconnect/qcom,icc.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator.h>
 
 / {
 	interrupt-parent = <0x01>;
@@ -5081,7 +5082,7 @@
 				#address-cells = <0x01>;
 				#size-cells = <0x00>;
 				status = "okay";
-				vdda-supply = <0x9e>;
+				vdda-supply = <&vreg_l3g>;
 				qcom,dual-dsi-mode;
 				qcom,master-dsi;
 				qcom,sync-dual-dsi;
@@ -5178,7 +5179,7 @@
 				#clock-cells = <0x01>;
 				#phy-cells = <0x00>;
 				status = "okay";
-				vdds-supply = <0xbc>;
+				vdds-supply = <&vreg_l3i>;
 				phandle = <0xb3>;
 			};
 
@@ -5196,7 +5197,7 @@
 				#address-cells = <0x01>;
 				#size-cells = <0x00>;
 				status = "okay";
-				vdda-supply = <0x9e>;
+				vdda-supply = <&vreg_l3g>;
 
 				ports {
 					#address-cells = <0x01>;
@@ -5232,7 +5233,7 @@
 				#clock-cells = <0x01>;
 				#phy-cells = <0x00>;
 				status = "okay";
-				vdds-supply = <0xbc>;
+				vdds-supply = <&vreg_l3i>;
 				phandle = <0xbd>;
 			};
 
@@ -7786,11 +7787,13 @@
 					phandle = <0x167>;
 				};
 
-				cam_csi1p2: ldo3 {
+				cam_csi1p2: vreg_l3g: ldo3 {
 					regulator-name = "vreg_l3g_1p2";
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x132a40>;
 					regulator-initial-mode = <0x03>;
+					/* Shared with the UFS PHY PLL. */
+					regulator-always-on;
 					phandle = <0x11e>;
 				};
 			};
@@ -7812,6 +7815,15 @@
 					regulator-min-microvolt = <0x124f80>;
 					regulator-max-microvolt = <0x124f80>;
 					regulator-initial-mode = <0x03>;
+					regulator-always-on;
+				};
+
+				vreg_l3i: ldo3 {
+					regulator-name = "vreg_l3i_0p88";
+					regulator-min-microvolt = <880000>;
+					regulator-max-microvolt = <880000>;
+					regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
+					/* Shared with the UFS PHY reference supply. */
 					regulator-always-on;
 				};
 
@@ -9845,15 +9857,6 @@
 		regulator-max-microvolt = <0x4630c0>;
 		regulator-always-on;
 		phandle = <0xb9>;
-	};
-
-	regulator-panel-vdds {
-		compatible = "regulator-fixed";
-		regulator-name = "panel_vdds_0p9";
-		regulator-min-microvolt = <0xd6d80>;
-		regulator-max-microvolt = <0xd6d80>;
-		regulator-always-on;
-		phandle = <0xbc>;
 	};
 
 	regulator-ufs-vdda-phy {
