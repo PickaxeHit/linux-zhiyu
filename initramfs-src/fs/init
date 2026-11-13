@@ -149,6 +149,31 @@ fi
 # ---------------------------------------------------------------------------
 [ -f "$load_order" ] && load_phase 4 MODULES
 
+# ABL marks an off-mode charging boot independently of USB presence.
+# Check both locations since vendor firmware can pass it as bootconfig.
+if grep -Eq '(^|[[:space:]])(offmode\.charge=1|androidboot\.mode=charger)([[:space:]]|$)' /proc/cmdline ||
+   grep -Eq '^offmode\.charge[[:space:]]*=[[:space:]]*"1"[[:space:]]*$|^androidboot\.mode[[:space:]]*=[[:space:]]*"charger"[[:space:]]*$' /proc/bootconfig 2>/dev/null; then
+	log "CHARGER: waiting for the power key"
+	if [ -x /bin/charger ]; then
+		printk_levels=$(cat /proc/sys/kernel/printk)
+		ignore_loglevel=/sys/module/printk/parameters/ignore_loglevel
+		console_override=$(cat "$ignore_loglevel" 2>/dev/null)
+		if [ "$console_override" = Y ]; then
+			echo N > "$ignore_loglevel"
+		fi
+		echo 1 > /proc/sys/kernel/printk
+		/bin/charger 2>/dev/kmsg
+		charger_status=$?
+		echo "$printk_levels" > /proc/sys/kernel/printk
+		if [ "$console_override" = Y ]; then
+			echo Y > "$ignore_loglevel"
+		fi
+		log "CHARGER: helper exited with status $charger_status, continuing boot"
+	else
+		log "CHARGER: /bin/charger missing or not executable, continuing boot"
+	fi
+fi
+
 
 # The topology parser runs when the machine driver probes, so its debug output
 # has to be enabled through debugfs once the modules are in.
