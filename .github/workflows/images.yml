@@ -87,9 +87,12 @@ jobs:
             sudo git clone --depth 1 \
               https://android.googlesource.com/platform/external/avb \
               /usr/local/lib/avb
-            # the script is not always called plain "avbtool" (and it may be a
-            # symlink), so locate whatever the tree actually ships
-            AVB=$(sudo find /usr/local/lib/avb -maxdepth 2 -name 'avbtool*' | head -1)
+            if [ -f /usr/local/lib/avb/avbtool.py ]; then
+              AVB=/usr/local/lib/avb/avbtool.py
+            else
+              AVB=$(sudo find /usr/local/lib/avb -maxdepth 1 -name 'avbtool*' ! -name '*test*' | head -1)
+            fi
+            test -n "$AVB" || { echo "avbtool not found in avb tree" >&2; exit 1; }
             echo "avbtool script: $AVB"
             printf '#!/bin/sh\nexec python3 %s "$@"\n' "$AVB" | sudo tee /usr/bin/avbtool >/dev/null
             sudo chmod 755 /usr/bin/avbtool
