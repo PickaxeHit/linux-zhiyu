@@ -144,6 +144,17 @@ jobs:
           set -euo pipefail
           JOBS=$(nproc) ./build.sh
           ./mkinitbootimg
+          # All LSM variants must be usable from either slot.
+          unpack_dir=$(mktemp -d)
+          trap 'rm -rf "$unpack_dir"' EXIT
+          for image in out/boot*.img; do
+            python3 /usr/local/lib/mkbootimg/unpack_bootimg.py \
+              --boot_img "$image" --out "$unpack_dir" > "$unpack_dir/header"
+            if grep -qF 'androidboot.slot_suffix=' "$unpack_dir/header"; then
+              echo "Hardcoded slot in $image" >&2
+              exit 1
+            fi
+          done
           ls -l out/boot*.img out/vendor_boot.img out/init_boot.img
           sha256sum out/boot*.img out/vendor_boot.img out/init_boot.img
 
