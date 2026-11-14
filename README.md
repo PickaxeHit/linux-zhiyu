@@ -24,26 +24,32 @@
 | 杜比音效 | ❌ | 无法适配 |
 ### 食用方法
 1. 请先解锁Bootloader  
-2. 底包基于ZUXOS 2.0.10.252，请自行提取底包或首先刷入该ROM（或基于该底包的ROM），并同步AB槽。  
-3. 前往[Releases](https://github.com/PickaxeHit/linux-zhiyu/releases/tag/packages)下载最新分区镜像，包含  
-   * [zhiyu-boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot.img)（默认 LSM）  
-   * [zhiyu-boot-none.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-none.img)（不额外指定 lsm=）  
-   * [zhiyu-boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-selinux.img)（RedHat系，如Fedora等发行版使用。`lsm=landlock,yama,selinux`）  
-   * [zhiyu-boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-apparmor.img)（Debian系，如Ubuntu等发行版使用`lsm=landlock,yama,apparmor`）  
-   * [zhiyu-init_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-init_boot.img)  
-   * [zhiyu-vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vendor_boot.img)  
+2. 底包基于ZUXOS 2.0.10.252，请自行提取底包或首先刷入该ROM（或基于该底包的ROM），并同步AB槽
+   * 可以使用bootloader刷入的：bluetooth, boot, cpucp, cpucp_dtb, dsp, dtbo, featenabler, init_boot, modem, multiimgqti, pdp, pvmfw, qweslicstore, recovery, shrm, soccp_dcd, soccp_debug, spuservice, uefi, vbmeta, vbmeta_system, vendor_boot
+   * 只能使用root或者EDL刷入的：abl, aop, aop_config, devcfg, hyp, imagefv, keymaster, multiimgoem, qupfw, pdp_cdb, tz, uefisecapp, xbl, xbl_config
+   * 由于线刷包只会写入A槽，请务必确保这些分区有实际内容，否则将会在切槽后陷入EDL模式！
+3. 前往 [Releases](https://github.com/PickaxeHit/linux-zhiyu/releases/tag/packages) 下载最新分区镜像
+
+   公共部分：
+   * [zhiyu-vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vendor_boot.img)
+   * [zhiyu-init_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-init_boot.img)
+
+   发行版相关：
+   * 不指定主 LSM（默认，如 ArchLinux）：[zhiyu-boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot.img) + [zhiyu-vbmeta.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vbmeta.img)
+   * 启用 SELinux，RedHat 系（如 Fedora）：[zhiyu-boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-selinux.img) + [zhiyu-vbmeta-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vbmeta-selinux.img)
+   * 启用 AppArmor，Debian 系（如 Ubuntu）：[zhiyu-boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-apparmor.img) + [zhiyu-vbmeta-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vbmeta-apparmor.img)
 4. 前往[rootfs仓库](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder)，[fork](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder/fork)该仓库到自己账号下，并启用Action  
 5. 在自己的rootfs仓库下，根据自己的偏好与设置，在Action中触发一次构建  
 6. 下载构建好的rootfs，并解压到设备中，内容物为.tar.xz后缀。请自行核对hash  
-7. 使用具有root权限的文件管理器，在/data/下创建linux子目录。完整路径为/data/linux/  
-8. 将rootfs以root身份解压至/data/linux下，并检查/data/linux/sbin/init是否存在（有可能多一级或少一级，此时需要删除整个linux目录并从第7步开始）  
-9. 刷入第3步下载的三个镜像至未使用的槽位（可使用`adb shell getprop ro.boot.slot_suffix`检查当前槽位）  
+7. 使用具有root权限的终端，在/data/下创建linux子目录。完整路径为/data/linux/  
+8. 将rootfs以root身份解压至/data/linux下，并检查/data/linux/sbin/init是否存在（有可能多一级或少一级，此时需要删除整个linux目录并从第7步开始）。参考命令：`tar -xJvf /path/to/rootfs.tar.xz -C /data/linux`  
+9. 刷入第3步下载的四个镜像至未使用的槽位（可使用`adb shell getprop ro.boot.slot_suffix`检查当前槽位）  
 10. 重启至该槽位
 ### 注意事项
 1. 请先自行备份所有关键分区并确保自己有救砖条件，在刷入和执行前先自行检查镜像内容
 2. 共享分区方案为实验性可能会导致分区出错，不保证android端不出现数据损坏、无法开机等现象。可自行评估风险与可用性
 3. linux端具有root权限，具有读写任意分区（以及RPMB区块）的能力，谨防恶意软件与误操作
-4. 系统内安装有`qbootctl`，仅用于标记启动成功。在[PR#7](https://github.com/linux-msm/qbootctl/pull/7)合并并同步至发行版前，请勿使用`qbootctl -s`切换槽位
+4. 系统内安装有`qbootctl`，仅用于标记启动成功。在[PR#7](https://github.com/linux-msm/qbootctl/pull/7)或相关PR合并并同步至发行版前，请勿使用`qbootctl -s`切换槽位
 5. 若使用过程中出现严重问题请及时反馈
 ### 参考项目
 https://github.com/yzddmr6/xiaomipad-8pro-mainline

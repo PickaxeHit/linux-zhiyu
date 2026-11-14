@@ -1,5 +1,5 @@
 /* Recover this device's existing Android metadata key through mainline QCOMTEE.
- * No key provisioning, deletion, metadata writes, or RPMB writes.
+ * Upgraded blobs remain in memory. The TA may write RPMB during upgrade.
  * Protocol derived from the successful TB378FC vendor HAL capture.
  */
 #define _GNU_SOURCE
@@ -100,6 +100,81 @@ static int send(const char *name,size_t *n) {
  *n=length;return 0;
 }
 static void check(int r,const char *what) {if(r){fprintf(stderr,"%s failed (%d)\n",what,r);exit(1);}}
+struct versions {
+ uint32_t os, patch, vendor;
+};
+
+/* QTI KMKD CBOR blob: [magic, format, id, characteristics bstr, key data].
+ * Characteristics map entry 1 contains the hardware-enforced tag map.
+ * These values only select CONFIGURE inputs. The TA authenticates the blob.
+ */
+static int get_versions(const uint8_t *blob,size_t len,struct versions *out)
+{
+ const uint8_t *end=blob+len,*cursor=blob;
+ struct item item;
+ if (cursor==end || *cursor++!=0x85) return -1;
+ if (next(&cursor,end,&item,0) || item.major || item.value!=0x4b4d4b44) return -1;
+ for (unsigned i=0;i<2;i++)
+  if (next(&cursor,end,&item,0) || item.major) return -1;
+ if (next(&cursor,end,&item,0) || item.major!=2) return -1;
+
+ cursor=item.data;
+ end=cursor+item.size;
+ if (cursor==end || *cursor<0xa0 || *cursor>=0xb8) return -1;
+ unsigned maps=*cursor++-0xa0, found=0;
+ while (maps--) {
+  struct item key;
+  if (next(&cursor,end,&key,0) || key.major) return -1;
+  if (key.value!=1) {
+   if (next(&cursor,end,&item,0)) return -1;
+   continue;
+  }
+  if (cursor==end || *cursor<0xa0 || *cursor>=0xb8) return -1;
+  unsigned entries=*cursor++-0xa0;
+  while (entries--) {
+   if (next(&cursor,end,&key,0) || next(&cursor,end,&item,0)) return -1;
+   uint32_t *field;
+   unsigned bit;
+   if (key.major) continue;
+   switch (key.value) {
+    case 0x300002c1: field=&out->os;bit=1;break;
+    case 0x300002c2: field=&out->patch;bit=2;break;
+    case 0x300002ce: field=&out->vendor;bit=4;break;
+    default: continue;
+   }
+   if (item.major || item.value>UINT32_MAX || (found&bit)) return -1;
+   *field=item.value;
+   found|=bit;
+  }
+ }
+ return found==7 ? 0 : -1;
+}
+
+static int configure(const struct versions *v)
+{
+ size_t n;
+ begin_msg(0x2116);head(5,5);u(22);u(4);
+ tag(0x300002c1);u(v->os);
+ tag(0x300002c2);u(v->patch);
+ tag(0x300002ce);u(v->vendor);
+ tag(0x30003a99);u(0);
+ return send("CONFIGURE",&n);
+}
+
+static void decrypt_request(uint32_t opcode,const uint8_t *blob,size_t blob_size,
+                            const uint8_t appid[64],const uint8_t nonce[12])
+{
+ int upgrading=opcode==0x2114;
+ begin_msg(opcode);head(5,upgrading ? 7 : 8);u(22);u(upgrading ? 5 : 6);
+ tag(0x20000004);u(32);
+ tag(0x20000006);u(1);
+ tag(0x300003eb);u(128);
+ tag(0x90000259);bstr(appid,64);
+ tag(0x900003e9);bstr(nonce,12);
+ if (!upgrading) { tag(0x20000001);u(1); }
+ u(23);bstr(blob,blob_size);
+}
+
 int main(int argc,char **argv) {
  if(argc!=3){fprintf(stderr,"usage: %s KEY_DIRECTORY OUTPUT_EPHEMERAL_KEY\n",argv[0]);return 2;}
  setvbuf(stdout,NULL,_IONBF,0);umask(077);
@@ -108,6 +183,8 @@ int main(int argc,char **argv) {
  size_t en=read_file(argv[1],"encrypted_key",enc,sizeof enc);
  size_t sn=read_file(argv[1],"secdiscardable",sec,sizeof sec);
  if(!kn||en<28||sn!=16384)fail("unexpected metadata key files");
+ struct versions v={0};
+ if(get_versions(kek,kn,&v))fail("unsupported metadata blob characteristics");
  uint8_t *hash_input=calloc(1,128+sn);if(!hash_input)fail("out of memory");
  memcpy(hash_input,"Android secdiscardable SHA512",sizeof("Android secdiscardable SHA512")-1);memcpy(hash_input+128,sec,sn);
  SHA512_CTX sha;
@@ -121,9 +198,32 @@ int main(int argc,char **argv) {
  check(open_uid(appobj,150,&km),"open KeyMint HAL");
  size_t n;
  begin_msg(0x3121);head(5,1);u(11);u(300);check(send("SET_VERSION",&n),"SET_VERSION");
- begin_msg(0x2116);head(5,5);u(22);u(4);tag(0x300002c1);u(170000);tag(0x300002c2);u(20260901);tag(0x300002ce);u(20250605);tag(0x30003a99);u(0);check(send("CONFIGURE",&n),"CONFIGURE");
- begin_msg(0x310f);head(5,8);u(22);u(6);tag(0x20000004);u(32);tag(0x20000006);u(1);tag(0x300003eb);u(128);tag(0x90000259);bstr(appid,64);tag(0x900003e9);bstr(enc,12);tag(0x20000001);u(1);u(23);bstr(kek,kn);
- check(send("BEGIN",&n),"BEGIN");operation=get_handle(response+8,n);if(!operation)fail("missing operation handle");
+ check(configure(&v),"CONFIGURE");
+ decrypt_request(0x310f,kek,kn,appid,enc);
+ int status=send("BEGIN",&n);
+ if(status==-62) {
+     /* os_version comparison in KeyMint only needs to never regress; pin it to
+      * a sentinel higher than any real Android version so this path keeps
+      * working regardless of what the device's actual os_version becomes.
+      * patch/vendor stay at the blob's real values. */
+     const uint32_t sentinel_os=999999;
+     if (v.os>sentinel_os) fail("blob OS version exceeds sentinel value");
+     v.os=sentinel_os;
+     check(configure(&v),"CONFIGURE_SENTINEL");
+     decrypt_request(0x2114,kek,kn,appid,enc);
+     check(send("UPGRADE",&n),"UPGRADE");
+     if (!n || n>sizeof kek) fail("invalid upgraded blob length");
+     explicit_bzero(kek,sizeof kek);
+     memcpy(kek,response+8,n);
+     kn=n;
+     decrypt_request(0x310f,kek,kn,appid,enc);
+     status=send("BEGIN_UPGRADED",&n);
+ }
+ check(status,"BEGIN");
+ operation=get_handle(response+8,n);
+ if(!operation)fail("missing operation handle");
+ explicit_bzero(kek,sizeof kek);
+ explicit_bzero(request,sizeof request);
  begin_msg(0x3111);head(5,2);u(34);u(operation);u(35);bstr(enc+12,en-12);check(send("UNWRAP_3111",&n),"UNWRAP_3111");
  size_t ln=extract_blob(response+8,n,lt,sizeof lt);printf("LT_BYTES=%zu\n",ln);if(ln!=250)fail("unexpected LT blob size");
  begin_msg(0x311d);head(5,1);u(23);bstr(lt,ln);check(send("CONVERT",&n),"CONVERT");

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build kernel Image/modules, initramfs, boot.img and vendor_boot.img.
+# Build the kernel, initramfs and signed AVB image sets.
 #
 #   KS    kernel tree (default: the kernel-source submodule)
 #   CFG   kernel config (default: configs/linux-<major.minor>-zhiyu.config)
@@ -41,4 +41,7 @@ for variant in none selinux apparmor; do
 	( cd "$root" && KERNEL="$KS/arch/arm64/boot/Image" \
 		LSM_VARIANT="$variant" ./mkbootimg )
 done
-( cd "$root" && ./mkvendorbootimg )
+( cd "$root" && ./mkvendorbootimg && ./mkinitbootimg )
+for variant in none selinux apparmor; do
+ ( cd "$root" && LSM_VARIANT="$variant" ./mkvbmetaimg )
+done

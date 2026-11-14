@@ -15,8 +15,8 @@ KERNEL=${KERNEL:-$ROOT/kernel-source/arch/arm64/boot/Image}
 KEY=${KEY:-$ROOT/avb-test-key.pem}
 SIZE=${SIZE:-100663296}		# boot partition (96 MiB)
 PAGESIZE=4096
-OS_VERSION=17.0.0
-OS_PATCH=2026-09
+OS_VERSION=${AVB_BOOT_OS_VERSION:-15}
+OS_PATCH=${AVB_BOOT_PATCH:-2025-06-05}
 
 # Boot command line.  Keep in sync with the flashed image: console stays alive
 # across suspend so a failed resume is captured in pstore, and genpd/clk are
@@ -39,8 +39,8 @@ die() { echo "mkbootimg: $*" >&2; exit 1; }
 LSM_VARIANT=${LSM_VARIANT:-none}
 case $LSM_VARIANT in
 none)		LSM_ARG="" ;;
-selinux|se)	LSM_VARIANT=selinux; LSM_ARG="lsm=landlock,yama,selinux" ;;
-apparmor|aa)	LSM_VARIANT=apparmor; LSM_ARG="lsm=landlock,yama,apparmor" ;;
+selinux|se)	LSM_VARIANT=selinux; LSM_ARG="lsm=landlock,yama,integrity,selinux" ;;
+apparmor|aa)	LSM_VARIANT=apparmor; LSM_ARG="lsm=landlock,yama,integrity,apparmor" ;;
 *)		die "unknown LSM_VARIANT: $LSM_VARIANT (none|selinux|apparmor)" ;;
 esac
 [ -n "$LSM_ARG" ] && CMDLINE="$CMDLINE $LSM_ARG"
@@ -58,7 +58,6 @@ img=$work/boot.img
 echo "kernel : $KERNEL ($(stat -c %s "$KERNEL") bytes, md5 $(md5sum "$KERNEL" | cut -d' ' -f1))"
 
 "$MKBOOTIMG" --header_version 4 --pagesize $PAGESIZE \
-	--os_version "$OS_VERSION" --os_patch_level "$OS_PATCH" \
 	--kernel "$KERNEL" --cmdline "$CMDLINE" \
 	--output "$img"
 

@@ -16,8 +16,8 @@ OUT=${OUT:-${1:-$ROOT/out}}
 KEY=${KEY:-$ROOT/avb-test-key.pem}
 SIZE=${SIZE:-8388608}		# init_boot partition (8 MiB)
 PAGESIZE=4096
-OS_VERSION=17.0.0
-OS_PATCH=2026-09
+OS_VERSION=${AVB_BOOT_OS_VERSION:-15}
+OS_PATCH=${AVB_BOOT_PATCH:-2025-06-05}
 
 MKBOOTIMG=${MKBOOTIMG:-/usr/bin/mkbootimg}
 AVBTOOL=${AVBTOOL:-/usr/bin/avbtool}
@@ -37,15 +37,14 @@ echo "ramdisk: empty ($(stat -c %s "$work/empty.cpio.gz") bytes)"
 
 img=$OUT/init_boot.img
 "$MKBOOTIMG" --header_version 4 --pagesize $PAGESIZE \
-	--os_version "$OS_VERSION" --os_patch_level "$OS_PATCH" \
 	--ramdisk "$work/empty.cpio.gz" \
 	--output "$img"
 
 [ "$(stat -c %s "$img")" -le "$SIZE" ] || die "init_boot.img larger than partition"
 "$AVBTOOL" add_hash_footer --image "$img" --partition_name init_boot \
 	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" \
-	--prop "com.android.build.boot.os_version:$OS_VERSION" \
-	--prop "com.android.build.boot.security_patch:$OS_PATCH" >/dev/null
+	--prop "com.android.build.init_boot.os_version:$OS_VERSION" \
+	--prop "com.android.build.init_boot.security_patch:$OS_PATCH" >/dev/null
 "$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
 
 if [ -x "$UNPACK" ]; then

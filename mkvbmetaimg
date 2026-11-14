@@ -1,0 +1,26 @@
+#!/bin/bash
+# Sign a top-level AVB image using only the Linux images produced by this build.
+set -euo pipefail
+root=$(cd "$(dirname "$0")" && pwd)
+out=${OUT:-$root/out}
+key=${KEY:-$root/avb-test-key.pem}
+avb=${AVBTOOL:-/usr/bin/avbtool}
+variant=${LSM_VARIANT:-none}
+case "$variant" in none|selinux|apparmor) ;; *) exit 2 ;; esac
+work=$(mktemp -d "$out/.vbmeta.XXXXXX")
+trap 'rm -rf "$work"' EXIT
+ln -s "$(realpath "$out/boot-$variant.img")" "$work/boot.img"
+for part in vendor_boot init_boot; do
+ ln -s "$(realpath "$out/$part.img")" "$work/$part.img"
+done
+"$avb" make_vbmeta_image --output "$work/vbmeta.img" \
+ --algorithm SHA256_RSA4096 --key "$key" --padding_size 65536 \
+ --flags 3 \
+ --include_descriptors_from_image "$work/boot.img" \
+ --include_descriptors_from_image "$work/vendor_boot.img" \
+ --include_descriptors_from_image "$work/init_boot.img"
+"$avb" verify_image --image "$work/vbmeta.img" --key "$key"
+install -m 0644 "$work/vbmeta.img" "$out/vbmeta-$variant.img"
+if [ "$variant" = none ]; then
+ install -m 0644 "$work/vbmeta.img" "$out/vbmeta.img"
+fi
