@@ -1,0 +1,7 @@
+post_install() {
+    /usr/libexec/zhiyu/update-boot-images.sh
+}
+
+post_upgrade() {
+    /usr/libexec/zhiyu/update-boot-images.sh
+}

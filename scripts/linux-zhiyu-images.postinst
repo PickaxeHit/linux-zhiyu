@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+case "${1:-}" in
+    configure)
+        /usr/libexec/zhiyu/update-boot-images.sh
+        ;;
+esac
+exit 0

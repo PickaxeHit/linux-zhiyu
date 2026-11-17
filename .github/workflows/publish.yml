@@ -1,0 +1,162 @@
+name: Publish package repositories
+run-name: Publish package repositories
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful Build images and packages run ID
+        required: true
+        type: string
+  # Allows publishing from the review branch before workflow_dispatch is
+  # available on the default branch.
+  push:
+    tags:
+      - 'publish-packages-*'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: publish-package-repositories
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download packages from the successful build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN: ${{ inputs.build_run }}
+        run: |
+          set -euo pipefail
+          run_id="$BUILD_RUN"
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            run_id="${GITHUB_REF_NAME#publish-packages-}"
+          fi
+          if [[ -z "$run_id" ]]; then
+            # A reusable call can download from its own run after the build
+            # job succeeds, while the overall workflow is still running.
+            echo "build_sha=$GITHUB_SHA" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          [[ "$run_id" =~ ^[0-9]+$ ]]
+          build=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id")
+          jq -e --arg repo "$GITHUB_REPOSITORY" '
+            (.path == ".github/workflows/build.yml" or .path == ".github/workflows/images.yml") and
+            .status == "completed" and .conclusion == "success" and
+            .head_repository.full_name == $repo and
+            (.head_branch == "main" or .head_branch == "package-repositories")
+          ' <<< "$build" >/dev/null
+          build_sha=$(jq -r .head_sha <<< "$build")
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            git merge-base --is-ancestor "$build_sha" "$GITHUB_SHA"
+          fi
+          echo "build_sha=$build_sha" >> "$GITHUB_ENV"
+          gh run download "$run_id" --name zhiyu-package-repositories-input --dir out/pkgs
+          gh run download "$run_id" --name zhiyu-images --dir out/image-archive
+
+      - uses: actions/download-artifact@v4
+        if: github.event_name != 'push' && inputs.build_run == ''
+        with:
+          name: zhiyu-package-repositories-input
+          path: out/pkgs
+
+      - uses: actions/download-artifact@v4
+        if: github.event_name != 'push' && inputs.build_run == ''
+        with:
+          name: zhiyu-images
+          path: out/image-archive
+
+      - name: Install repository tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev pacman-package-manager libarchive-tools zstd
+
+      - name: Verify signed image archive contents
+        run: |
+          set -euo pipefail
+          archives=(out/image-archive/zhiyu-images.tar.*)
+          test "${#archives[@]}" -eq 1
+          mkdir -p out/release-images
+          tar -xf "${archives[0]}" -C out/release-images
+          cd out/release-images
+          sha256sum -c SHA256SUMS
+          for image in boot vendor_boot init_boot vbmeta; do
+            test -s "$image.img"
+          done
+
+      - name: Generate indexes and publish package sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          scripts/mkrepos.sh debian out/pkgs out/repositories
+          scripts/mkrepos.sh archlinuxarm out/pkgs out/repositories
+          for distro in debian archlinuxarm; do
+            dir="out/repositories/$distro"
+            case "$distro" in
+              debian)
+                tag=repo-apt
+                package_suffix=.deb
+                packages=("$dir"/*.deb)
+                indexes=("$dir/Packages" "$dir/Packages.gz" "$dir/Release")
+                ;;
+              archlinuxarm)
+                tag=repo-pacman
+                package_suffix=.pkg.tar.zst
+                packages=("$dir"/*.pkg.tar.zst)
+                indexes=("$dir/zhiyu.files" "$dir/zhiyu.db")
+                ;;
+            esac
+            test "${#packages[@]}" -eq 6
+            if gh release view "$tag" >/dev/null 2>&1; then
+              # Save the previous asset names before uploading. Prune only after
+              # the new indexes are live so they always have matching packages.
+              previous=$(gh release view "$tag" --json assets --jq '.assets[].name')
+              gh release upload "$tag" "${packages[@]}" --clobber
+              gh release upload "$tag" "${indexes[@]}" --clobber
+              printf '%s\n' "${packages[@]##*/}" > "$dir/current-packages"
+              while IFS= read -r asset; do
+                case "$asset" in
+                  *"$package_suffix")
+                    if ! grep -Fxq -- "$asset" "$dir/current-packages"; then
+                      gh release delete-asset "$tag" "$asset" --yes
+                    fi
+                    ;;
+                esac
+              done <<< "$previous"
+              gh release edit "$tag" --prerelease=false --latest=false
+            else
+              gh release create "$tag" "${packages[@]}" "${indexes[@]}" \
+                --latest=false --target "$build_sha" \
+                --title "Zhiyu $distro nightly repository" \
+                --notes "Flat package repository for Lenovo TB378FC. Use the release download URL as the repository base."
+            fi
+          done
+
+
+      - name: Publish signed boot images
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=zhiyu-images
+          images=(out/release-images/*.img)
+          checksums=out/release-images/SHA256SUMS
+          printf 'Signed Lenovo TB378FC boot images from build commit %s.\n' "$build_sha" > image-release-notes.md
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${images[@]}" --clobber
+            gh release upload "$tag" "$checksums" --clobber
+            gh release edit "$tag" --prerelease=false --latest=false --notes-file image-release-notes.md
+          else
+            gh release create "$tag" "${images[@]}" "$checksums" \
+              --latest=false --target "$build_sha" \
+              --title "Zhiyu signed boot images" --notes-file image-release-notes.md
+          fi

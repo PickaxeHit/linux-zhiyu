@@ -17,9 +17,13 @@ stage=$(realpath "$stage")
 out=$(realpath -m "$out")
 name=${PKG_NAME:?PKG_NAME}
 ver=${PKG_VERSION:?PKG_VERSION}
+revision=${PKG_REVISION:-1}
+debver="$ver-$revision"
 desc=${PKG_DESC:-$name}
 url=${PKG_URL:-https://github.com/PickaxeHit/linux-zhiyu}
 arch=aarch64
+deb_postinst=${PKG_DEB_POSTINST:-}
+arch_install=${PKG_ARCH_INSTALL:-}
 
 mkdir -p "$out"
 
@@ -30,7 +34,7 @@ cp -a "$stage" "$work/root"
 install -d "$work/root/DEBIAN"
 {
 	printf 'Package: %s\n' "$name"
-	printf 'Version: %s\n' "$ver"
+	printf 'Version: %s\n' "$debver"
 	printf 'Architecture: arm64\n'
 	printf 'Maintainer: linux-zhiyu CI <ci@localhost>\n'
 	if [ -n "${PKG_DEB_DEPENDS:-}" ]; then
@@ -48,22 +52,28 @@ install -d "$work/root/DEBIAN"
 	fi
 	printf 'Description: %s\n' "$desc"
 } > "$work/root/DEBIAN/control"
-dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${ver}_arm64.deb" >/dev/null
-echo "wrote $out/${name}_${ver}_arm64.deb"
+if [ -n "$deb_postinst" ]; then
+	install -m 0755 "$deb_postinst" "$work/root/DEBIAN/postinst"
+fi
+if [ -f "$work/root/etc/udev/rules.d/60-persistent-v4l.rules" ]; then
+    printf '/etc/udev/rules.d/60-persistent-v4l.rules\n' > "$work/root/DEBIAN/conffiles"
+fi
+dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${debver}_arm64.deb" >/dev/null
+echo "wrote $out/${name}_${debver}_arm64.deb"
 
 # ---- Arch ---------------------------------------------------------------
 # pacman's pkgver may not contain "-" (it separates the pkgrel), and our
 # kernel version is 7.3.1-zhiyu+: Arch gets 7.3.1_zhiyu+ while the Debian
 # package keeps the original string.
 archver=$(printf '%s' "$ver" | tr '-' '_')
-archpkg="${name}-${archver}-1-${arch}"
+archpkg="${name}-${archver}-${revision}-${arch}"
 install -d "$work/arch"
 cp -a "$stage/." "$work/arch/"
 size=$(du -sb "$stage" | cut -f1)
 {
 	printf 'pkgname = %s\n' "$name"
 	printf 'pkgbase = %s\n' "$name"
-	printf 'pkgver = %s-1\n' "$archver"
+	printf 'pkgver = %s-%s\n' "$archver" "$revision"
 	printf 'pkgdesc = %s\n' "$desc"
 	printf 'url = %s\n' "$url"
 	printf 'builddate = %s\n' "$(date +%s)"
@@ -71,7 +81,8 @@ size=$(du -sb "$stage" | cut -f1)
 	printf 'size = %s\n' "$size"
 	printf 'arch = aarch64\n'
 	printf 'license = GPL-2.0-only\n'
-	for d in ${PKG_ARCH_DEPENDS:-}; do
+	read -ra dependencies <<< "${PKG_ARCH_DEPENDS:-}"
+	for d in "${dependencies[@]}"; do
 		printf 'depend = %s\n' "$d"
 	done
 	for p in ${PKG_ARCH_PROVIDES:-}; do
@@ -103,10 +114,13 @@ size=$(du -sb "$stage" | cut -f1)
 		printf 'replaces = %s\n' "$p"
 	done
 } > "$work/arch/.PKGINFO"
+if [ -n "$arch_install" ]; then
+	install -m 0644 "$arch_install" "$work/arch/.INSTALL"
+fi
 # .PKGINFO must be the first entry and must not be prefixed with "./":
 # libalpm looks for that exact name and otherwise reports "missing package
 # metadata" and refuses to install the package.
 ( cd "$work/arch" &&
-  tar --zstd --numeric-owner -cf "$out/${archpkg}.pkg.tar.zst" .PKGINFO \
+  tar --zstd --owner=0 --group=0 --numeric-owner -cf "$out/${archpkg}.pkg.tar.zst" .PKGINFO \
       $(find . -mindepth 1 -maxdepth 1 ! -name .PKGINFO -printf '%f\n') )
 echo "wrote $out/${archpkg}.pkg.tar.zst"

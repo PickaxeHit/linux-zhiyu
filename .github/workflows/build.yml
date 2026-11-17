@@ -26,15 +26,14 @@ on:
         description: Compression for the uploaded image tarball
         type: choice
         options: [zstd, xz]
-        default: zstd
-      release:
-        description: Publish the rolling "packages" release
+        default: xz
+      publish:
+        description: Publish packages and signed images after a complete build
         type: boolean
-        default: true
+        default: false
 
-# The release job uploads assets to the repository's releases.
 permissions:
-  contents: write
+  contents: read
 
 env:
   LC_OPTIONS: >-
@@ -47,11 +46,20 @@ env:
     -Dcam=enabled
     -Dv4l2=enabled
 
+concurrency:
+  group: images-${{ github.ref }}
+
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 300
     steps:
+      - name: Validate publication inputs
+        if: inputs.publish && (!inputs.kernel || !inputs.packages)
+        run: |
+          echo "::error::Publishing requires both kernel and packages"
+          exit 1
+
       - name: Free disk space and install host tools
         run: |
           sudo rm -rf /usr/share/dotnet /opt/hostedtoolcache /usr/local/lib/android || true
@@ -102,40 +110,34 @@ jobs:
           clang --version | head -1
           df -h /
 
-      - name: Checkout linux-zhiyu with submodules
+      - name: Set nightly package revision
+        run: echo "PKG_REVISION=$(TZ=Asia/Shanghai date +%Y%m%d).$((GITHUB_RUN_ID * 1000 + GITHUB_RUN_ATTEMPT))" >> "$GITHUB_ENV"
+
+      - name: Checkout linux-zhiyu
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           lfs: true
           fetch-depth: 1
 
-      - name: Resolve kernel revision
-        id: krev
+      - name: Initialize pinned submodules
+        id: kernel
         run: |
-          echo "sha=$(git ls-remote https://github.com/PickaxeHit/linux-kernel-zhiyu.git \
-            refs/heads/zhiyu | cut -f1)" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          git config --local submodule.libcamera.url https://github.com/PickaxeHit/libcamera-zhiyu.git
+          if ! git submodule update --init --recursive --depth 1; then
+            echo "::warning::Shallow submodule checkout failed; retrying with full history"
+            git submodule foreach --recursive 'if [ "$(git rev-parse --is-shallow-repository)" = true ]; then git fetch --unshallow origin; fi'
+            git submodule update --init --recursive
+          fi
+          echo "sha=$(git -C kernel-source rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      # The kernel is by far the slowest part (LTO on 4 vCPUs, ~40 min), and
-      # most iterations only touch scripts or packages.  Keep the built tree
-      # around so a run with the same kernel commit and config skips it.
       - name: Restore kernel build tree
-        if: ${{ inputs.kernel }}
-        uses: actions/cache@v4
+        id: kernel-cache
+        if: inputs.kernel
+        uses: actions/cache/restore@v4
         with:
           path: kernel-source
-          # Only the kernel commit and its config matter here: touching
-          # .gitmodules (adding an unrelated submodule) must not throw away
-          # 20 minutes of compilation.
-          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config') }}
-
-      - name: Fix submodule URLs for CI
-        run: |
-          # .gitmodules uses git@github.com: for libcamera; CI has no SSH key.
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git submodule sync --recursive
-          git submodule update --init --recursive
-          git -C kernel-source log --oneline -1
-          git -C libcamera log --oneline -1
+          key: kernel-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.kernel.outputs.sha }}-${{ hashFiles('configs/linux-*-zhiyu.config') }}
 
       - name: Set up native Rust for the IDL compiler
         if: ${{ inputs.kernel }}
@@ -157,21 +159,24 @@ jobs:
               exit 1
             fi
           done
+          grep -qx 'CONFIG_BOOT_CONFIG=y' configs/linux-7.3-zhiyu.config
+          mkdir -p "$unpack_dir/bootconfig"
+          python3 /usr/local/lib/mkbootimg/unpack_bootimg.py \
+            --boot_img out/boot-apparmor.img --out "$unpack_dir/bootconfig" \
+            > "$unpack_dir/bootconfig-header"
+          grep -q '^command line args: .* bootconfig ' "$unpack_dir/bootconfig-header" || {
+            echo "boot image does not ask ABL to load the bootconfig" >&2
+            exit 1
+          }
           ls -l out/boot*.img out/vendor_boot.img out/init_boot.img out/vbmeta*.img
           sha256sum out/boot*.img out/vendor_boot.img out/init_boot.img out/vbmeta*.img
 
-      # actions/cache only saves on success, and a run that fails afterwards
-      # (packaging, upload) must not throw away 40 minutes of LTO.  Save the
-      # tree explicitly, unconditionally.
       - name: Save kernel build tree
-        if: always() && inputs.kernel
+        if: inputs.kernel && steps.kernel-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: kernel-source
-          # Only the kernel commit and its config matter here: touching
-          # .gitmodules (adding an unrelated submodule) must not throw away
-          # 20 minutes of compilation.
-          key: kernel-${{ steps.krev.outputs.sha }}-${{ hashFiles('configs/linux-7.3-zhiyu.config') }}
+          key: ${{ steps.kernel-cache.outputs.cache-primary-key }}
 
       - name: Package kernel modules, headers and firmware
         if: ${{ inputs.kernel }}
@@ -245,14 +250,50 @@ jobs:
           Q=stage/linux-zhiyu-firmware/usr/share/qcom
           install -d "$Q"
           cp -a initramfs-src/blobs/sensors "$Q"/
+          U=stage/linux-zhiyu-firmware/usr/share/alsa/ucm2
+          install -d "$U"
+          cp -a scripts/alsa-ucm2/. "$U"/
+          R=stage/linux-zhiyu-firmware/usr/lib/udev/rules.d
+          V=stage/linux-zhiyu-firmware/etc/udev/rules.d
+          install -d "$R"
+          install -m644 scripts/90-dma-heap.rules scripts/91-flash-led.rules \
+            scripts/90-fastrpc.rules "$R"/
+          install -Dm644 scripts/60-persistent-v4l.rules "$V/60-persistent-v4l.rules"
           find "$F" -type f | wc -l
           find "$Q" -type f | wc -l
+          find "$U" "$R" -type f | sort
           PKG_NAME=linux-zhiyu-firmware \
           PKG_VERSION="$VER" \
           PKG_DESC="Firmware blobs, AudioReach topology and SNS registry for the zhiyu port" \
           PKG_DEB_DEPENDS="" \
           PKG_ARCH_DEPENDS="" \
           scripts/mkpkgs.sh stage/linux-zhiyu-firmware out/pkgs
+
+          # The package maintainer hook selects the LSM-matched AVB chain and
+          # updates only the slot that actually booted. CONFIG_BOOT_CONFIG plus
+          # the kernel's bootconfig command-line switch are required so ABL's
+          # androidboot.slot_suffix is available without guessing.
+          I=stage/linux-zhiyu-images/usr/lib/linux-zhiyu/images
+          install -d "$I"
+          install -m644 out/boot-none.img out/boot-selinux.img \
+            out/boot-apparmor.img out/vendor_boot.img out/init_boot.img \
+            out/vbmeta-none.img out/vbmeta-selinux.img out/vbmeta-apparmor.img "$I"/
+          (
+            cd "$I"
+            sha256sum -- *.img > SHA256SUMS
+            stat -c "%s %n" -- *.img > SIZES
+            xz -9e -T1 -- *.img
+          )
+          install -Dm755 scripts/update-boot-images.sh \
+            stage/linux-zhiyu-images/usr/libexec/zhiyu/update-boot-images.sh
+          PKG_NAME=linux-zhiyu-images \
+          PKG_VERSION="$VER" \
+          PKG_DESC="AVB-signed boot image set and active-slot updater for zhiyu" \
+          PKG_DEB_DEPENDS="coreutils, util-linux, grep, sed, mawk | gawk, diffutils, xz-utils, linux-zhiyu-modules (= ${VER}-${PKG_REVISION:-1})" \
+          PKG_ARCH_DEPENDS="coreutils util-linux grep sed gawk diffutils xz linux-zhiyu-modules=${VER//-/_}-${PKG_REVISION:-1}" \
+          PKG_DEB_POSTINST=scripts/linux-zhiyu-images.postinst \
+          PKG_ARCH_INSTALL=scripts/linux-zhiyu-images.install \
+          scripts/mkpkgs.sh stage/linux-zhiyu-images out/pkgs
           ls -l out/pkgs
 
       - name: Build libcamera and package it
@@ -291,8 +332,8 @@ jobs:
           PKG_DESC="Camera stack for the zhiyu port (simple pipeline, EGL debayer, CDAF)" \
           PKG_DEB_DEPENDS="libc6, libstdc++6, libudev1, libdrm2, libyaml-0-2, libevent-2.1-7, libjpeg62-turbo, libqt6widgets6" \
           PKG_DEB_PROVIDES="libcamera-tools, libcamera-ipa, libcamera0.7" \
-          PKG_DEB_CONFLICTS="libcamera-tools, libcamera-ipa, libcamera0.7" \
-          PKG_DEB_REPLACES="libcamera-tools, libcamera-ipa, libcamera0.7" \
+          PKG_DEB_CONFLICTS="libcamera, libcamera-tools, libcamera-ipa, libcamera0.7" \
+          PKG_DEB_REPLACES="libcamera, libcamera-tools, libcamera-ipa, libcamera0.7" \
           PKG_ARCH_DEPENDS="gcc-libs glibc systemd-libs libdrm libyaml libevent libjpeg-turbo qt6-base" \
           PKG_ARCH_PROVIDES="libcamera libcamera-tools libcamera-ipa" \
           PKG_ARCH_CONFLICTS="libcamera libcamera-tools libcamera-ipa" \
@@ -321,85 +362,43 @@ jobs:
           scripts/mkpkgs.sh stage/zhiyu-sensord out/pkgs
           ls -l out/pkgs
 
-      - name: Collect artifacts
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          if [ "${{ inputs.kernel }}" = "true" ]; then
-            cp out/boot*.img out/vendor_boot.img out/init_boot.img out/vbmeta*.img dist/
-          fi
-          if [ "${{ inputs.packages }}" = "true" ]; then
-            cp out/pkgs/* dist/
-          fi
-          if [ "${{ inputs.image_compression }}" = "xz" ]; then
-            tar -C dist -I 'xz -9e -T0' -cf images-and-packages.tar.xz .
-          else
-            tar -C dist -I 'zstd -T0 -19' -cf images-and-packages.tar.zst .
-          fi
-          sha256sum images-and-packages.tar.* > images-and-packages.sha256
-          ls -lh dist images-and-packages.*
-
-      # Rolling release with stable asset names, so the rootfs builders can
-      # install them straight from
-      #   https://github.com/PickaxeHit/linux-zhiyu/releases/latest/download/<name>
-      # instead of carrying their own copy of the firmware and rebuilding
-      # libcamera/sensord.  Assets are replaced on every build.
-      - name: Publish rolling release
-        if: ${{ inputs.release }}
+      - name: Archive signed images
+        if: inputs.kernel
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_COMPRESSION: ${{ inputs.image_compression }}
         run: |
           set -euo pipefail
-          mkdir -p rel
-          cp_pkg() {   # cp_pkg <glob> <stable name>; missing sources are fine
-            local src
-            src=$(ls $1 2>/dev/null | head -1) || true
-            if [ -n "${src:-}" ] && [ -f "$src" ]; then
-              cp -f "$src" "rel/$2"
-            fi
-            return 0
-          }
-          cp_pkg 'out/pkgs/linux-zhiyu-modules-*.pkg.tar.zst'  zhiyu-modules.pkg.tar.zst
-          cp_pkg 'out/pkgs/linux-zhiyu-headers-*.pkg.tar.zst'  zhiyu-headers.pkg.tar.zst
-          cp_pkg 'out/pkgs/linux-zhiyu-firmware-*.pkg.tar.zst' zhiyu-firmware.pkg.tar.zst
-          cp_pkg 'out/pkgs/libcamera-*.pkg.tar.zst'            zhiyu-libcamera.pkg.tar.zst
-          cp_pkg 'out/pkgs/zhiyu-sensord-*.pkg.tar.zst'        zhiyu-sensord.pkg.tar.zst
-          cp_pkg 'out/pkgs/linux-zhiyu-modules_*.deb'          zhiyu-modules.deb
-          cp_pkg 'out/pkgs/linux-zhiyu-headers_*.deb'          zhiyu-headers.deb
-          cp_pkg 'out/pkgs/linux-zhiyu-firmware_*.deb'         zhiyu-firmware.deb
-          cp_pkg 'out/pkgs/libcamera_*.deb'                    zhiyu-libcamera.deb
-          cp_pkg 'out/pkgs/zhiyu-sensord_*.deb'                zhiyu-sensord.deb
-          # boot.img is the default (no lsm= override) variant; the lsm
-          # variants only differ in the command line, the kernel is identical.
-          cp_pkg 'out/boot-none.img'                           zhiyu-boot-none.img
-          cp_pkg 'out/boot.img'                                zhiyu-boot.img
-          cp_pkg 'out/boot-selinux.img'                        zhiyu-boot-selinux.img
-          cp_pkg 'out/boot-apparmor.img'                       zhiyu-boot-apparmor.img
-          cp_pkg 'out/vendor_boot.img'                         zhiyu-vendor_boot.img
-          cp_pkg 'out/init_boot.img'                           zhiyu-init_boot.img
-          cp_pkg 'out/vbmeta.img'                             zhiyu-vbmeta.img
-          cp_pkg 'out/vbmeta-selinux.img'                     zhiyu-vbmeta-selinux.img
-          cp_pkg 'out/vbmeta-apparmor.img'                    zhiyu-vbmeta-apparmor.img
-          ls -l rel
-          tag=packages
-          if ! gh release view "$tag" >/dev/null 2>&1; then
-            gh release create "$tag" --title "CI packages (rolling)" \
-              --notes "Packages and images built by images.yml. Asset names are stable; each build replaces them."
+          cd out
+          images=(boot*.img vendor_boot.img init_boot.img vbmeta*.img)
+          sha256sum "${images[@]}" > SHA256SUMS
+          if [ "$IMAGE_COMPRESSION" = xz ]; then
+            tar -I 'xz -9e -T1' -cf zhiyu-images.tar.xz "${images[@]}" SHA256SUMS
+          else
+            tar -I 'zstd -T0 -19' -cf zhiyu-images.tar.zst "${images[@]}" SHA256SUMS
           fi
-          shopt -s nullglob
-          files=(rel/*)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "nothing to publish"
-            exit 0
-          fi
-          gh release upload "$tag" "${files[@]}" --clobber
 
       - uses: actions/upload-artifact@v4
+        if: inputs.kernel
         with:
-          name: zhiyu-images-and-packages
-          path: |
-            dist/*
-            images-and-packages.tar.*
-            images-and-packages.sha256
+          name: zhiyu-images
+          path: out/zhiyu-images.tar.*
+          if-no-files-found: error
           compression-level: 0
           retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: inputs.kernel || inputs.packages
+        with:
+          name: zhiyu-package-repositories-input
+          path: out/pkgs/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  publish:
+    needs: build
+    if: inputs.publish && inputs.kernel && inputs.packages
+    permissions:
+      actions: read
+      contents: write
+    uses: ./.github/workflows/publish.yml
