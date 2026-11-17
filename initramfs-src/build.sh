@@ -5,7 +5,7 @@
 # places, and this script is the only thing that writes the tree:
 #
 #   fs/                  our own init script                  (source)
-#   busybox/busybox      built from the busybox submodule (source -> binary)
+#   .sources/            compiled BusyBox from the pinned upstream release
 #   blobs/firmware/      firmware blobs, see MANIFEST.tsv (blob)
 #   modules.tsv + $KS    kernel modules built from source (source -> .ko)
 #
@@ -24,13 +24,13 @@ for cand in "${KS:-}" "$here/../kernel-source" /nosnap/gt13-port/linux/kernel-so
 done
 KS=${KS:-$here/../kernel-source}
 VER=${VER:-$(make -s -C "$KS" ARCH=arm64 kernelrelease)}
-BB=$here/busybox/busybox
+read -r busybox_version _ < "$here/BUSYBOX-RELEASE.txt"
+BB=${BB_OUT:-${BB_SRC:-$here/.sources/busybox-$busybox_version}/busybox}
 
 die() { echo "build.sh: $*" >&2; exit 1; }
 
 # ---- 1. busybox (built from source, statically linked) --------------------
 if [ ! -x "$BB" ] || [ "${REBUILD_BB:-0}" = 1 ]; then
-	echo "== building busybox =="
 	"$here/build-busybox.sh"
 fi
 file -b "$BB" | grep -q "statically linked" || die "$BB is not statically linked"

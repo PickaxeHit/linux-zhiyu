@@ -66,7 +66,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential git pkg-config bc bison flex cpio \
-            libssl-dev libelf-dev libncurses-dev lz4 zstd xz-utils \
+            libssl-dev libelf-dev libncurses-dev lz4 zstd xz-utils bzip2 \
             device-tree-compiler clang lld llvm pahole \
             meson ninja-build cmake cargo curl dpkg-dev \
             libudev-dev libdrm-dev libevent-dev libyaml-dev libjpeg-dev \

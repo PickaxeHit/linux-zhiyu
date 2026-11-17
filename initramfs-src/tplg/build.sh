@@ -4,8 +4,7 @@
 # Chain:  Zhiyu-vendorprops.m4  --m4-->  sm8750-tplg.conf  --alsatplg-->  sm8750-tplg.bin
 #
 # The top-level .m4 is ours; it includes the vendor base tree
-# (audioreach/*.m4, util/*.m4) which comes from the linux-msm/audioreach-topology
-# submodule at vendor-audioreach/ (the submodule records the pinned commit).
+# (audioreach/*.m4, util/*.m4) from a pinned linux-msm/audioreach-topology archive.
 #
 # output: ./sm8750-tplg.bin  (ALSA topology, magic "CoSA")
 set -euo pipefail
@@ -14,16 +13,19 @@ out=${OUT:-$here/sm8750-tplg.bin}
 entry=${ENTRY:-Zhiyu-vendorprops.m4}
 M4=${M4:-m4}
 ALSATPLG=${ALSATPLG:-alsatplg}
+revision=$(cat "$here/VENDOR-COMMIT.txt")
+vendor="$here/../.sources/audioreach-$revision"
 
 die() { echo "tplg/build.sh: $*" >&2; exit 1; }
-[ -d "$here/vendor-audioreach/audioreach" ] || die "vendor m4 base missing (vendor-audioreach/)"
 command -v "$ALSATPLG" >/dev/null || die "alsatplg not found (alsa-utils)"
+bash "$here/../fetch-source.sh" "https://codeload.github.com/linux-msm/audioreach-topology/tar.gz/$revision" \
+	41532ad929058c9b046269c5b85d7b845d0b67a8402ae8982f30231088211549 "$vendor"
 
 cd "$here"
 conf=$(mktemp "$here/.tplg.XXXXXX.conf")
 trap 'rm -f "$conf"' EXIT
 echo "== m4 $entry =="
-"$M4" -I . -I vendor-audioreach "$entry" > "$conf"
+"$M4" -I . -I "$vendor" "$entry" > "$conf"
 echo "   conf: $(stat -c %s "$conf") bytes"
 echo "== alsatplg =="
 "$ALSATPLG" -c "$conf" -o "$out" 2>&1 | sed 's/^/   /' || true
