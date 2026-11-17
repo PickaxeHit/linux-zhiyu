@@ -22,13 +22,13 @@ if [[ -d stage/linux-zhiyu-modules ]]; then
                     export PKG_LICENSE=GPL-2.0-only PKG_RPM_REQUIRES=kmod
                     ;;
                 headers)
-                    export PKG_LICENSE=GPL-2.0-only PKG_RPM_REQUIRES='gcc, make'
+                    export PKG_LICENSE='GPL-2.0-only AND (GPL-2.0-only WITH Linux-syscall-note)' PKG_RPM_REQUIRES='gcc, make'
                     ;;
                 firmware)
-                    export PKG_LICENSE='LicenseRef-Zhiyu-Firmware'
+                    export PKG_LICENSE='BSD-3-Clause AND LicenseRef-LICENSE.qcom AND LicenseRef-LICENSE.qcom-2 AND LicenseRef-Zhiyu-Firmware AND LicenseRef-Zhiyu-Unspecified'
                     ;;
                 images)
-                    export PKG_LICENSE='GPL-2.0-only AND LicenseRef-Zhiyu-Firmware'
+                    export PKG_LICENSE='GPL-2.0-only AND LGPL-2.1-or-later AND Apache-2.0 AND BSD-3-Clause AND LicenseRef-LICENSE.qcom AND LicenseRef-LICENSE.qcom-2 AND LicenseRef-Zhiyu-Firmware AND LicenseRef-Zhiyu-Unspecified'
                     export PKG_RPM_REQUIRES="coreutils, util-linux, grep, sed, gawk, diffutils, xz, linux-zhiyu-modules = $rpm_kernel_version-${PKG_REVISION:-1}"
                     export PKG_RPM_POST='/usr/libexec/zhiyu/update-boot-images.sh'
                     ;;
@@ -75,8 +75,9 @@ if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
     DESTDIR="$PWD/stage/fedora-camera" meson install -C out/fedora-camera --no-rebuild
     version=$(meson introspect out/fedora-camera --projectinfo |
         python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+    bash scripts/stage-license-notices.sh stage/fedora-camera libcamera-zhiyu
     PKG_NAME=libcamera-zhiyu PKG_VERSION="$version" \
-        PKG_LICENSE='LGPL-2.1-or-later AND GPL-2.0-or-later' \
+        PKG_LICENSE='LGPL-2.1-or-later AND GPL-2.0-or-later AND MIT' \
         PKG_RPM_PROVIDES="libcamera = $version" PKG_RPM_CONFLICTS="libcamera < $version, libcamera > $version" \
         scripts/mkrpm.sh stage/fedora-camera out/rpms
 
@@ -86,6 +87,7 @@ if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
         stage/fedora-sensord/usr/lib/systemd/system/zhiyu-sensord.service
     sed -i 's#ExecStart=/usr/local/bin/#ExecStart=/usr/bin/#' \
         stage/fedora-sensord/usr/lib/systemd/system/zhiyu-sensord.service
-    PKG_NAME=zhiyu-sensord PKG_VERSION=1.0.0 PKG_LICENSE=GPL-2.0-only \
+    bash scripts/stage-license-notices.sh stage/fedora-sensord zhiyu-sensord
+    PKG_NAME=zhiyu-sensord PKG_VERSION=1.0.0 PKG_LICENSE=GPL-2.0-or-later \
         scripts/mkrpm.sh stage/fedora-sensord out/rpms
 fi

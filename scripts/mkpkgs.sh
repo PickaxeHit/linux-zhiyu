@@ -3,7 +3,7 @@
 # .pkg.tar.zst, without needing makepkg or dpkg-buildpackage.
 #
 #   usage: mkpkgs.sh <stagedir> <outdir>
-#   env:   PKG_NAME PKG_VERSION PKG_DESC PKG_URL
+#   env:   PKG_NAME PKG_VERSION PKG_LICENSE PKG_DESC PKG_URL
 #          PKG_DEB_DEPENDS   (comma separated, Debian names)
 #          PKG_ARCH_DEPENDS  (space separated, Arch names)
 #
@@ -16,6 +16,7 @@ out=${2:?usage: mkpkgs.sh <stagedir> <outdir>}
 stage=$(realpath "$stage")
 out=$(realpath -m "$out")
 name=${PKG_NAME:?PKG_NAME}
+license=${PKG_LICENSE:?PKG_LICENSE}
 ver=${PKG_VERSION:?PKG_VERSION}
 revision=${PKG_REVISION:-1}
 debver="$ver-$revision"
@@ -58,6 +59,7 @@ fi
 if [ -f "$work/root/etc/udev/rules.d/60-persistent-v4l.rules" ]; then
     printf '/etc/udev/rules.d/60-persistent-v4l.rules\n' > "$work/root/DEBIAN/conffiles"
 fi
+install -Dm644 "$stage/usr/share/licenses/$name/NOTICE.md" "$work/root/usr/share/doc/$name/copyright"
 dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${debver}_arm64.deb" >/dev/null
 echo "wrote $out/${name}_${debver}_arm64.deb"
 
@@ -80,7 +82,7 @@ size=$(du -sb "$stage" | cut -f1)
 	printf 'packager = linux-zhiyu CI\n'
 	printf 'size = %s\n' "$size"
 	printf 'arch = aarch64\n'
-	printf 'license = GPL-2.0-only\n'
+	printf 'license = %s\n' "$license"
 	read -ra dependencies <<< "${PKG_ARCH_DEPENDS:-}"
 	for d in "${dependencies[@]}"; do
 		printf 'depend = %s\n' "$d"

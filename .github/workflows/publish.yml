@@ -162,6 +162,9 @@ jobs:
           set -euo pipefail
           tag=zhiyu-images
           images=(out/release-images/*.img)
+          if [ -f out/release-images/LICENSES.tar.gz ]; then
+            images+=(out/release-images/LICENSES.tar.gz)
+          fi
           checksums=out/release-images/SHA256SUMS
           printf 'Signed Lenovo TB378FC boot images from build commit %s.\n' "$build_sha" > image-release-notes.md
           if gh release view "$tag" >/dev/null 2>&1; then
