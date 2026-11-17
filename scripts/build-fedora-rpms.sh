@@ -59,9 +59,7 @@ if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
         > "$hexagonrpc_stage/usr/lib/tmpfiles.d/hexagonrpc.conf"
     license_dir="$hexagonrpc_stage/usr/share/licenses/hexagonrpc"
     install -Dm644 out/hexagonrpc-source/COPYING "$license_dir/COPYING"
-    curl --fail --silent --show-error --location --retry 3 \
-        https://raw.githubusercontent.com/spdx/license-list-data/v3.26.0/text/LGPL-3.0-or-later.txt \
-        -o "$license_dir/LGPL-3.0.txt"
+    install -m644 licenses/LGPL-3.0.txt "$license_dir/LGPL-3.0.txt"
     hexagonrpc_version=$(meson introspect out/fedora-hexagonrpc --projectinfo |
         python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
     PKG_NAME=hexagonrpc PKG_VERSION="$hexagonrpc_version" \

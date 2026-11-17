@@ -59,7 +59,7 @@ else
     printf 'DNF baseurl: https://raw.githubusercontent.com/%s/%s/fedora/\n' \
         "$GITHUB_REPOSITORY" "$branch" > "$notes"
 fi
-if ! grep -Fq -- "\`$hexagonrpc_asset\`" "$notes"; then
+if ! grep -Fq -- "$hexagonrpc_asset" "$notes"; then
     printf '\n- `%s`: [upstream source](https://github.com/linux-msm/hexagonrpc/archive/%s.tar.gz) and [packaging scripts](https://github.com/%s/tree/%s/scripts).\n' \
         "$hexagonrpc_asset" "$revision" "$GITHUB_REPOSITORY" "$sha" >> "$notes"
 fi
