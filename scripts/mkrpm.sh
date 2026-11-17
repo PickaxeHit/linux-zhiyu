@@ -13,6 +13,7 @@ mkdir -p "$out"
 find "$stage" -mindepth 1 ! -type d -printf '/%P\n' | LC_ALL=C sort |
     while IFS= read -r file; do
         case "$file" in
+            /usr/share/licenses/*) printf '%%license "%s"\n' "$file" ;;
             /etc/*) printf '%%config(noreplace) "%s"\n' "$file" ;;
             *) printf '"%s"\n' "$file" ;;
         esac

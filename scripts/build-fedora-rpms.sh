@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Run inside a Fedora 44 aarch64 container.
 set -euo pipefail
-dnf -y install rpm-build redhat-rpm-config gcc gcc-c++ make meson ninja-build git \
+dnf -y --setopt=install_weak_deps=False install rpm-build redhat-rpm-config gcc gcc-c++ make meson ninja-build git \
     python3-pyyaml python3-jinja2 python3-ply pkgconf-pkg-config \
     glib2-devel systemd-devel libdrm-devel libevent-devel libyaml-devel \
     libjpeg-turbo-devel qt6-qtbase-devel mesa-libEGL-devel mesa-libGL-devel \
-    openssl-devel libatomic
+    openssl-devel libatomic curl tar gzip
 
 install -d out/rpms
 if [[ -d stage/linux-zhiyu-modules ]]; then
@@ -39,6 +39,36 @@ if [[ -d stage/linux-zhiyu-modules ]]; then
 fi
 
 if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
+    hexagonrpc_revision=$(cat scripts/hexagonrpc-revision)
+    mkdir -p out/hexagonrpc-source
+    curl --fail --silent --show-error --location --retry 3 \
+        "https://codeload.github.com/linux-msm/hexagonrpc/tar.gz/$hexagonrpc_revision" |
+        tar -xz --strip-components=1 -C out/hexagonrpc-source
+    meson setup out/fedora-hexagonrpc out/hexagonrpc-source \
+        --buildtype=release --prefix=/usr --libdir=lib64
+    meson compile -C out/fedora-hexagonrpc
+    hexagonrpc_stage="$PWD/stage/fedora-hexagonrpc"
+    DESTDIR="$hexagonrpc_stage" meson install -C out/fedora-hexagonrpc --no-rebuild
+    install -d "$hexagonrpc_stage/usr/lib/systemd/system" \
+        "$hexagonrpc_stage/usr/lib/sysusers.d" "$hexagonrpc_stage/usr/lib/tmpfiles.d"
+    mv "$hexagonrpc_stage"/usr/lib64/systemd/system/hexagonrpcd-*.service \
+        "$hexagonrpc_stage/usr/lib/systemd/system/"
+    printf '%s\n' 'u fastrpc - "FastRPC" /var/lib/fastrpc' \
+        > "$hexagonrpc_stage/usr/lib/sysusers.d/fastrpc.conf"
+    printf '%s\n' 'd /usr/share/qcom/sensors/registry 0755 fastrpc fastrpc -' \
+        > "$hexagonrpc_stage/usr/lib/tmpfiles.d/hexagonrpc.conf"
+    license_dir="$hexagonrpc_stage/usr/share/licenses/hexagonrpc"
+    install -Dm644 out/hexagonrpc-source/COPYING "$license_dir/COPYING"
+    curl --fail --silent --show-error --location --retry 3 \
+        https://raw.githubusercontent.com/spdx/license-list-data/v3.26.0/text/LGPL-3.0-or-later.txt \
+        -o "$license_dir/LGPL-3.0.txt"
+    hexagonrpc_version=$(meson introspect out/fedora-hexagonrpc --projectinfo |
+        python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+    PKG_NAME=hexagonrpc PKG_VERSION="$hexagonrpc_version" \
+        PKG_DESC="Qualcomm Hexagon FastRPC daemon and libraries" \
+        PKG_LICENSE='GPL-3.0-or-later AND LGPL-3.0-or-later' \
+        scripts/mkrpm.sh "$hexagonrpc_stage" out/rpms
+
     # Use Fedora's native ABI and libdir for userspace binaries.
     meson setup out/fedora-camera libcamera --buildtype=release --prefix=/usr --libdir=lib64 \
         -Dwerror=false -Dqcam=enabled -Dpipelines=simple -Dgstreamer=disabled \

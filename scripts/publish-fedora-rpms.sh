@@ -10,8 +10,8 @@ work=$(mktemp -d)
 trap 'git worktree remove --force "$work/tree" 2>/dev/null || true; rm -rf "$work"' EXIT
 
 packages=("$rpms"/*.rpm)
-test "${#packages[@]}" -eq 6
-for name in linux-zhiyu-modules linux-zhiyu-headers linux-zhiyu-firmware linux-zhiyu-images libcamera-zhiyu zhiyu-sensord; do
+test "${#packages[@]}" -eq 7
+for name in linux-zhiyu-modules linux-zhiyu-headers linux-zhiyu-firmware linux-zhiyu-images libcamera-zhiyu zhiyu-sensord hexagonrpc; do
     candidates=("$rpms/$name"-[0-9]*.aarch64.rpm)
     test "${#candidates[@]}" -eq 1
     test -f "${candidates[0]}"
@@ -48,11 +48,26 @@ if ! git -C "$work/tree" diff --cached --quiet; then
     git -C "$work/tree" commit -m "Update Fedora repository for ${sha:0:12}"
 fi
 
-if gh release view "$tag" >/dev/null 2>&1; then
+revision=$(git show "$sha:scripts/hexagonrpc-revision")
+hexagonrpc_packages=("$rpms"/hexagonrpc-[0-9]*.aarch64.rpm)
+hexagonrpc_asset=${hexagonrpc_packages[0]##*/}
+notes="$work/release-notes.md"
+if gh release view "$tag" --json body --jq .body > "$notes"; then
+    existing=1
+else
+    existing=0
+    printf 'DNF baseurl: https://raw.githubusercontent.com/%s/%s/fedora/\n' \
+        "$GITHUB_REPOSITORY" "$branch" > "$notes"
+fi
+if ! grep -Fq -- "\`$hexagonrpc_asset\`" "$notes"; then
+    printf '\n- \`%s\`: [upstream source](https://github.com/linux-msm/hexagonrpc/archive/%s.tar.gz) and [packaging scripts](https://github.com/%s/tree/%s/scripts).\n' \
+        "$hexagonrpc_asset" "$revision" "$GITHUB_REPOSITORY" "$sha" >> "$notes"
+fi
+if [[ "$existing" == 1 ]]; then
+    gh release edit "$tag" --notes-file "$notes"
     gh release upload "$tag" "${packages[@]}" --clobber
 else
     gh release create "$tag" "${packages[@]}" --target "$sha" --latest=false \
-        --title "Zhiyu Fedora RPM repository" \
-        --notes "DNF baseurl: https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$branch/fedora/"
+        --title "Zhiyu Fedora RPM repository" --notes-file "$notes"
 fi
 git -C "$work/tree" push origin "HEAD:refs/heads/$branch"
