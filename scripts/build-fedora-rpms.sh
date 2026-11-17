@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Run inside a Fedora 44 aarch64 container.
+set -euo pipefail
+dnf -y install rpm-build redhat-rpm-config gcc gcc-c++ make meson ninja-build git \
+    python3-pyyaml python3-jinja2 python3-ply pkgconf-pkg-config \
+    glib2-devel systemd-devel libdrm-devel libevent-devel libyaml-devel \
+    libjpeg-turbo-devel qt6-qtbase-devel mesa-libEGL-devel mesa-libGL-devel \
+    openssl-devel libatomic
+
+install -d out/rpms
+if [[ -d stage/linux-zhiyu-modules ]]; then
+    modules=(stage/linux-zhiyu-modules/usr/lib/modules/*)
+    test "${#modules[@]}" -eq 1
+    kernel_version=${modules[0]##*/}
+    rpm_kernel_version=${kernel_version//-/_}
+
+    for part in modules headers firmware images; do
+        (
+            export PKG_NAME="linux-zhiyu-$part" PKG_VERSION="$kernel_version"
+            case "$part" in
+                modules)
+                    export PKG_LICENSE=GPL-2.0-only PKG_RPM_REQUIRES=kmod
+                    ;;
+                headers)
+                    export PKG_LICENSE=GPL-2.0-only PKG_RPM_REQUIRES='gcc, make'
+                    ;;
+                firmware)
+                    export PKG_LICENSE='LicenseRef-Zhiyu-Firmware'
+                    ;;
+                images)
+                    export PKG_LICENSE='GPL-2.0-only AND LicenseRef-Zhiyu-Firmware'
+                    export PKG_RPM_REQUIRES="coreutils, util-linux, grep, sed, gawk, diffutils, xz, linux-zhiyu-modules = $rpm_kernel_version-${PKG_REVISION:-1}"
+                    export PKG_RPM_POST='/usr/libexec/zhiyu/update-boot-images.sh'
+                    ;;
+            esac
+            scripts/mkrpm.sh "stage/$PKG_NAME" out/rpms
+        )
+    done
+fi
+
+if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
+    # Use Fedora's native ABI and libdir for userspace binaries.
+    meson setup out/fedora-camera libcamera --buildtype=release --prefix=/usr --libdir=lib64 \
+        -Dwerror=false -Dqcam=enabled -Dpipelines=simple -Dgstreamer=disabled \
+        -Dpycamera=disabled -Ddocumentation=disabled -Dcam=enabled -Dv4l2=enabled
+    meson compile -C out/fedora-camera
+    DESTDIR="$PWD/stage/fedora-camera" meson install -C out/fedora-camera --no-rebuild
+    version=$(meson introspect out/fedora-camera --projectinfo |
+        python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+    PKG_NAME=libcamera-zhiyu PKG_VERSION="$version" \
+        PKG_LICENSE='LGPL-2.1-or-later AND GPL-2.0-or-later' \
+        PKG_RPM_PROVIDES="libcamera = $version" PKG_RPM_CONFLICTS="libcamera < $version, libcamera > $version" \
+        scripts/mkrpm.sh stage/fedora-camera out/rpms
+
+    make -C sensors -B
+    install -Dm755 sensors/sensord stage/fedora-sensord/usr/bin/zhiyu-sensord
+    install -Dm644 sensors/zhiyu-sensord.service \
+        stage/fedora-sensord/usr/lib/systemd/system/zhiyu-sensord.service
+    sed -i 's#ExecStart=/usr/local/bin/#ExecStart=/usr/bin/#' \
+        stage/fedora-sensord/usr/lib/systemd/system/zhiyu-sensord.service
+    PKG_NAME=zhiyu-sensord PKG_VERSION=1.0.0 PKG_LICENSE=GPL-2.0-only \
+        scripts/mkrpm.sh stage/fedora-sensord out/rpms
+fi

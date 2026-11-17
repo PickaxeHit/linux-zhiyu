@@ -362,6 +362,24 @@ jobs:
           scripts/mkpkgs.sh stage/zhiyu-sensord out/pkgs
           ls -l out/pkgs
 
+      - name: Build Fedora RPMs
+        if: inputs.kernel || inputs.packages
+        env:
+          BUILD_USERSPACE: ${{ inputs.packages }}
+        run: |
+          docker run --rm -e PKG_REVISION -e BUILD_USERSPACE \
+            -v "$PWD:/work" -w /work quay.io/fedora/fedora:44 \
+            scripts/build-fedora-rpms.sh
+
+      - uses: actions/upload-artifact@v4
+        if: inputs.kernel || inputs.packages
+        with:
+          name: zhiyu-fedora-rpms
+          path: out/rpms/aarch64/*.rpm
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
       - name: Archive signed images
         if: inputs.kernel
         env:

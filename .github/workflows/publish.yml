@@ -43,7 +43,7 @@ jobs:
           if [[ -z "$run_id" ]]; then
             # A reusable call can download from its own run after the build
             # job succeeds, while the overall workflow is still running.
-            echo "build_sha=$GITHUB_SHA" >> "$GITHUB_ENV"
+            printf "build_sha=%s\nsource_run=%s\n" "$GITHUB_SHA" "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
             exit 0
           fi
           [[ "$run_id" =~ ^[0-9]+$ ]]
@@ -58,7 +58,7 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == push ]]; then
             git merge-base --is-ancestor "$build_sha" "$GITHUB_SHA"
           fi
-          echo "build_sha=$build_sha" >> "$GITHUB_ENV"
+          printf "build_sha=%s\nsource_run=%s\n" "$build_sha" "$run_id" >> "$GITHUB_ENV"
           gh run download "$run_id" --name zhiyu-package-repositories-input --dir out/pkgs
           gh run download "$run_id" --name zhiyu-images --dir out/image-archive
 
@@ -78,6 +78,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y dpkg-dev pacman-package-manager libarchive-tools zstd
+
+      - name: Download optional Fedora RPMs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          count=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$source_run/artifacts?name=zhiyu-fedora-rpms" --jq '.total_count')
+          if [ "$count" -gt 0 ]; then
+            gh run download "$source_run" --name zhiyu-fedora-rpms --dir out/fedora-rpms
+          fi
 
       - name: Verify signed image archive contents
         run: |
@@ -160,3 +170,12 @@ jobs:
               --latest --target "$build_sha" \
               --title "Zhiyu signed boot images" --notes-file image-release-notes.md
           fi
+
+
+      - name: Publish Fedora RPM repository
+        if: hashFiles('out/fedora-rpms/*.rpm') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo apt-get install -y createrepo-c
+          scripts/publish-fedora-rpms.sh out/fedora-rpms "$build_sha"
