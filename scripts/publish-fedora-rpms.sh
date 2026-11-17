@@ -60,7 +60,7 @@ else
         "$GITHUB_REPOSITORY" "$branch" > "$notes"
 fi
 if ! grep -Fq -- "\`$hexagonrpc_asset\`" "$notes"; then
-    printf '\n- \`%s\`: [upstream source](https://github.com/linux-msm/hexagonrpc/archive/%s.tar.gz) and [packaging scripts](https://github.com/%s/tree/%s/scripts).\n' \
+    printf '\n- `%s`: [upstream source](https://github.com/linux-msm/hexagonrpc/archive/%s.tar.gz) and [packaging scripts](https://github.com/%s/tree/%s/scripts).\n' \
         "$hexagonrpc_asset" "$revision" "$GITHUB_REPOSITORY" "$sha" >> "$notes"
 fi
 if [[ "$existing" == 1 ]]; then
