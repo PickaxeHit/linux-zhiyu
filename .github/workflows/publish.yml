@@ -50,10 +50,13 @@ jobs:
           build=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id")
           jq -e --arg repo "$GITHUB_REPOSITORY" '
             (.path == ".github/workflows/build.yml" or .path == ".github/workflows/images.yml") and
-            .status == "completed" and .conclusion == "success" and
+            .status == "completed" and
             .head_repository.full_name == $repo and
             (.head_branch == "main" or .head_branch == "package-repositories")
           ' <<< "$build" >/dev/null
+          # A publishing failure can be retried using the completed build job.
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs" |
+            jq -e 'any(.jobs[]; .name == "build" and .conclusion == "success")' >/dev/null
           build_sha=$(jq -r .head_sha <<< "$build")
           if [[ "$GITHUB_EVENT_NAME" == push ]]; then
             git merge-base --is-ancestor "$build_sha" "$GITHUB_SHA"

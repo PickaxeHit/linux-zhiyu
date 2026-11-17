@@ -22,8 +22,8 @@ git worktree add --detach "$work/tree" "$GITHUB_SHA"
 git -C "$work/tree" config user.name github-actions[bot]
 git -C "$work/tree" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
-    git fetch origin "refs/heads/$branch"
-    git -C "$work/tree" switch --detach FETCH_HEAD
+    git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch"
+    git -C "$work/tree" switch --detach "refs/remotes/origin/$branch"
 else
     git -C "$work/tree" switch --orphan "$branch"
 fi
