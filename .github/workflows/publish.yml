@@ -154,9 +154,9 @@ jobs:
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" "${images[@]}" --clobber
             gh release upload "$tag" "$checksums" --clobber
-            gh release edit "$tag" --prerelease=false --latest=false --notes-file image-release-notes.md
+            gh release edit "$tag" --prerelease=false --latest --notes-file image-release-notes.md
           else
             gh release create "$tag" "${images[@]}" "$checksums" \
-              --latest=false --target "$build_sha" \
+              --latest --target "$build_sha" \
               --title "Zhiyu signed boot images" --notes-file image-release-notes.md
           fi

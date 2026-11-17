@@ -31,13 +31,13 @@
 3. 前往 [Releases](https://github.com/PickaxeHit/linux-zhiyu/releases/tag/packages) 下载最新分区镜像
 
    公共部分：
-   * [zhiyu-vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vendor_boot.img)
-   * [zhiyu-init_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-init_boot.img)
+   * [vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vendor_boot.img)
+   * [init_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/init_boot.img)
 
    发行版相关：
-   * 不指定主 LSM（默认，如 ArchLinux）：[zhiyu-boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot.img) + [zhiyu-vbmeta.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vbmeta.img)
-   * 启用 SELinux，RedHat 系（如 Fedora）：[zhiyu-boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-selinux.img) + [zhiyu-vbmeta-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vbmeta-selinux.img)
-   * 启用 AppArmor，Debian 系（如 Ubuntu）：[zhiyu-boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-boot-apparmor.img) + [zhiyu-vbmeta-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/packages/zhiyu-vbmeta-apparmor.img)
+   * 不指定主 LSM（默认，如 ArchLinux）：[boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/boot.img) + [vbmeta.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vbmeta.img)
+   * 启用 SELinux，RedHat 系（如 Fedora）：[boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/boot-selinux.img) + [vbmeta-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vbmeta-selinux.img)
+   * 启用 AppArmor，Debian 系（如 Ubuntu）：[boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/boot-apparmor.img) + [vbmeta-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vbmeta-apparmor.img)
 4. 前往[rootfs仓库](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder)，[fork](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder/fork)该仓库到自己账号下，并启用Action  
 5. 在自己的rootfs仓库下，根据自己的偏好与设置，在Action中触发一次构建  
 6. 下载构建好的rootfs，并解压到设备中，内容物为.tar.xz后缀。请自行核对hash  
