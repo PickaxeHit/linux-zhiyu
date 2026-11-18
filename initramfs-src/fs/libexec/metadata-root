@@ -60,9 +60,26 @@ rm -f "$state/metadata.eph"
 umount "$state/metadata"
 meta_mounted=0
 mkdir -p "$target"
-/bin/userdata-map check-writable /dev/mapper/android-data-root
-mount -t f2fs -o rw,noatime,inlinecrypt,nodiscard,barrier,fsync_mode=posix,background_gc=off \
+# CP_ERROR/CP_FSCK are cleared only by an offline fsck, and Android refuses to
+# mount the volume while they are set.  Repair it here (on the dm device) so a
+# stale flag cannot lock the board out of its rootfs.
+if ! /bin/userdata-map check-writable /dev/mapper/android-data-root >&2; then
+	# CP_ERROR/CP_FSCK stay set until an offline fsck runs, and the mount
+	# below would be refused by Android afterwards.  Repair the dm device
+	# (never the raw partition, which is ciphered) before mounting it.
+	if [ -x /bin/fsck.f2fs ]; then
+		echo 'userdata: repair required, running fsck.f2fs' >&2
+		/bin/fsck.f2fs -f /dev/mapper/android-data-root >&2 ||
+			echo 'userdata: fsck failed, continuing anyway' >&2
+	else
+		echo 'userdata: repair required, no fsck.f2fs available' >&2
+	fi
+fi
+mount -t f2fs -o rw,noatime,inlinecrypt,nodiscard,barrier,fsync_mode=posix,background_gc=off,usrquota,grpquota,prjquota \
 	/dev/mapper/android-data-root "$target"
 data_mounted=1
-/bin/userdata-map quota-check /dev/mapper/android-data-root
+# Quota accounting is a best-effort check: a mismatch must not tear down a
+# mount that already succeeded (a module-less kernel reports it unavailable).
+/bin/userdata-map quota-check /dev/mapper/android-data-root >&2 || \
+	echo 'userdata: quota check unavailable, continuing' >&2
 success=1

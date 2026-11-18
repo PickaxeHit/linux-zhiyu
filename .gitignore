@@ -10,3 +10,4 @@
 /keymint/bin/
 /keymint/__pycache__/
 /keymint/.deps/
+/initramfs-src/blobs/fsck.f2fs

@@ -535,22 +535,15 @@ finish_rootfs() {
 	cmsg "root init: $init"
 
 	apply_factory_macs
-	# Keep the whole filesystem visible after switching into its linux subdir.
-	# systemd can then track/remount it during shutdown instead of leaving an
-	# unreachable writable mount behind in the discarded initramfs.
+	# The rootfs is a bind mount of /data/<sub>, so this f2fs superblock stays
+	# mounted through /newroot even after the initramfs root is discarded.
+	# Do NOT hand the rest of the partition to the guest: exposing it at
+	# /root/android-data gives the distribution a writable path into Android's
+	# own /data, and anything that walks every mountpoint (SELinux fixfiles /
+	# restorecon -R relabels, a stray recursive write) then rewrites Android's
+	# labels and metadata on the shared filesystem.
 	if [ "${root_on_userdata:-0}" -eq 1 ]; then
-		# Android owns the filesystem root as uid 1000, which is also the
-		# usual Linux desktop uid. Protect this view through a Linux-only
-		# parent directory; never chmod/chown Android's /data root.
-		mkdir -p /newroot/root/android-data /newroot/mnt
-		chmod 0700 /newroot/root
-		if [ -L /newroot/mnt/android-data ]; then
-			[ "$(readlink /newroot/mnt/android-data)" = /root/android-data ] || return 1
-		else
-			[ ! -e /newroot/mnt/android-data ] || rmdir /newroot/mnt/android-data || return 1
-			ln -s /root/android-data /newroot/mnt/android-data || return 1
-		fi
-		mount -o move /mnt/data /newroot/root/android-data || return 1
+		umount /mnt/data || cmsg "WARNING: /mnt/data still busy, dropping the view anyway"
 	fi
 
 	cmsg "switching to the Linux rootfs"

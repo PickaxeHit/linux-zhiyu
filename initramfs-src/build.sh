@@ -73,6 +73,18 @@ for src in "$here"/src/*.c; do
 	echo "helper : $(basename "$tool") ($(stat -c %s "$tool") bytes)"
 done
 
+# A fully static fsck.f2fs lets the initramfs repair a dirty f2fs checkpoint
+# before it mounts the shared userdata volume.  Built from the pinned
+# f2fs-tools release with --without-selinux/--without-libuuid, so it has no
+# runtime dependencies.
+if [ ! -x "$here/blobs/fsck.f2fs" ] || [ "${REBUILD_FSCK:-0}" = 1 ]; then
+	bash "$here/build-fsck.sh"
+fi
+if [ -x "$here/blobs/fsck.f2fs" ]; then
+	install -m 0755 "$here/blobs/fsck.f2fs" "$stage/bin/fsck.f2fs"
+	echo "helper : fsck.f2fs ($(stat -c %s "$stage/bin/fsck.f2fs") bytes)"
+fi
+
 # Stage fully static clients built from source and verified static libraries.
 "$here/../keymint/stage-initramfs.sh" "$stage"
 
