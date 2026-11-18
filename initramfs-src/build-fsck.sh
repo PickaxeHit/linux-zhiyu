@@ -24,12 +24,18 @@ fi
 [ -f "$src/configure.ac" ] || die "f2fs-tools source is missing: $src"
 cd "$src"
 
-if [ ! -f Makefile ]; then
-	# The git snapshot ships no generated configure script.
-	./autogen.sh >/dev/null 2>&1
-	./configure --host="${CROSS%-}" --disable-shared --enable-static \
-		--without-selinux --without-blkid >/dev/null
-fi
+[ -f configure ] || ./autogen.sh >/dev/null 2>&1
+# Force every optional dependency off so the result does not depend on what
+# the build host happens to have installed: with libuuid/libselinux/liblz4
+# present, configure compiles in uuid_unparse()/LZ4_compress_fast_extState()
+# calls that the static link below would then have to resolve.
+./configure --host="${CROSS%-}" --disable-shared --enable-static \
+	--without-selinux --without-blkid --without-lz4 --without-lzo2 \
+	ac_cv_lib_uuid_uuid_clear=no ac_cv_header_uuid_uuid_h=no >/dev/null
+for feature in HAVE_LIBUUID HAVE_LIBSELINUX HAVE_LIBLZ4 HAVE_LIBLZO2; do
+	grep -q "#define $feature" config.h \
+		&& die "$feature was detected; the static link needs $feature"
+done
 make -j"$jobs" >/dev/null 2>&1
 
 # libtool still links a dynamic binary even with LDFLAGS=-static, so link the
