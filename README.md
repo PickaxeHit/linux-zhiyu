@@ -42,7 +42,9 @@
 5. 在自己的rootfs仓库下，根据自己的偏好与设置，在Action中触发一次构建  
 6. 下载构建好的rootfs，并解压到设备中，内容物为.tar.xz后缀。请自行核对hash  
 7. 使用具有root权限的终端，在/data/下创建linux子目录。完整路径为/data/linux/  
-8. 将rootfs以root身份解压至/data/linux下，并检查/data/linux/sbin/init是否存在（有可能多一级或少一级，此时需要删除整个linux目录并从第7步开始）。参考命令：`tar -xJvf /path/to/rootfs.tar.xz -C /data/linux`  
+8. 将rootfs以root身份解压至/data/linux下，并检查/data/linux/sbin/init是否存在（有可能多一级或少一级，此时需要删除整个linux目录并从第7步开始）。
+   * 非SELinux: `tar -xJvf /path/to/rootfs.tar.xz -C /data/linux`
+   * 启用SELinux: `tar -xJvf /path/to/rootfs.tar.xz -C /data/linux --numeric-owner --same-owner --same-permissions --xattrs --xattrs-include='security.*'`
 9. 刷入第3步下载的四个镜像至未使用的槽位（可使用`adb shell getprop ro.boot.slot_suffix`检查当前槽位）  
 10. 重启至该槽位
 ### 注意事项
