@@ -39,6 +39,23 @@ if [[ -d stage/linux-zhiyu-modules ]]; then
 fi
 
 if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
+    dnf -y --setopt=install_weak_deps=False install qmic qrtr-devel protobuf-c-devel protobuf-c-compiler
+    sensh_revision=$(cat scripts/sensh-revision)
+    mkdir -p out/sensh-source
+    curl --fail --silent --show-error --location --retry 3 \
+        "https://gitlab.com/flamingradian/sensh/-/archive/$sensh_revision/sensh-$sensh_revision.tar.gz" |
+        tar -xz --strip-components=1 -C out/sensh-source
+    meson setup out/fedora-sensh out/sensh-source --buildtype=release --prefix=/usr
+    meson compile -C out/fedora-sensh
+    sensh_stage="$PWD/stage/fedora-sensh"
+    DESTDIR="$sensh_stage" meson install -C out/fedora-sensh --no-rebuild
+    install -Dm644 out/sensh-source/COPYING "$sensh_stage/usr/share/licenses/sensh/COPYING"
+    sensh_version=$(meson introspect out/fedora-sensh --projectinfo |
+        python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+    PKG_NAME=sensh PKG_VERSION="$sensh_version" PKG_LICENSE=GPL-3.0-or-later \
+        PKG_DESC="Qualcomm Sensor Core diagnostic shell" \
+        scripts/mkrpm.sh "$sensh_stage" out/rpms
+
     hexagonrpc_revision=$(cat scripts/hexagonrpc-revision)
     mkdir -p out/hexagonrpc-source
     curl --fail --silent --show-error --location --retry 3 \
@@ -81,13 +98,13 @@ if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
         PKG_RPM_PROVIDES="libcamera = $version" PKG_RPM_CONFLICTS="libcamera < $version, libcamera > $version" \
         scripts/mkrpm.sh stage/fedora-camera out/rpms
 
-    make -C sensors -B
+    make -C sensors -B CPPFLAGS='-DSENSH=\"/usr/bin/sensh\"'
     install -Dm755 sensors/sensord stage/fedora-sensord/usr/bin/zhiyu-sensord
     install -Dm644 sensors/zhiyu-sensord.service \
         stage/fedora-sensord/usr/lib/systemd/system/zhiyu-sensord.service
     sed -i 's#ExecStart=/usr/local/bin/#ExecStart=/usr/bin/#' \
         stage/fedora-sensord/usr/lib/systemd/system/zhiyu-sensord.service
     bash scripts/stage-license-notices.sh stage/fedora-sensord zhiyu-sensord
-    PKG_NAME=zhiyu-sensord PKG_VERSION=1.0.0 PKG_LICENSE=GPL-2.0-or-later \
+    PKG_NAME=zhiyu-sensord PKG_VERSION=1.0.0 PKG_LICENSE=GPL-2.0-or-later PKG_RPM_REQUIRES=sensh \
         scripts/mkrpm.sh stage/fedora-sensord out/rpms
 fi

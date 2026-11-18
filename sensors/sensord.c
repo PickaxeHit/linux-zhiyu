@@ -24,7 +24,9 @@
 #define BUS_NAME "net.hadess.SensorProxy"
 #define OBJ_PATH "/net/hadess/SensorProxy"
 #define IFACE    "net.hadess.SensorProxy"
+#ifndef SENSH
 #define SENSH    "/usr/local/bin/sensh"
+#endif
 
 static const gchar introspection_xml[] =
 	"<node>"
