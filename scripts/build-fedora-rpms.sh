@@ -92,7 +92,8 @@ if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
         meson setup "out/fedora-camera-$soname" "src/libcamera-$soname" \
             --buildtype=release --prefix=/usr --libdir=lib64 \
             -Dwerror=false -Dqcam=enabled -Dpipelines=simple -Dgstreamer=disabled \
-            -Dpycamera=disabled -Ddocumentation=disabled -Dcam=enabled -Dv4l2=enabled
+            -Dpycamera=disabled -Ddocumentation=disabled -Dcam=enabled -Dv4l2=enabled \
+            -Dtest=false
         meson compile -C "out/fedora-camera-$soname"
         DESTDIR="$PWD/stage/fedora-camera-$soname" \
             meson install -C "out/fedora-camera-$soname" --no-rebuild

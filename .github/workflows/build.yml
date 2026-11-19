@@ -45,6 +45,7 @@ env:
     -Ddocumentation=disabled
     -Dcam=enabled
     -Dv4l2=enabled
+    -Dtest=false
 
 concurrency:
   group: images-${{ github.ref }}
