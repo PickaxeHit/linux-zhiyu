@@ -1,4 +1,6 @@
-# libcamera's software ISP needs a dma-buf heap; the kernel exposes it as
-# /dev/dma_heap/* with 0600 root:root by default, which locks out the
-# desktop user.  Give the video group access, like the V4L2 nodes.
-SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"
+# libcamera's software ISP needs a dma-buf heap.  The kernel already creates
+# /dev/dma_heap/* as root:video 0660, so the group/mode below only keeps that
+# state; what actually matters is that the logged-in user can open the node.
+# Fedora images created with `useradd -G wheel` do not put the user in video,
+# so grant the active seat user an ACL as well.
+SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660", TAG+="uaccess"
