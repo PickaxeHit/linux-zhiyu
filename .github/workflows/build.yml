@@ -6,7 +6,7 @@ name: Build images and packages
 #     boot critical ones also live in the vendor ramdisk)
 #   - linux-zhiyu-headers: a prepared tree for out-of-tree module builds
 #   - linux-zhiyu-firmware: the board blobs plus the built AudioReach topology
-#   - libcamera (the tb378fc fork: simple pipeline, EGL debayer, CDAF)
+#   - libcamera (the zhiyu fork: simple pipeline, EGL debayer, CDAF)
 #   - sensord (SensorProxy daemon backed by sensh/SNS Client)
 # Everything is packaged as both Debian (.deb) and Arch (.pkg.tar.zst) so any
 # of the rootfs images can install it.

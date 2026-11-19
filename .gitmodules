@@ -5,4 +5,4 @@
 [submodule "libcamera"]
 	path = libcamera
 	url = git@github.com:PickaxeHit/libcamera-zhiyu.git
-	branch = tb378fc
+	branch = zhiyu-0.8.0
