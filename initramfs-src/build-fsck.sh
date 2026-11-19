@@ -18,7 +18,7 @@ die() { echo "build-fsck.sh: $*" >&2; exit 1; }
 
 if [ -z "${F2FS_SRC:-}" ]; then
 	bash "$here/fetch-source.sh" \
-		"https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git/snapshot/f2fs-tools-$version.tar.gz" \
+		"https://deb.debian.org/debian/pool/main/f/f2fs-tools/f2fs-tools_$version.orig.tar.xz" \
 		"$checksum" "$src"
 fi
 [ -f "$src/configure.ac" ] || die "f2fs-tools source is missing: $src"
@@ -29,6 +29,9 @@ cd "$src"
 # the build host happens to have installed: with libuuid/libselinux/liblz4
 # present, configure compiles in uuid_unparse()/LZ4_compress_fast_extState()
 # calls that the static link below would then have to resolve.
+# -std=gnu17: 1.16 still has "typedef u8 bool;", which GCC 15 and later
+# reject because bool is a keyword in their default C23 mode.
+CFLAGS="-std=gnu17 -O2" \
 ./configure --host="${CROSS%-}" --disable-shared --enable-static \
 	--without-selinux --without-blkid --without-lz4 --without-lzo2 \
 	ac_cv_lib_uuid_uuid_clear=no ac_cv_header_uuid_uuid_h=no >/dev/null
