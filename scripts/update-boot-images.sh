@@ -5,7 +5,11 @@ set -eu
 images=/usr/lib/linux-zhiyu/images
 proc_bootconfig=/proc/bootconfig
 proc_cmdline=/proc/cmdline
-compat=/proc/device-tree/compatible
+# The board is recognised by the properties our own device tree adds.  The
+# stock DTBO that the bootloader applies on top overrides the root "model"
+# and "compatible" with Qualcomm's values, but it knows nothing about these,
+# so they always describe this port.
+compat=/proc/device-tree/lenovo,mainline-compatible
 partitions=/dev/disk/by-partlabel
 
 log() { echo "zhiyu-image-update: $*" >&2; }
@@ -13,7 +17,7 @@ log() { echo "zhiyu-image-update: $*" >&2; }
 # Package installation is also used while building a rootfs on a CI host.
 # Silently skip there; on this board, missing slot data is an error and must
 # never fall back to guessing or changing the active slot.
-if [ ! -r "$compat" ] || ! tr '\0' '\n' < "$compat" | grep -Fx 'lenovo,zhiyu' >/dev/null; then
+if [ ! -r "$compat" ] || ! tr '\0' '\n' < "$compat" | grep -Fxq 'lenovo,zhiyu'; then
     log "not running on Lenovo zhiyu; skipping partition writes"
     exit 0
 fi
