@@ -13,10 +13,7 @@ log() { echo "zhiyu-image-update: $*" >&2; }
 # Package installation is also used while building a rootfs on a CI host.
 # Silently skip there; on this board, missing slot data is an error and must
 # never fall back to guessing or changing the active slot.
-#
-# The board is identified by the compatible string its device tree actually
-# carries ("qcom,sunp-qrd"), not by a vendor string the DTS never had.
-if [ ! -r "$compat" ] || ! tr '\0' '\n' < "$compat" | grep -Fxq 'qcom,sunp-qrd'; then
+if [ ! -r "$compat" ] || ! tr '\0' '\n' < "$compat" | grep -Fx 'lenovo,zhiyu' >/dev/null; then
     log "not running on Lenovo zhiyu; skipping partition writes"
     exit 0
 fi
