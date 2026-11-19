@@ -120,15 +120,19 @@ jobs:
                 package_suffix=.deb
                 packages=("$dir"/*.deb)
                 indexes=("$dir/Packages" "$dir/Packages.gz" "$dir/Release")
+                # Debian carries both libcamera ABIs.
+                expected=7
                 ;;
               archlinuxarm)
                 tag=repo-pacman
                 package_suffix=.pkg.tar.zst
                 packages=("$dir"/*.pkg.tar.zst)
                 indexes=("$dir/zhiyu.files" "$dir/zhiyu.db")
+                # Arch only carries the 0.7 ABI.
+                expected=6
                 ;;
             esac
-            test "${#packages[@]}" -eq 6
+            test "${#packages[@]}" -eq "$expected"
             if gh release view "$tag" >/dev/null 2>&1; then
               # Save the previous asset names before uploading. Prune only after
               # the new indexes are live so they always have matching packages.

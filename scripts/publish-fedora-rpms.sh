@@ -17,11 +17,18 @@ fi
 names=(linux-zhiyu-modules linux-zhiyu-headers linux-zhiyu-firmware linux-zhiyu-images
        libcamera-zhiyu zhiyu-sensord "${upstream_packages[@]}")
 packages=("$rpms"/*.rpm)
-test "${#packages[@]}" -eq "${#names[@]}"
+# libcamera-zhiyu is published in more than one ABI version, everything else
+# in exactly one.
+test "${#packages[@]}" -ge "${#names[@]}"
 for name in "${names[@]}"; do
     candidates=("$rpms/$name"-[0-9]*.aarch64.rpm)
-    test "${#candidates[@]}" -eq 1
-    test -f "${candidates[0]}"
+    if [ "$name" = libcamera-zhiyu ]; then
+        test "${#candidates[@]}" -ge 1
+        for candidate in "${candidates[@]}"; do test -f "$candidate"; done
+    else
+        test "${#candidates[@]}" -eq 1
+        test -f "${candidates[0]}"
+    fi
 done
 createrepo_c --baseurl "$baseurl" "$rpms"
 

@@ -22,9 +22,11 @@ case "$name" in
         install -m644 "$root/initramfs-src/blobs/MANIFEST.tsv" "$dest/firmware-manifest.tsv"
         ;;
     libcamera-zhiyu)
-        install -m644 "$root/libcamera/COPYING.rst" "$dest/"
+        # libcamera is cloned at build time now, so the caller says where.
+        libcamera_source=${LIBCAMERA_SOURCE:-$root/libcamera}
+        install -m644 "$libcamera_source/COPYING.rst" "$dest/"
         install -d "$dest/libcamera"
-        cp -a "$root/libcamera/LICENSES/." "$dest/libcamera/"
+        cp -a "$libcamera_source/LICENSES/." "$dest/libcamera/"
         ;;
 esac
 

@@ -84,19 +84,28 @@ if [[ "${BUILD_USERSPACE:-false}" == true ]]; then
         PKG_LICENSE='GPL-3.0-or-later AND LGPL-3.0-or-later' \
         scripts/mkrpm.sh "$hexagonrpc_stage" out/rpms
 
-    # Use Fedora's native ABI and libdir for userspace binaries.
-    meson setup out/fedora-camera libcamera --buildtype=release --prefix=/usr --libdir=lib64 \
-        -Dwerror=false -Dqcam=enabled -Dpipelines=simple -Dgstreamer=disabled \
-        -Dpycamera=disabled -Ddocumentation=disabled -Dcam=enabled -Dv4l2=enabled
-    meson compile -C out/fedora-camera
-    DESTDIR="$PWD/stage/fedora-camera" meson install -C out/fedora-camera --no-rebuild
-    version=$(meson introspect out/fedora-camera --projectinfo |
-        python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
-    bash scripts/stage-license-notices.sh stage/fedora-camera libcamera-zhiyu
-    PKG_NAME=libcamera-zhiyu PKG_VERSION="$version" \
-        PKG_LICENSE='LGPL-2.1-or-later AND GPL-2.0-or-later AND MIT' \
-        PKG_RPM_PROVIDES="libcamera = $version" PKG_RPM_CONFLICTS="libcamera < $version, libcamera > $version" \
-        scripts/mkrpm.sh stage/fedora-camera out/rpms
+    # One branch per upstream release; Fedora carries both ABIs like Debian.
+    for entry in "0.7 zhiyu-0.7.2" "0.8 zhiyu-0.8.0"; do
+        read -r soname branch <<< "$entry"
+        bash scripts/fetch-libcamera.sh "$branch" "src/libcamera-$soname"
+        # Use Fedora's native ABI and libdir for userspace binaries.
+        meson setup "out/fedora-camera-$soname" "src/libcamera-$soname" \
+            --buildtype=release --prefix=/usr --libdir=lib64 \
+            -Dwerror=false -Dqcam=enabled -Dpipelines=simple -Dgstreamer=disabled \
+            -Dpycamera=disabled -Ddocumentation=disabled -Dcam=enabled -Dv4l2=enabled
+        meson compile -C "out/fedora-camera-$soname"
+        DESTDIR="$PWD/stage/fedora-camera-$soname" \
+            meson install -C "out/fedora-camera-$soname" --no-rebuild
+        version=$(meson introspect "out/fedora-camera-$soname" --projectinfo |
+            python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')
+        LIBCAMERA_SOURCE="src/libcamera-$soname" \
+            bash scripts/stage-license-notices.sh "stage/fedora-camera-$soname" libcamera-zhiyu
+        PKG_NAME=libcamera-zhiyu PKG_VERSION="$version" \
+            PKG_LICENSE='LGPL-2.1-or-later AND GPL-2.0-or-later AND MIT' \
+            PKG_RPM_PROVIDES="libcamera = $version" \
+            PKG_RPM_CONFLICTS="libcamera < $version, libcamera > $version" \
+            scripts/mkrpm.sh "stage/fedora-camera-$soname" out/rpms
+    done
 
     make -C sensors -B CPPFLAGS='-DSENSH=\"/usr/bin/sensh\"'
     install -Dm755 sensors/sensord stage/fedora-sensord/usr/bin/zhiyu-sensord

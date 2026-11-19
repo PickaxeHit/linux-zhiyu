@@ -25,10 +25,14 @@ url=${PKG_URL:-https://github.com/PickaxeHit/linux-zhiyu}
 arch=aarch64
 deb_postinst=${PKG_DEB_POSTINST:-}
 arch_install=${PKG_ARCH_INSTALL:-}
+# Which package formats to emit: "deb", "arch" or both.  Arch and Debian do
+# not have to carry the same set (e.g. an older libcamera ABI for pacman).
+formats=${PKG_FORMATS:-"deb arch"}
 
 mkdir -p "$out"
 
 # ---- Debian -------------------------------------------------------------
+if [[ " $formats " == *" deb "* ]]; then
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 cp -a "$stage" "$work/root"
@@ -63,7 +67,10 @@ install -Dm644 "$stage/usr/share/licenses/$name/NOTICE.md" "$work/root/usr/share
 dpkg-deb --build --root-owner-group "$work/root" "$out/${name}_${debver}_arm64.deb" >/dev/null
 echo "wrote $out/${name}_${debver}_arm64.deb"
 
+fi
+
 # ---- Arch ---------------------------------------------------------------
+if [[ " $formats " == *" arch "* ]]; then
 # pacman's pkgver may not contain "-" (it separates the pkgrel), and our
 # kernel version is 7.3.1-zhiyu+: Arch gets 7.3.1_zhiyu+ while the Debian
 # package keeps the original string.
@@ -126,3 +133,4 @@ fi
   tar --zstd --owner=0 --group=0 --numeric-owner -cf "$out/${archpkg}.pkg.tar.zst" .PKGINFO \
       $(find . -mindepth 1 -maxdepth 1 ! -name .PKGINFO -printf '%f\n') )
 echo "wrote $out/${archpkg}.pkg.tar.zst"
+fi
