@@ -8,12 +8,14 @@
   "busybox": {
     "type": "git",
     "url": "https://git.busybox.net/busybox",
-    "tag": "1_38_0"
+    "tag": "1_38_0",
+    "rev": "fc71374dfccd46448c62947269a35f1420d7ee28"
   },
   "f2fs-tools": {
     "type": "git",
     "url": "https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git",
-    "tag": "v1.16.0"
+    "tag": "v1.16.0",
+    "rev": "06c027abc6153c4a97cba5317844e8dcaaee3cf7"
   },
   "audioreach": {
     "type": "git",
@@ -36,7 +38,8 @@
   "sensh": {
     "type": "git",
     "url": "https://gitlab.com/flamingradian/sensh.git",
-    "tag": "v2.1.1"
+    "tag": "v2.1.1",
+    "rev": "560b48080283fe73ca5e67635b566177028cebc9"
   },
   "qcbor": {
     "type": "git",
@@ -47,26 +50,31 @@
   "quic-teec": {
     "type": "git",
     "url": "https://github.com/quic/quic-teec.git",
-    "tag": "v1.0.2"
+    "tag": "v1.0.2",
+    "rev": "34fa8197a34a06ec0187c2958c776f3c3a6b9ec1"
   },
   "minkipc": {
     "type": "git",
     "url": "https://github.com/quic/minkipc.git",
-    "tag": "v1.2.11"
+    "tag": "v1.2.11",
+    "rev": "5e3c6951d13162a262ea65ea8e8351228f092b58"
   },
   "mink-idl-compiler": {
     "type": "git",
     "url": "https://github.com/quic/mink-idl-compiler.git",
-    "tag": "v0.2.0"
+    "tag": "v0.2.0",
+    "rev": "95ebb8d6031dd2c8d3f6277e50edadee8a119d5b"
   },
   "mkbootimg": {
     "type": "git",
     "url": "https://android.googlesource.com/platform/system/tools/mkbootimg",
-    "tag": "android-15.0.0_r1"
+    "tag": "android-15.0.0_r1",
+    "rev": "c40a04c0620c5a0dab87497857805b8d9b8a827a"
   },
   "avb": {
     "type": "git",
     "url": "https://android.googlesource.com/platform/external/avb",
-    "tag": "android-15.0.0_r1"
+    "tag": "android-15.0.0_r1",
+    "rev": "25a14f7e3e6493a7f1a42aa9f78209d4dbe848e9"
   }
 }
