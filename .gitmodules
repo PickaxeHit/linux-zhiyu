@@ -2,3 +2,11 @@
 	path = kernel-source
 	url = https://github.com/PickaxeHit/linux-kernel-zhiyu.git
 	branch = zhiyu
+[submodule "libcamera/0.7"]
+	path = libcamera/0.7
+	url = https://github.com/PickaxeHit/libcamera-zhiyu.git
+	branch = zhiyu-0.7.2
+[submodule "libcamera/0.8"]
+	path = libcamera/0.8
+	url = https://github.com/PickaxeHit/libcamera-zhiyu.git
+	branch = zhiyu-0.8.0

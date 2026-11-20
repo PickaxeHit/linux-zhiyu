@@ -9,9 +9,11 @@ on:
         description: Successful Build images and packages run ID
         required: true
         type: string
-  # Allows publishing from the review branch before workflow_dispatch is
-  # available on the default branch.
+  # Retry publishing retained build artifacts without rebuilding, via a
+  # publish-packages-<run_id> branch or tag (or workflow_dispatch).
   push:
+    branches:
+      - 'publish-packages-*'
     tags:
       - 'publish-packages-*'
 
@@ -30,20 +32,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download packages from the successful build
+      - name: Resolve successful build and download earlier artifacts
+        id: source
         env:
           GH_TOKEN: ${{ github.token }}
           BUILD_RUN: ${{ inputs.build_run }}
         run: |
           set -euo pipefail
           run_id="$BUILD_RUN"
-          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+          retry_ref=false
+          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_NAME" == publish-packages-* ]]; then
+            retry_ref=true
             run_id="${GITHUB_REF_NAME#publish-packages-}"
+            [[ "$run_id" =~ ^[0-9]+$ ]]
           fi
           if [[ -z "$run_id" ]]; then
             # A reusable call can download from its own run after the build
             # job succeeds, while the overall workflow is still running.
             printf "build_sha=%s\nsource_run=%s\n" "$GITHUB_SHA" "$GITHUB_RUN_ID" >> "$GITHUB_ENV"
+            echo "same_run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           [[ "$run_id" =~ ^[0-9]+$ ]]
@@ -58,7 +65,7 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs" |
             jq -e 'any(.jobs[]; .name == "build" and .conclusion == "success")' >/dev/null
           build_sha=$(jq -r .head_sha <<< "$build")
-          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+          if [[ "$retry_ref" == true ]]; then
             git merge-base --is-ancestor "$build_sha" "$GITHUB_SHA"
           fi
           printf "build_sha=%s\nsource_run=%s\n" "$build_sha" "$run_id" >> "$GITHUB_ENV"
@@ -66,13 +73,13 @@ jobs:
           gh run download "$run_id" --name zhiyu-images --dir out/image-archive
 
       - uses: actions/download-artifact@v4
-        if: github.event_name != 'push' && inputs.build_run == ''
+        if: steps.source.outputs.same_run == 'true'
         with:
           name: zhiyu-package-repositories-input
           path: out/pkgs
 
       - uses: actions/download-artifact@v4
-        if: github.event_name != 'push' && inputs.build_run == ''
+        if: steps.source.outputs.same_run == 'true'
         with:
           name: zhiyu-images
           path: out/image-archive
@@ -133,6 +140,9 @@ jobs:
                 ;;
             esac
             test "${#packages[@]}" -eq "$expected"
+            # Rolling repository tags are created on the default branch, not on
+            # an older build SHA (GITHUB_TOKEN cannot always create such refs).
+            notes="Flat package repository for Lenovo TB378FC. Build commit: $build_sha. Use the release download URL as the repository base."
             if gh release view "$tag" >/dev/null 2>&1; then
               # Save the previous asset names before uploading. Prune only after
               # the new indexes are live so they always have matching packages.
@@ -149,12 +159,12 @@ jobs:
                     ;;
                 esac
               done <<< "$previous"
-              gh release edit "$tag" --prerelease=false --latest=false
+              gh release edit "$tag" --prerelease=false --latest=false --notes "$notes"
             else
               gh release create "$tag" "${packages[@]}" "${indexes[@]}" \
-                --latest=false --target "$build_sha" \
+                --latest=false \
                 --title "Zhiyu $distro nightly repository" \
-                --notes "Flat package repository for Lenovo TB378FC. Use the release download URL as the repository base."
+                --notes "$notes"
             fi
           done
 
@@ -169,6 +179,9 @@ jobs:
           if [ -f out/release-images/LICENSES.tar.gz ]; then
             images+=(out/release-images/LICENSES.tar.gz)
           fi
+          if [ -f out/release-images/manifest.json ]; then
+            images+=(out/release-images/manifest.json)
+          fi
           checksums=out/release-images/SHA256SUMS
           printf 'Signed Lenovo TB378FC boot images from build commit %s.\n' "$build_sha" > image-release-notes.md
           if gh release view "$tag" >/dev/null 2>&1; then
@@ -177,7 +190,7 @@ jobs:
             gh release edit "$tag" --prerelease=false --latest --notes-file image-release-notes.md
           else
             gh release create "$tag" "${images[@]}" "$checksums" \
-              --latest --target "$build_sha" \
+              --latest \
               --title "Zhiyu signed boot images" --notes-file image-release-notes.md
           fi
 

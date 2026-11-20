@@ -16,7 +16,7 @@ mkdir "$out/$format"
 cd "$out/$format"
 cp -- "${files[@]}" .
 if [[ $format == debian ]]; then
-    dpkg-scanpackages --arch arm64 . > Packages
+    dpkg-scanpackages --multiversion --arch arm64 . > Packages
     gzip -n -c Packages > Packages.gz
     {
         cat <<'EOF'

@@ -1,47 +1,118 @@
 #!/bin/bash
-# Build the kernel, initramfs and signed AVB image sets.
-#
-#   KS    kernel tree (default: the kernel-source submodule)
-#   CFG   kernel config (default: configs/linux-<major.minor>-zhiyu.config)
-#   VER   `uname -r` of the result (default: <kernel version>-zhiyu+)
+# Local and CI build entry point. No arguments retains the historical image build.
 set -euo pipefail
-root=$(cd "$(dirname "$0")" && pwd)
-KS=${KS:-$root/kernel-source}
-JOBS=${JOBS:-$(nproc)}
+cd "$(dirname "$0")"
+root=$PWD
+export JOBS=${JOBS:-$(nproc)}
+export PKG_REVISION=${PKG_REVISION:-1}
+export IMAGE_COMPRESSION=${IMAGE_COMPRESSION:-xz}
 
-[ -d "$KS" ] || { echo "kernel-source submodule is not initialized" >&2; exit 1; }
-# The board config is kept per stable series, and the branch we build (zhiyu)
-# is a merge target for it, so pulling in v7.3.2 or v7.4 keeps working here
-# without an edit: only a new series needs a new configs/linux-<X.Y> file.
-KVER=${KVER:-$(make -s -C "$KS" ARCH=arm64 kernelversion)}
-SERIES=${SERIES:-${KVER%.*}}
-CFG=${CFG:-$root/configs/linux-$SERIES-zhiyu.config}
-[ -f "$CFG" ] || { echo "no kernel config for $SERIES: $CFG" >&2; exit 1; }
-
-echo "kernel : $KS ($KVER)"
-echo "config : $CFG"
-
-cp "$CFG" "$KS/.config"
-# gcc, not LLVM=1: LTO is disabled in the config, and a clang-built kernel
-# makes dkms append LLVM=1 to every out-of-tree module build (it reads
-# CONFIG_CC_IS_CLANG from the kernel config), which drags the whole LLVM
-# toolchain onto the device.  Set CROSS_COMPILE when building on a host of a
-# different architecture.
-MAKE_ARGS="ARCH=arm64"
-[ -n "${CROSS_COMPILE:-}" ] && MAKE_ARGS="$MAKE_ARGS CROSS_COMPILE=$CROSS_COMPILE"
-make -C "$KS" $MAKE_ARGS olddefconfig
-VER=${VER:-$(make -s -C "$KS" $MAKE_ARGS kernelrelease)}
-echo "release: $VER"
-make -C "$KS" -j"$JOBS" $MAKE_ARGS Image modules
-"$root/keymint/build-deps.sh"
-( cd "$root" && KS="$KS" VER="$VER" ./initramfs-src/build.sh )
-# One kernel, three command lines: all LSMs are built in and only the active
-# set is selected at boot, so SELinux and AppArmor can be tried without a rebuild.
-for variant in none selinux apparmor; do
-	( cd "$root" && KERNEL="$KS/arch/arm64/boot/Image" \
-		LSM_VARIANT="$variant" ./mkbootimg )
+kernel() {
+    source scripts/kernel-env.sh
+    mkdir -p out "$KBUILD_DIR"
+    local input_id
+    input_id=$(kernel_id)
+    # Discard only this Kbuild object tree when switching input/toolchain.
+    if [[ -f "$KBUILD_DIR/.zhiyu-input" && $(cat "$KBUILD_DIR/.zhiyu-input") != "$input_id" ]]; then
+        kmake clean
+    fi
+    printf "%s\n" "$input_id" > "$KBUILD_DIR/.zhiyu-input"
+    rm -f out/kernel-build.id out/images-build.id out/package-build.id out/manifest.json
+    cp "$CFG" "$KBUILD_DIR/.config"
+    kmake olddefconfig
+    kmake -j"$JOBS" Image modules
+    kmake -s kernelrelease > out/kernel-release
+    kernel_id > out/kernel-build.id
+}
+initramfs() {
+    source scripts/kernel-env.sh
+    rm -f out/images-build.id out/package-build.id out/manifest.json
+    [[ -f out/kernel-build.id && $(cat out/kernel-build.id) == "$(kernel_id)" ]] || { echo 'Build the matching kernel first' >&2; return 1; }
+    export VER=$(cat out/kernel-release)
+    export MODULES_DIR="$KBUILD_DIR"
+    # Rebuild small userspace from clean build trees; never reuse unkeyed binaries.
+    export KEYMINT_DEPS="$root/out/build/keymint" KEYMINT_BIN="$root/out/build/keymint/bin"
+    scripts/check-rust.sh
+    keymint/build-deps.sh
+    KEEP_OLD=0 TPLG_OUT="$root/out/sm8750-tplg.bin" OUT="$root/initramfs" initramfs-src/build.sh
+}
+images() {
+    rm -f out/images-build.id
+    kernel
+    initramfs
+    source scripts/image-tools.sh
+    for variant in none selinux apparmor; do
+        KERNEL="$KBUILD_DIR/arch/arm64/boot/Image" LSM_VARIANT="$variant" OUT="$root/out" ./mkbootimg
+    done
+    OUT="$root/out" DTB="$root/out/lenovo-zhiyu.dtb" ./mkvendorbootimg
+    OUT="$root/out" ./mkinitbootimg
+    for variant in none selinux apparmor; do OUT="$root/out" LSM_VARIANT="$variant" ./mkvbmetaimg; done
+    scripts/verify-images.sh
+    (cd out && sha256sum boot.img boot-none.img boot-selinux.img boot-apparmor.img vendor_boot.img init_boot.img vbmeta.img vbmeta-none.img vbmeta-selinux.img vbmeta-apparmor.img sm8750-tplg.bin > image-build.SHA256SUMS)
+    images_id > out/images-build.id
+}
+usage() {
+    cat <<'HELP'
+Usage: ./build.sh [target] [--distro debian|arch|fedora|all]
+  kernel           Build kernel and modules into out/kernel
+  initramfs        Assemble ramdisk from the matching built kernel
+  images (default) Build and verify the complete image set
+  stage-kernel     Prepare shared kernel packages (after images)
+  kernel-packages  Package kernel stage inside selected distro containers
+  userspace        Compile and package userspace inside selected containers
+  packages         Both kernel and userspace packages in selected containers
+  archive          Archive the previously staged kernel packages/images
+  manifest         Record source and output checksums
+  all              Build images, all distro packages and archive
+  check            Validate dependency manifest
+CONTAINER_ENGINE=auto|podman|docker; CONTAINER_PULL=missing|always|never
+STRICT_LOCK=true requires committed dependency pins and recorded environment
+HELP
+}
+target=${1:-images}
+if [[ $# -gt 0 ]]; then shift; fi
+distro=all
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --distro) distro=${2:?missing distro}; shift 2 ;;
+        *) usage >&2; exit 2 ;;
+    esac
 done
-( cd "$root" && ./mkvendorbootimg && ./mkinitbootimg )
-for variant in none selinux apparmor; do
- ( cd "$root" && LSM_VARIANT="$variant" ./mkvbmetaimg )
-done
+case $distro in debian|arch|fedora|all) ;; *) usage >&2; exit 2 ;; esac
+case $target in
+    -h|--help|help) usage; exit 0 ;;
+    check) python3 scripts/deps.py check; exit 0 ;;
+    kernel|initramfs|images|stage-kernel|kernel-packages|userspace|packages|archive|manifest|all) ;;
+    *) usage >&2; exit 2 ;;
+esac
+if [[ $distro != all ]]; then
+    case $target in kernel-packages|userspace|packages|all) ;; *) echo '--distro only applies to package build targets' >&2; exit 2 ;; esac
+fi
+packages() {
+    export BUILD_KERNEL=$1 BUILD_USERSPACE=$2
+    for flag in "$BUILD_KERNEL" "$BUILD_USERSPACE"; do [[ $flag == true || $flag == false ]] || { echo "Build flags must be true or false" >&2; return 2; }; done
+    [[ $BUILD_KERNEL == true || $BUILD_USERSPACE == true ]] || { echo "Select at least one package family" >&2; return 2; }
+    if [[ $BUILD_KERNEL == true ]]; then
+        scripts/stage-kernel.sh
+    fi
+    local selection=() d
+    if [[ $distro == all ]]; then selection=(debian arch fedora); else selection=("$distro"); fi
+    for d in "${selection[@]}"; do scripts/run-package-container.sh "$d"; done
+}
+if [[ ${STRICT_LOCK:-false} == true ]]; then
+    python3 scripts/deps.py check --locked
+else
+    python3 scripts/deps.py check
+fi
+case $target in
+    kernel) kernel ;;
+    initramfs) initramfs ;;
+    images) images ;;
+    stage-kernel) scripts/stage-kernel.sh ;;
+    kernel-packages) packages true false ;;
+    userspace) packages false true ;;
+    packages) packages "${BUILD_KERNEL:-true}" "${BUILD_USERSPACE:-true}" ;;
+    archive) scripts/archive-images.sh ;;
+    manifest) python3 scripts/build-manifest.py ;;
+    all) images; packages true true; scripts/archive-images.sh ;;
+esac

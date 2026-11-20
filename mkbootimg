@@ -81,7 +81,7 @@ final=$OUT/boot-$LSM_VARIANT.img
 cp -f "$img" "$final"
 # Keep the historical name for the default variant so flashing instructions
 # that only mention boot.img keep working.
-[ "$LSM_VARIANT" = none ] && cp -f "$img" "$OUT/boot.img"
+if [ "$LSM_VARIANT" = none ]; then cp -f "$img" "$OUT/boot.img"; fi
 
 echo "$final: $(stat -c %s "$final") bytes  md5 $(md5sum "$final" | cut -d' ' -f1)"
 echo "flash: dd if=$final of=/dev/disk/by-partlabel/boot_<slot> bs=4M conv=fsync"

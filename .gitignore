@@ -2,12 +2,21 @@
 /initramfs
 /initramfs.bak.*
 /initramfs-src/.stage.*
-/initramfs-src/.sources/
-/initramfs-src/busybox/
-/initramfs-src/tplg/vendor-audioreach/
+/.sources/
 *.bak
 
 /keymint/bin/
 /keymint/__pycache__/
 /keymint/.deps/
-/initramfs-src/blobs/fsck.f2fs
+
+/.cache/
+/stage/
+/sensors/sensord
+/initramfs-src/tplg/.tplg.*
+/deps/deps.json.tmp
+/containers/build-lock.json.tmp
+
+__pycache__/
+*.pyc
+
+/dts/lenovo-zhiyu.dtb

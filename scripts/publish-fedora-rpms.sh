@@ -11,7 +11,7 @@ trap 'git worktree remove --force "$work/tree" 2>/dev/null || true; rm -rf "$wor
 
 upstream_packages=(hexagonrpc)
 # Manually selected build artifacts may predate the sensh package.
-if git cat-file -e "$sha:scripts/sensh-revision" 2>/dev/null; then
+if compgen -G "$rpms/sensh-*.aarch64.rpm" >/dev/null; then
     upstream_packages+=(sensh)
 fi
 names=(linux-zhiyu-modules linux-zhiyu-headers linux-zhiyu-firmware linux-zhiyu-images
@@ -56,6 +56,7 @@ if gh release view "$tag" --json body,assets > "$work/release.json"; then
     jq -r '.body
         | split("\n")
         | map(select(. != "## Upstream sources · 上游源码"
+            and (startswith("Build commit: ") | not)
             and (test("^- `(hexagonrpc|sensh)-[^`]+\\.rpm`: \\[upstream source\\]") | not)
             and (test("^- \\*\\*(hexagonrpc|sensh)\\*\\* · \\[上游源码\\]") | not)))
         | join("\n")
@@ -65,20 +66,36 @@ else
     printf 'DNF baseurl: https://raw.githubusercontent.com/%s/%s/fedora/\n' \
         "$GITHUB_REPOSITORY" "$branch" > "$notes"
 fi
-printf '\n## Upstream sources · 上游源码\n\n' >> "$notes"
+printf '\n## Upstream sources · 上游源码\n\nBuild commit: %s\n\n' "$sha" >> "$notes"
+# The build commit records the source revisions in deps/deps.json.
+deps_json="$work/deps.json"
+git cat-file -e "$sha:deps/deps.json" 2>/dev/null || {
+    echo "build commit $sha has no deps/deps.json" >&2
+    exit 1
+}
+git show "$sha:deps/deps.json" > "$deps_json"
 for name in "${upstream_packages[@]}"; do
-    revision=$(git show "$sha:scripts/$name-revision")
-    case "$name" in
-        hexagonrpc) source_url="https://github.com/linux-msm/hexagonrpc/archive/$revision.tar.gz" ;;
-        sensh) source_url="https://gitlab.com/flamingradian/sensh/-/archive/$revision/sensh-$revision.tar.gz" ;;
-    esac
+    revision=$(python3 - "$deps_json" "$name" <<'PY'
+import json, sys
+entry = json.load(open(sys.argv[1], encoding="utf-8"))[sys.argv[2]]
+print(entry.get("rev") or entry["tag"])
+PY
+)
+    source_url=$(python3 - "$deps_json" "$name" "$revision" <<'PY'
+import json, sys
+entry = json.load(open(sys.argv[1], encoding="utf-8"))[sys.argv[2]]
+url = entry["url"].removesuffix(".git").rstrip("/")
+separator = "/-/tree/" if "gitlab." in url else "/tree/"
+print(f"{url}{separator}{sys.argv[3]}")
+PY
+)
     printf -- '- **%s** · [上游源码](%s) · [打包脚本](https://github.com/%s/tree/%s/scripts)\n' \
         "$name" "$source_url" "$GITHUB_REPOSITORY" "$sha" >> "$notes"
 done
 if [[ "$existing" == 1 ]]; then
     gh release upload "$tag" "${packages[@]}" --clobber
 else
-    gh release create "$tag" "${packages[@]}" --target "$sha" --latest=false \
+    gh release create "$tag" "${packages[@]}" --latest=false \
         --title "Zhiyu Fedora RPM repository" --notes-file "$notes"
 fi
 git -C "$work/tree" push origin "HEAD:refs/heads/$branch"

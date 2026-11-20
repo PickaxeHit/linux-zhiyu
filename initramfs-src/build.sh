@@ -1,12 +1,12 @@
 #!/bin/bash
 # build.sh — assemble the initramfs tree for Lenovo TB378FC ("zhiyu").
 #
-# Everything that ends up in the initramfs comes from exactly one of three
-# places, and this script is the only thing that writes the tree:
+# Everything that ends up in the initramfs comes from one of the locations
+# below, and this script is the only thing that writes the tree:
 #
 #   fs/                  our own init script                  (source)
-#   .sources/            compiled BusyBox from the pinned upstream release
-#   blobs/firmware/      firmware blobs, see MANIFEST.tsv (blob)
+#   $root/.sources/      fetched BusyBox and f2fs-tools       (see deps/)
+#   firmware repo        firmware blobs and SNS registry      (see deps/)
 #   modules.tsv + $KS    kernel modules built from source (source -> .ko)
 #
 # usage: ./build.sh [outdir]      (default: ../initramfs)
@@ -14,25 +14,22 @@
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")" && pwd)
+root=$(cd "$here/.." && pwd)
 OUT=${OUT:-${1:-$here/../initramfs}}
 # Where the built .ko files come from.  Prefer an explicit KS, then the kernel
-# tree archived next to us, then the live build tree.
-first_src=$(awk -F'\t' '!/^#/ && NF>=2 {print $2; exit}' "$here/modules.tsv")
-for cand in "${KS:-}" "$here/../kernel-source" /nosnap/gt13-port/linux/kernel-source; do
-	[ -n "$cand" ] || continue
-	if [ -f "$cand/$first_src" ]; then KS=$cand; break; fi
-done
-KS=${KS:-$here/../kernel-source}
+# tree archived next to us.
+KS=${KS:-$root/kernel-source}
+MODULES_DIR=${MODULES_DIR:-$KS}
 VER=${VER:-$(make -s -C "$KS" ARCH=arm64 kernelrelease)}
-read -r busybox_version _ < "$here/BUSYBOX-RELEASE.txt"
-BB=${BB_OUT:-${BB_SRC:-$here/.sources/busybox-$busybox_version}/busybox}
+BB=${BB_OUT:-$root/out/build/busybox/bin/busybox}
+firmware=${FW_SRC:-$(python3 "$root/scripts/deps.py" path firmware)}
+fsck=${FSCK_OUT:-$root/out/build/f2fs/bin/fsck.f2fs}
+TPLG_OUT=${TPLG_OUT:-$root/out/sm8750-tplg.bin}
 
 die() { echo "build.sh: $*" >&2; exit 1; }
 
 # ---- 1. busybox (built from source, statically linked) --------------------
-if [ ! -x "$BB" ] || [ "${REBUILD_BB:-0}" = 1 ]; then
-	"$here/build-busybox.sh"
-fi
+BB_OUT="$BB" "$here/build-busybox.sh"
 file -b "$BB" | grep -q "statically linked" || die "$BB is not statically linked"
 
 
@@ -62,8 +59,9 @@ done < "$here/busybox-applets.txt"
 # lives in the persist partition exactly like the WLAN address does.  btaddr
 # sends the single management command that hands the address to the kernel, so
 # the value never has to be written into the device tree.
-CC_AARCH64=${CC_AARCH64:-aarch64-linux-gnu-gcc}
+CC_AARCH64=${CC_AARCH64:-${CROSS_COMPILE-aarch64-linux-gnu-}gcc}
 for src in "$here"/src/*.c; do
+	[ "$(basename "$src")" != userdata-map.c ] || continue
 	[ -f "$src" ] || continue
 	tool=$stage/bin/$(basename "$src" .c)
 	"$CC_AARCH64" -static -Os -Wall -Wextra -o "$tool" "$src" \
@@ -77,11 +75,10 @@ done
 # before it mounts the shared userdata volume.  Built from the pinned
 # f2fs-tools release with --without-selinux/--without-libuuid, so it has no
 # runtime dependencies.
-if [ ! -x "$here/blobs/fsck.f2fs" ] || [ "${REBUILD_FSCK:-0}" = 1 ]; then
-	bash "$here/build-fsck.sh"
-fi
-if [ -x "$here/blobs/fsck.f2fs" ]; then
-	install -m 0755 "$here/blobs/fsck.f2fs" "$stage/bin/fsck.f2fs"
+F2FS_OUT="$fsck" bash "$here/build-fsck.sh"
+[ -x "$fsck" ] || die "missing $fsck"
+if [ -x "$fsck" ]; then
+	install -m 0755 "$fsck" "$stage/bin/fsck.f2fs"
 	echo "helper : fsck.f2fs ($(stat -c %s "$stage/bin/fsck.f2fs") bytes)"
 fi
 
@@ -89,24 +86,25 @@ fi
 "$here/../keymint/stage-initramfs.sh" "$stage"
 
 # ---- 3. firmware blobs ----------------------------------------------------
-cp -a "$here"/blobs/firmware/. "$stage/lib/firmware/"
+# The firmware repository is pinned by deps/deps.json and fetched into
+# .sources/firmware; it carries the firmware tree, the SNS registry and its
+# own license notices.
+cp -a "$firmware/firmware/." "$stage/lib/firmware/"
 
 # the SM8750 audio topology is *built* (m4 + alsatplg), not a blob: it is
 # installed on top of the firmware tree at the path the ADSP firmware looks for
-if [ ! -f "$here/tplg/sm8750-tplg.bin" ] || [ "${REBUILD_TPLG:-0}" = 1 ]; then
-	"$here/tplg/build.sh" || die "topology build failed"
-fi
-install -m 0644 "$here/tplg/sm8750-tplg.bin" "$stage/lib/firmware/qcom/sm8750/sm8750-tplg.bin"
+OUT="$TPLG_OUT" "$here/tplg/build.sh" || die "topology build failed"
+install -Dm644 "$TPLG_OUT" "$stage/lib/firmware/qcom/sm8750/sm8750-tplg.bin"
 fw=$(find "$stage/lib/firmware" -type f | wc -l)
 
 # ---- 4. kernel modules built from source ----------------------------------
 mods=0
 while IFS=$'\t' read -r rel src; do
 	case "$rel" in ''|\#*) continue ;; esac
-	[ -f "$KS/$src" ] || die "module missing: $KS/$src
-       build them first: make -C $KS ARCH=arm64 LLVM=1 CROSS_COMPILE=aarch64-linux-gnu- modules"
+	[ -f "$MODULES_DIR/$src" ] || die "module missing: $MODULES_DIR/$src
+       build them first: ./build.sh kernel"
 	mkdir -p "$(dirname "$stage/lib/modules/$VER/$rel")"
-	install -m 0644 "$KS/$src" "$stage/lib/modules/$VER/$rel"
+	install -m 0644 "$MODULES_DIR/$src" "$stage/lib/modules/$VER/$rel"
 	mods=$((mods + 1))
 done < "$here/modules.tsv"
 
@@ -124,12 +122,12 @@ ordered=$(wc -l < "$stage/lib/modules/$VER/load-order")
 
 # ---- 6. summary + publish -------------------------------------------------
 echo "init   : $(head -1 "$stage/init")"
-echo "busybox: $("$here"/../initramfs/bin/busybox 2>/dev/null | head -0; file -b "$BB" | cut -d, -f1-3)"
+echo "busybox: $(file -b "$BB" | cut -d, -f1-3)"
 echo "applets: $applets   firmware: $fw files   modules: $mods ($ordered ordered)"
 echo "tree   : $(find "$stage" -type f | wc -l) files, $(du -sh "$stage" | cut -f1)"
 
 mkdir -p "$(dirname "$OUT")"
-stamp=$(date +%Y%m%d-%H%M%S)
+stamp=$(date +%Y%m%d-%H%M%S-%N)
 if [ -e "$OUT" ] && [ "${KEEP_OLD:-1}" = 1 ]; then
 	mv "$OUT" "$OUT.bak.$stamp"
 	echo "old    : kept as $OUT.bak.$stamp"
@@ -141,7 +139,9 @@ if [ -e "$OUT" ] && [ "${KEEP_OLD:-1}" = 1 ]; then
 			rm -rf "$old_bak"
 			echo "pruned : $old_bak"
 		done )
+elif [ -e "$OUT" ]; then
+	rm -rf -- "$OUT"
 fi
-mv "$stage" "$OUT"
+mv -T "$stage" "$OUT"
 trap - EXIT
 echo "wrote  : $OUT"

@@ -2,18 +2,24 @@
 # Build a static aarch64 BusyBox from the pinned upstream release.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-read -r version checksum < "$here/BUSYBOX-RELEASE.txt"
-src=${BB_SRC:-$here/.sources/busybox-$version}
-out=${BB_OUT:-$src/busybox}
+root=$(cd "$here/.." && pwd)
+if [ -n "${BB_SRC:-}" ]; then
+	src=$BB_SRC
+else
+	src=$(python3 "$root/scripts/deps.py" path busybox)
+fi
+out=$(realpath -m "${BB_OUT:-$root/out/build/busybox/bin/busybox}")
+build=$root/out/build/busybox/src
+mkdir -p "$(dirname "$out")"
+rm -rf "$build"
+mkdir -p "$build"
+cp -a "$src/." "$build/"
+src=$build
 jobs=${JOBS:-$(nproc)}
-CROSS=${CROSS_COMPILE:-aarch64-linux-gnu-}
+CROSS=${CROSS_COMPILE-aarch64-linux-gnu-}
 
 die() { echo "build-busybox.sh: $*" >&2; exit 1; }
 
-if [ -z "${BB_SRC:-}" ]; then
-	bash "$here/fetch-source.sh" "https://busybox.net/downloads/busybox-$version.tar.bz2" \
-		"$checksum" "$src"
-fi
 [ -f "$src/Makefile" ] || die "BusyBox source is missing: $src"
 cd "$src"
 
@@ -36,5 +42,5 @@ make -j"$jobs" ARCH=arm64 CROSS_COMPILE="$CROSS" busybox >/dev/null
 file busybox | sed 's/^/   /'
 # out defaults to the build output itself, so only copy when they differ.
 [ "$out" -ef busybox ] || cp -f busybox "$out"
-aarch64-linux-gnu-strip "$out" 2>/dev/null || true
+"${CROSS}strip" "$out" 2>/dev/null || true
 echo "== $out: $(stat -c %s "$out") bytes, md5 $(md5sum "$out" | cut -d' ' -f1) =="

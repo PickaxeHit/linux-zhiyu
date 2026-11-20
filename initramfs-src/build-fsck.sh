@@ -7,21 +7,27 @@
 # only place where they can be cleared is here, before the rw mount.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
-read -r version checksum < "$here/F2FS-TOOLS-RELEASE.txt"
-src=${F2FS_SRC:-$here/.sources/f2fs-tools-$version}
-out=${F2FS_OUT:-$here/blobs/fsck.f2fs}
+root=$(cd "$here/.." && pwd)
+if [ -n "${F2FS_SRC:-}" ]; then
+	src=$F2FS_SRC
+else
+	src=$(python3 "$root/scripts/deps.py" path f2fs-tools)
+fi
+out=$(realpath -m "${F2FS_OUT:-$root/out/build/f2fs/bin/fsck.f2fs}")
+build=$root/out/build/f2fs/src
+mkdir -p "$(dirname "$out")"
+rm -rf "$build"
+mkdir -p "$build"
+cp -a "$src/." "$build/"
+src=$build
 jobs=${JOBS:-$(nproc)}
-CROSS=${CROSS_COMPILE:-aarch64-linux-gnu-}
+CROSS=${CROSS_COMPILE-aarch64-linux-gnu-}
 cc=${CROSS}gcc
 
 die() { echo "build-fsck.sh: $*" >&2; exit 1; }
 
-if [ -z "${F2FS_SRC:-}" ]; then
-	bash "$here/fetch-source.sh" \
-		"https://deb.debian.org/debian/pool/main/f/f2fs-tools/f2fs-tools_$version.orig.tar.xz" \
-		"$checksum" "$src"
-fi
 [ -f "$src/configure.ac" ] || die "f2fs-tools source is missing: $src"
+mkdir -p "$(dirname "$out")"
 cd "$src"
 
 [ -f configure ] || ./autogen.sh >/dev/null 2>&1
@@ -32,7 +38,7 @@ cd "$src"
 # -std=gnu17: 1.16 still has "typedef u8 bool;", which GCC 15 and later
 # reject because bool is a keyword in their default C23 mode.
 CFLAGS="-std=gnu17 -O2" \
-./configure --host="${CROSS%-}" --disable-shared --enable-static \
+./configure --host="$("$cc" -dumpmachine)" --disable-shared --enable-static \
 	--without-selinux --without-blkid --without-lz4 --without-lzo2 \
 	ac_cv_lib_uuid_uuid_clear=no ac_cv_header_uuid_uuid_h=no >/dev/null
 for feature in HAVE_LIBUUID HAVE_LIBSELINUX HAVE_LIBLZ4 HAVE_LIBLZO2; do
@@ -48,4 +54,4 @@ file -b "$out.tmp" | grep -q "statically linked" \
 	|| die "$out.tmp is not statically linked"
 install -Dm0755 "$out.tmp" "$out"
 rm -f "$out.tmp"
-echo "fsck.f2fs: $out ($(stat -c %s "$out") bytes, f2fs-tools $version)"
+echo "fsck.f2fs: $out ($(stat -c %s "$out") bytes)"

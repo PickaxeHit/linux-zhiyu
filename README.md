@@ -28,16 +28,16 @@
    * 可以使用bootloader刷入的：bluetooth, boot, cpucp, cpucp_dtb, dsp, dtbo, featenabler, init_boot, modem, multiimgqti, pdp, pvmfw, qweslicstore, recovery, shrm, soccp_dcd, soccp_debug, spuservice, uefi, vbmeta, vbmeta_system, vendor_boot
    * 只能使用root或者EDL刷入的：abl, aop, aop_config, devcfg, hyp, imagefv, keymaster, multiimgoem, qupfw, pdp_cdb, tz, uefisecapp, xbl, xbl_config
    * 由于线刷包只会写入A槽，请务必确保这些分区有实际内容，否则将会在切槽后陷入EDL模式！
-3. 前往 [Releases](https://github.com/PickaxeHit/linux-zhiyu/releases/tag/packages) 下载最新分区镜像
+3. 前往 [Releases](https://github.com/PickaxeHit/linux-zhiyu-next/releases) 下载最新分区镜像
 
    公共部分：
-   * [vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vendor_boot.img)
-   * [init_boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/init_boot.img)
+   * [vendor_boot.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/vendor_boot.img)
+   * [init_boot.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/init_boot.img)
 
    发行版相关：
-   * 不指定主 LSM（默认，如 ArchLinux）：[boot.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/boot.img) + [vbmeta.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vbmeta.img)
-   * 启用 SELinux，RedHat 系（如 Fedora）：[boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/boot-selinux.img) + [vbmeta-selinux.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vbmeta-selinux.img)
-   * 启用 AppArmor，Debian 系（如 Ubuntu）：[boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/boot-apparmor.img) + [vbmeta-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu/releases/download/zhiyu-images/vbmeta-apparmor.img)
+   * 不指定主 LSM（默认，如 ArchLinux）：[boot.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/boot.img) + [vbmeta.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/vbmeta.img)
+   * 启用 SELinux，RedHat 系（如 Fedora）：[boot-selinux.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/boot-selinux.img) + [vbmeta-selinux.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/vbmeta-selinux.img)
+   * 启用 AppArmor，Debian 系（如 Ubuntu）：[boot-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/boot-apparmor.img) + [vbmeta-apparmor.img](https://github.com/PickaxeHit/linux-zhiyu-next/releases/download/zhiyu-images/vbmeta-apparmor.img)
 4. 前往[rootfs仓库](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder)，[fork](https://github.com/PickaxeHit/linux-zhiyu-rootfs-builder/fork)该仓库到自己账号下，并启用Action  
 5. 在自己的rootfs仓库下，根据自己的偏好与设置，在Action中触发一次构建  
 6. 下载构建好的rootfs，并解压到设备中，内容物为.tar.xz后缀。请自行核对hash  
@@ -57,3 +57,6 @@
 https://github.com/yzddmr6/xiaomipad-8pro-mainline
 
 https://github.com/KunBuFenZi/progt13-ubuntu
+
+### 构建与开发
+见 `./build.sh help` 查看构建目标。`./build.sh all` 构建公共镜像及三发行版软件包；使用 Docker 或 Podman。`python3 scripts/deps.py lock --missing` 锁定依赖。

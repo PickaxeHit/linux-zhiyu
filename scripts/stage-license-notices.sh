@@ -9,21 +9,25 @@ install -Dm644 "$root/LICENSE.md" "$dest/NOTICE.md"
 
 case "$name" in
     linux-zhiyu-modules|linux-zhiyu-headers|linux-zhiyu-images|zhiyu-sensord)
-        install -m644 "$root/kernel-source/LICENSES/preferred/GPL-2.0" "$dest/GPL-2.0.txt"
+        install -m644 "${KS:-$root/kernel-source}/LICENSES/preferred/GPL-2.0" "$dest/GPL-2.0.txt"
         ;;
 esac
 case "$name" in
     linux-zhiyu-modules|linux-zhiyu-headers)
         install -d "$dest/kernel"
-        cp -a "$root/kernel-source/LICENSES/." "$dest/kernel/"
+        cp -a "${KS:-$root/kernel-source}/LICENSES/." "$dest/kernel/"
         ;;
     linux-zhiyu-firmware|linux-zhiyu-images)
-        install -m644 "$root/licenses/firmware/"* "$root/licenses/AudioReach-BSD-3-Clause.txt" "$dest/"
-        install -m644 "$root/initramfs-src/blobs/MANIFEST.tsv" "$dest/firmware-manifest.tsv"
+        firmware=$(python3 "$root/scripts/deps.py" path firmware)
+        install -m644 "$firmware/LICENSE.qcom" "$firmware/LICENSE.qcom-2" \
+            "$firmware/NOTICE.qcom" "$firmware/README.md" \
+            "$root/licenses/AudioReach-BSD-3-Clause.txt" "$dest/"
+        install -m644 "$firmware/MANIFEST.tsv" "$dest/firmware-manifest.tsv"
         ;;
     libcamera-zhiyu)
-        # libcamera is cloned at build time now, so the caller says where.
-        libcamera_source=${LIBCAMERA_SOURCE:-$root/libcamera}
+        # The caller names the libcamera submodule it built (libcamera/0.7 or
+        # libcamera/0.8), because both ABIs are packaged separately.
+        libcamera_source=${LIBCAMERA_SOURCE:?set LIBCAMERA_SOURCE to the libcamera submodule}
         install -m644 "$libcamera_source/COPYING.rst" "$dest/"
         install -d "$dest/libcamera"
         cp -a "$libcamera_source/LICENSES/." "$dest/libcamera/"
@@ -33,5 +37,5 @@ esac
 if [ "$name" = linux-zhiyu-images ]; then
     install -d "$dest/initramfs"
     install -m644 "$root/licenses/initramfs/"* "$dest/initramfs/"
-    install -m644 "$root/kernel-source/LICENSES/preferred/LGPL-2.1" "$dest/initramfs/LGPL-2.1.txt"
+    install -m644 "${KS:-$root/kernel-source}/LICENSES/preferred/LGPL-2.1" "$dest/initramfs/LGPL-2.1.txt"
 fi

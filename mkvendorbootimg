@@ -41,7 +41,7 @@ if [ -z "$RAMDISK" ]; then
 	[ -d "$INITRAMFS" ] || die "initramfs staging dir not found: $INITRAMFS"
 	RAMDISK=$work/initramfs.cpio.gz
 	echo "ramdisk: packing $INITRAMFS ($(find "$INITRAMFS" -name '*.ko' | wc -l) modules)"
-	( cd "$INITRAMFS" && find . -print0 | cpio --null -o --format=newc --owner=0:0 --reproducible --quiet | gzip -n -9 ) > "$RAMDISK"
+	( cd "$INITRAMFS" && find . -print0 | LC_ALL=C sort -z | cpio --null -o --format=newc --owner=0:0 --reproducible --quiet | gzip -n -9 ) > "$RAMDISK"
 else
 	[ -f "$RAMDISK" ] || die "ramdisk not found: $RAMDISK"
 	echo "ramdisk: using prebuilt $RAMDISK"

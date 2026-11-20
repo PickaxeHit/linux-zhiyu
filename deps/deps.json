@@ -1,0 +1,72 @@
+{
+  "firmware": {
+    "type": "git",
+    "url": "https://github.com/PickaxeHit/linux-zhiyu-firmware.git",
+    "tag": "v1.0.0",
+    "rev": "0b8d11b935653e428df458a0469b69590de9619b"
+  },
+  "busybox": {
+    "type": "git",
+    "url": "https://git.busybox.net/busybox",
+    "tag": "1_38_0"
+  },
+  "f2fs-tools": {
+    "type": "git",
+    "url": "https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git",
+    "tag": "v1.16.0"
+  },
+  "audioreach": {
+    "type": "git",
+    "url": "https://github.com/linux-msm/audioreach-topology.git",
+    "tag": "v1.0.5",
+    "rev": "35e482d209ecacdda205eea75866a957396e7b0a"
+  },
+  "openssl": {
+    "type": "git",
+    "url": "https://github.com/openssl/openssl.git",
+    "tag": "openssl-3.0.22",
+    "rev": "a279090b9cd6b682a5a178410765a63e619fa2d9"
+  },
+  "hexagonrpc": {
+    "type": "git",
+    "url": "https://github.com/linux-msm/hexagonrpc.git",
+    "tag": "v0.5.0",
+    "rev": "435ed1cd68e20f8a9fe4871233ed1f8ce7ccf9e8"
+  },
+  "sensh": {
+    "type": "git",
+    "url": "https://gitlab.com/flamingradian/sensh.git",
+    "tag": "v2.1.1"
+  },
+  "qcbor": {
+    "type": "git",
+    "url": "https://github.com/laurencelundblade/QCBOR.git",
+    "tag": "v1.6.1",
+    "rev": "930708bb86481e88879eb1d87fd4d664f1d69503"
+  },
+  "quic-teec": {
+    "type": "git",
+    "url": "https://github.com/quic/quic-teec.git",
+    "tag": "v1.0.2"
+  },
+  "minkipc": {
+    "type": "git",
+    "url": "https://github.com/quic/minkipc.git",
+    "tag": "v1.2.11"
+  },
+  "mink-idl-compiler": {
+    "type": "git",
+    "url": "https://github.com/quic/mink-idl-compiler.git",
+    "tag": "v0.2.0"
+  },
+  "mkbootimg": {
+    "type": "git",
+    "url": "https://android.googlesource.com/platform/system/tools/mkbootimg",
+    "tag": "android-15.0.0_r1"
+  },
+  "avb": {
+    "type": "git",
+    "url": "https://android.googlesource.com/platform/external/avb",
+    "tag": "android-15.0.0_r1"
+  }
+}

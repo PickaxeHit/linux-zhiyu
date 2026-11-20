@@ -1,0 +1,5 @@
+{
+  "debian": "docker.io/library/debian:13-slim",
+  "arch": "docker.io/menci/archlinuxarm:base",
+  "fedora": "quay.io/fedora/fedora:44"
+}

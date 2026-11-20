@@ -30,11 +30,11 @@ arch_install=${PKG_ARCH_INSTALL:-}
 formats=${PKG_FORMATS:-"deb arch"}
 
 mkdir -p "$out"
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
 
 # ---- Debian -------------------------------------------------------------
 if [[ " $formats " == *" deb "* ]]; then
-work=$(mktemp -d)
-trap 'rm -rf "$work"' EXIT
 cp -a "$stage" "$work/root"
 install -d "$work/root/DEBIAN"
 {
