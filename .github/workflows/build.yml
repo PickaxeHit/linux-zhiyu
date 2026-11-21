@@ -1,16 +1,38 @@
 name: Build images and packages
 
 on:
+  pull_request:
+    paths:
+      - '**.nix'
+      - flake.lock
+      - nix/**
+      - deps/**
+      - .gitmodules
+      - kernel-source
+      - libcamera/**
+      - configs/**
+      - dts/**
+      - initramfs-src/**
+      - keymint/**
+      - sensors/**
+      - scripts/**
+      - mk*img
+      - avb-test-key.pem
+      - .github/workflows/build.yml
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
       kernel:
-        description: Build the kernel and the signed images
+        description: Build the kernel and signed boot images for Debian, Arch Linux ARM and Fedora
         type: boolean
         default: true
       packages:
-        description: Build the libcamera and sensord packages
+        description: Build userspace packages for Debian, Arch Linux ARM and Fedora
+        type: boolean
+        default: true
+      nix:
+        description: Build and verify the Nix BSP packages
         type: boolean
         default: true
       image_compression:
@@ -19,7 +41,7 @@ on:
         options: [zstd, xz]
         default: xz
       publish:
-        description: Publish packages and signed images after a complete build
+        description: Publish selected package repositories, the Nix binary cache and signed boot images
         type: boolean
         default: false
       strict_lock:
@@ -30,11 +52,18 @@ on:
 permissions:
   contents: read
 
+env:
+  NIX_BSP_SUBSTITUTER: https://github.com/PickaxeHit/linux-zhiyu-pkgs/releases/download/nix-cache-index/
+
 concurrency:
-  group: images-${{ github.ref }}
+  group: build-and-publish-${{ github.ref }}
 
 jobs:
   common:
+    name: Build shared images and kernel
+    if: >-
+      (github.event_name == 'push' && github.ref_name == 'main') ||
+      (github.event_name == 'workflow_dispatch' && (inputs.kernel || inputs.packages || !inputs.nix))
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 300
     outputs:
@@ -135,6 +164,7 @@ jobs:
           retention-days: 7
 
   packages:
+    name: Build packages (${{ matrix.distro }})
     needs: common
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 180
@@ -283,10 +313,92 @@ jobs:
           overwrite: true
           retention-days: 7
 
+  nix_evaluate:
+    name: Evaluate Nix packages
+    if: github.event_name != 'workflow_dispatch' || inputs.nix
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@d698718aa798980d17dd749f03beae0b51183399 # v31
+      - name: Validate locks, formatting and flake
+        run: |
+          python3 scripts/deps.py check --locked
+          python3 scripts/gen-nix-sources.py --check
+          nix fmt -- --check flake.nix nix/*.nix
+          nix flake show --all-systems
+          nix flake check --all-systems --no-build
+          python3 scripts/test-nix-incremental.py
+      - name: Traditional build tools
+        run: |
+          python3 scripts/test-build-tools.py
+          python3 scripts/test-ci-tools.py
+
+  nix_build:
+    name: Build Nix packages (ARM64)
+    needs: nix_evaluate
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@d698718aa798980d17dd749f03beae0b51183399 # v31
+        with:
+          extra_nix_config: |
+            max-jobs = 1
+            cores = 4
+      - name: Configure the signed cache
+        if: ${{ vars.NIX_CACHE_PUBLIC_KEY != '' }}
+        env:
+          NIX_CACHE_PUBLIC_KEY: ${{ vars.NIX_CACHE_PUBLIC_KEY }}
+        run: |
+          {
+            printf 'extra-substituters = %s\n' "$NIX_BSP_SUBSTITUTER"
+            printf 'extra-trusted-public-keys = %s\n' "$NIX_CACHE_PUBLIC_KEY"
+          } >> "$GITHUB_ENV.nix"
+          echo "NIX_USER_CONF_FILES=$GITHUB_ENV.nix" >> "$GITHUB_ENV"
+      - name: Build and verify the BSP
+        run: |
+          nix flake check -L --keep-going
+      - name: Stage the runtime cache closure
+        if: (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: |
+          set -o pipefail
+          nix build --no-link --print-out-paths -L \
+            '.#kernel^*' .#dtb .#firmware .#sns .#topology .#ucm2 .#udev-rules \
+            .#initramfs .#busybox .#fsck-f2fs .#keymint .#static-helpers \
+            .#sensh .#sensord .#hexagonrpc '.#libcamera-0_7^*' '.#libcamera-0_8^*' \
+            .#flasher .#qcom-va-driver |
+            python3 scripts/nix-cache.py prepare "$RUNNER_TEMP/nix-cache"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        with:
+          name: nix-cache
+          path: ${{ runner.temp }}/nix-cache/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: true
+
   publish:
-    needs: build
-    if: (github.event_name == 'push' || inputs.publish) && (github.event_name == 'push' || inputs.kernel) && (github.event_name == 'push' || inputs.packages)
+    name: Publish
+    needs: [build, nix_build]
+    if: >-
+      ${{ always() && !cancelled() &&
+          ((needs.build.result == 'success' &&
+            (github.event_name == 'push' || (inputs.publish && inputs.kernel && inputs.packages))) ||
+           (needs.nix_build.result == 'success' &&
+            (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) &&
+            github.ref == format('refs/heads/{0}', github.event.repository.default_branch))) }}
     permissions:
       actions: read
       contents: write
     uses: ./.github/workflows/publish.yml
+    with:
+      publish_packages: ${{ needs.build.result == 'success' && (github.event_name == 'push' || (inputs.publish && inputs.kernel && inputs.packages)) }}
+      publish_nix_cache: ${{ needs.nix_build.result == 'success' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish)) && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    secrets:
+      NIX_CACHE_SIGNING_KEY: ${{ secrets.NIX_CACHE_SIGNING_KEY }}
+      PACKAGE_PUBLISH_TOKEN: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}

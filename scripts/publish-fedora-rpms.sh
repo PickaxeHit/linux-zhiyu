@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Publish RPM payloads in a Release and the directory-shaped DNF index in Git.
+# Use the Release tag as the repodata directory in DNF download URLs.
 set -euo pipefail
 rpms=$(realpath "${1:?RPM artifact directory required}")
 sha=${2:?source commit required}
-tag=repo-rpm
-branch=rpm-repodata
-baseurl="https://github.com/$GITHUB_REPOSITORY/releases/download/$tag/"
+tag=repodata
+repository=${PACKAGE_REPOSITORY:?Pass the package release repository}
+baseurl="https://github.com/$repository/releases/download/"
 work=$(mktemp -d)
-trap 'git worktree remove --force "$work/tree" 2>/dev/null || true; rm -rf "$work"' EXIT
+trap 'rm -rf "$work"' EXIT
 
 upstream_packages=(hexagonrpc)
 # Manually selected build artifacts may predate the sensh package.
@@ -30,42 +30,10 @@ for name in "${names[@]}"; do
         test -f "${candidates[0]}"
     fi
 done
-createrepo_c --baseurl "$baseurl" "$rpms"
-
-git worktree add --detach "$work/tree" "$GITHUB_SHA"
-git -C "$work/tree" config user.name github-actions[bot]
-git -C "$work/tree" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
-    git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch"
-    git -C "$work/tree" switch --detach "refs/remotes/origin/$branch"
-else
-    git -C "$work/tree" switch --orphan "$branch"
-fi
-git -C "$work/tree" rm -r --ignore-unmatch fedora/repodata
-install -d "$work/tree/fedora/repodata"
-cp -a "$rpms/repodata/." "$work/tree/fedora/repodata/"
-git -C "$work/tree" add fedora/repodata
-if ! git -C "$work/tree" diff --cached --quiet; then
-    git -C "$work/tree" commit -m "Update Fedora repository for ${sha:0:12}"
-fi
-
+createrepo_c --baseurl "$baseurl$tag/" "$rpms"
 notes="$work/release-notes.md"
-if gh release view "$tag" --json body,assets > "$work/release.json"; then
-    existing=1
-    jq -r '.assets[].name' "$work/release.json" > "$work/previous-assets"
-    jq -r '.body
-        | split("\n")
-        | map(select(. != "## Upstream sources · 上游源码"
-            and (startswith("Build commit: ") | not)
-            and (test("^- `(hexagonrpc|sensh)-[^`]+\\.rpm`: \\[upstream source\\]") | not)
-            and (test("^- \\*\\*(hexagonrpc|sensh)\\*\\* · \\[上游源码\\]") | not)))
-        | join("\n")
-        | sub("\\n+$"; "")' "$work/release.json" > "$notes"
-else
-    existing=0
-    printf 'DNF baseurl: https://raw.githubusercontent.com/%s/%s/fedora/\n' \
-        "$GITHUB_REPOSITORY" "$branch" > "$notes"
-fi
+printf 'Lenovo TB378FC package repository for Fedora. Build commit: %s.\n\nDNF baseurl: %s\n' "$sha" "$baseurl" > "$notes"
+metadata=("$rpms/repodata/"*)
 printf '\n## Upstream sources · 上游源码\n\nBuild commit: %s\n\n' "$sha" >> "$notes"
 # The build commit records the source revisions in deps/deps.json.
 deps_json="$work/deps.json"
@@ -92,19 +60,16 @@ PY
     printf -- '- **%s** · [上游源码](%s) · [打包脚本](https://github.com/%s/tree/%s/scripts)\n' \
         "$name" "$source_url" "$GITHUB_REPOSITORY" "$sha" >> "$notes"
 done
-if [[ "$existing" == 1 ]]; then
-    gh release upload "$tag" "${packages[@]}" --clobber
-else
-    gh release create "$tag" "${packages[@]}" --latest=false \
-        --title "Zhiyu Fedora RPM repository" --notes-file "$notes"
-fi
-git -C "$work/tree" push origin "HEAD:refs/heads/$branch"
-if [[ "$existing" == 1 ]]; then
-    printf '%s\n' "${packages[@]##*/}" > "$work/current-assets"
-    while IFS= read -r asset; do
-        if [[ "$asset" == *.rpm ]] && ! grep -Fxq -- "$asset" "$work/current-assets"; then
-            gh release delete-asset "$tag" "$asset" --yes
+if gh release view "$tag" --repo "$repository" >/dev/null 2>&1; then
+    gh release upload "$tag" "${packages[@]}" --clobber --repo "$repository"
+    for file in "${metadata[@]}"; do
+        if [[ "${file##*/}" != repomd.xml ]]; then
+            gh release upload "$tag" "$file" --clobber --repo "$repository"
         fi
-    done < "$work/previous-assets"
-    gh release edit "$tag" --notes-file "$notes"
+    done
+    gh release upload "$tag" "$rpms/repodata/repomd.xml" --clobber --repo "$repository"
+    gh release edit "$tag" --title "Zhiyu Fedora package repository" --notes-file "$notes" --repo "$repository"
+else
+    gh release create "$tag" "${packages[@]}" "${metadata[@]}" --latest=false \
+        --repo "$repository" --title "Zhiyu Fedora package repository" --notes-file "$notes"
 fi

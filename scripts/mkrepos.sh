@@ -27,8 +27,8 @@ Codename: zhiyu
 Architectures: arm64
 Components: main
 Description: Lenovo TB378FC mainline Linux packages
-SHA256:
 EOF
+        printf 'Date: %s\nSHA256:\n' "$(LC_ALL=C date -Ru)"
         for file in Packages Packages.gz; do
             printf ' %s %8s %s\n' \
                 "$(sha256sum "$file" | cut -d' ' -f1)" \

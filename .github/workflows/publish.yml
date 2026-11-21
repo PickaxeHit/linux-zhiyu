@@ -1,21 +1,27 @@
-name: Publish package repositories
-run-name: Publish package repositories
+name: Publish packages and cache
 
 on:
   workflow_call:
+    inputs:
+      publish_packages:
+        type: boolean
+        default: false
+      publish_nix_cache:
+        type: boolean
+        default: false
+    secrets:
+      NIX_CACHE_SIGNING_KEY:
+        required: false
+      PACKAGE_PUBLISH_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       build_run:
-        description: Successful Build images and packages run ID
-        required: true
+        description: Build images and packages run ID for traditional package repositories and images
         type: string
-  # Retry publishing retained build artifacts without rebuilding, via a
-  # publish-packages-<run_id> branch or tag (or workflow_dispatch).
-  push:
-    branches:
-      - 'publish-packages-*'
-    tags:
-      - 'publish-packages-*'
+      nix_cache_from_run:
+        description: Build images and packages run ID for a retained Nix cache artifact (default branch only)
+        type: string
 
 permissions:
   actions: read
@@ -24,8 +30,25 @@ permissions:
 concurrency:
   group: publish-package-repositories
 
+env:
+  PACKAGE_REPOSITORY: PickaxeHit/linux-zhiyu-pkgs
+
 jobs:
+  require_source:
+    name: Check publication inputs
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      !inputs.publish_packages && !inputs.publish_nix_cache &&
+      inputs.build_run == '' && inputs.nix_cache_from_run == ''
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          echo 'Provide a build_run or nix_cache_from_run to republish artifacts.' >&2
+          exit 1
+
   publish:
+    name: Publish package repositories and images
+    if: inputs.publish_packages || inputs.build_run != ''
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -40,12 +63,6 @@ jobs:
         run: |
           set -euo pipefail
           run_id="$BUILD_RUN"
-          retry_ref=false
-          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_NAME" == publish-packages-* ]]; then
-            retry_ref=true
-            run_id="${GITHUB_REF_NAME#publish-packages-}"
-            [[ "$run_id" =~ ^[0-9]+$ ]]
-          fi
           if [[ -z "$run_id" ]]; then
             # A reusable call can download from its own run after the build
             # job succeeds, while the overall workflow is still running.
@@ -59,15 +76,12 @@ jobs:
             (.path == ".github/workflows/build.yml" or .path == ".github/workflows/images.yml") and
             .status == "completed" and
             .head_repository.full_name == $repo and
-            (.head_branch == "main" or .head_branch == "package-repositories")
+            (.head_branch == "main" or .head_branch == "package-repositories" or .head_branch == "nix-full")
           ' <<< "$build" >/dev/null
           # A publishing failure can be retried using the completed build job.
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/jobs" |
             jq -e 'any(.jobs[]; .name == "build" and .conclusion == "success")' >/dev/null
           build_sha=$(jq -r .head_sha <<< "$build")
-          if [[ "$retry_ref" == true ]]; then
-            git merge-base --is-ancestor "$build_sha" "$GITHUB_SHA"
-          fi
           printf "build_sha=%s\nsource_run=%s\n" "$build_sha" "$run_id" >> "$GITHUB_ENV"
           gh run download "$run_id" --name zhiyu-package-repositories-input --dir out/pkgs
           gh run download "$run_id" --name zhiyu-images --dir out/image-archive
@@ -112,11 +126,37 @@ jobs:
             test -s "$image.img"
           done
 
-      - name: Generate indexes and publish package sources
+      - name: Publish signed boot images
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          tag=zhiyu-images
+          images=(out/release-images/*.img)
+          if [ -f out/release-images/LICENSES.tar.gz ]; then
+            images+=(out/release-images/LICENSES.tar.gz)
+          fi
+          if [ -f out/release-images/manifest.json ]; then
+            images+=(out/release-images/manifest.json)
+          fi
+          checksums=out/release-images/SHA256SUMS
+          printf 'Lenovo TB378FC signed boot images. Build commit: %s. Verify the files against SHA256SUMS before installing.\n' "$build_sha" > image-release-notes.md
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${images[@]}" --clobber
+            gh release upload "$tag" "$checksums" --clobber
+            gh release edit "$tag" --prerelease=false --latest --notes-file image-release-notes.md
+          else
+            gh release create "$tag" "${images[@]}" "$checksums" \
+              --latest \
+              --title "Zhiyu signed boot images" --notes-file image-release-notes.md
+          fi
+
+      - name: Generate indexes and publish package sources
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+        run: |
+          set -euo pipefail
+          : "${GH_TOKEN:?Set PACKAGE_PUBLISH_TOKEN with write access to the package repository}"
           scripts/mkrepos.sh debian out/pkgs out/repositories
           scripts/mkrepos.sh archlinuxarm out/pkgs out/repositories
           for distro in debian archlinuxarm; do
@@ -142,63 +182,112 @@ jobs:
             test "${#packages[@]}" -eq "$expected"
             # Rolling repository tags are created on the default branch, not on
             # an older build SHA (GITHUB_TOKEN cannot always create such refs).
-            notes="Flat package repository for Lenovo TB378FC. Build commit: $build_sha. Use the release download URL as the repository base."
-            if gh release view "$tag" >/dev/null 2>&1; then
+            case "$distro" in
+              debian) label=Debian ;;
+              archlinuxarm) label='Arch Linux ARM' ;;
+            esac
+            notes="Lenovo TB378FC package repository for $label. Build commit: $build_sha. Use this Release download URL as the repository base."
+            if gh release view "$tag" --repo "$PACKAGE_REPOSITORY" >/dev/null 2>&1; then
               # Save the previous asset names before uploading. Prune only after
               # the new indexes are live so they always have matching packages.
-              previous=$(gh release view "$tag" --json assets --jq '.assets[].name')
-              gh release upload "$tag" "${packages[@]}" --clobber
-              gh release upload "$tag" "${indexes[@]}" --clobber
+              previous=$(gh release view "$tag" --repo "$PACKAGE_REPOSITORY" --json assets --jq '.assets[].name')
+              gh release upload "$tag" --repo "$PACKAGE_REPOSITORY" "${packages[@]}" --clobber
+              gh release upload "$tag" --repo "$PACKAGE_REPOSITORY" "${indexes[@]}" --clobber
               printf '%s\n' "${packages[@]##*/}" > "$dir/current-packages"
               while IFS= read -r asset; do
                 case "$asset" in
                   *"$package_suffix")
                     if ! grep -Fxq -- "$asset" "$dir/current-packages"; then
-                      gh release delete-asset "$tag" "$asset" --yes
+                      gh release delete-asset "$tag" --repo "$PACKAGE_REPOSITORY" "$asset" --yes
                     fi
                     ;;
                 esac
               done <<< "$previous"
-              gh release edit "$tag" --prerelease=false --latest=false --notes "$notes"
+              gh release edit "$tag" --repo "$PACKAGE_REPOSITORY" --prerelease=false --latest=false --title "Zhiyu $label package repository" --notes "$notes"
             else
-              gh release create "$tag" "${packages[@]}" "${indexes[@]}" \
+              gh release create "$tag" --repo "$PACKAGE_REPOSITORY" "${packages[@]}" "${indexes[@]}" \
                 --latest=false \
-                --title "Zhiyu $distro nightly repository" \
+                --title "Zhiyu $label package repository" \
                 --notes "$notes"
             fi
           done
 
 
-      - name: Publish signed boot images
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          tag=zhiyu-images
-          images=(out/release-images/*.img)
-          if [ -f out/release-images/LICENSES.tar.gz ]; then
-            images+=(out/release-images/LICENSES.tar.gz)
-          fi
-          if [ -f out/release-images/manifest.json ]; then
-            images+=(out/release-images/manifest.json)
-          fi
-          checksums=out/release-images/SHA256SUMS
-          printf 'Signed Lenovo TB378FC boot images from build commit %s.\n' "$build_sha" > image-release-notes.md
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "${images[@]}" --clobber
-            gh release upload "$tag" "$checksums" --clobber
-            gh release edit "$tag" --prerelease=false --latest --notes-file image-release-notes.md
-          else
-            gh release create "$tag" "${images[@]}" "$checksums" \
-              --latest \
-              --title "Zhiyu signed boot images" --notes-file image-release-notes.md
-          fi
-
-
       - name: Publish Fedora RPM repository
         if: hashFiles('out/fedora-rpms/*.rpm') != ''
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
         run: |
           sudo apt-get install -y createrepo-c
           scripts/publish-fedora-rpms.sh out/fedora-rpms "$build_sha"
+
+  nix_publish:
+    name: Publish Nix binary cache
+    if: inputs.publish_nix_cache || inputs.nix_cache_from_run != ''
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: nix-cache-publish
+      cancel-in-progress: false
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Require the default branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [[ "$GITHUB_REF" != "refs/heads/$DEFAULT_BRANCH" ]]; then
+            echo 'Nix cache publication must run from the default branch.' >&2
+            exit 1
+          fi
+      - name: Validate the artifact run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_RUN: ${{ inputs.nix_cache_from_run || github.run_id }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          [[ $ARTIFACT_RUN =~ ^[0-9]+$ ]]
+          endpoint="repos/$GITHUB_REPOSITORY/actions/runs/$ARTIFACT_RUN"
+          gh api "$endpoint" | jq -e --arg repo "$GITHUB_REPOSITORY" --arg branch "$DEFAULT_BRANCH" '
+            .head_repository.full_name == $repo and .head_branch == $branch
+            and (.path == ".github/workflows/nix.yml" or .path == ".github/workflows/build.yml")
+            and (.event == "workflow_dispatch" or
+              (.event == "push" and .head_branch == "main" and .path == ".github/workflows/build.yml"))
+          '
+          gh api --paginate --slurp "$endpoint/jobs?per_page=100" |
+            jq -e 'any(.[].jobs[]; .conclusion == "success" and
+              (.name == "Native ARM64" or .name == "Build Nix packages (ARM64)" or
+               (.name | endswith("Build packages (ARM64)"))))'
+      - name: Check that publication is configured
+        id: signing
+        env:
+          NIX_CACHE_SIGNING_KEY: ${{ secrets.NIX_CACHE_SIGNING_KEY }}
+          PACKAGE_PUBLISH_TOKEN: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+        run: |
+          if [[ -n "$NIX_CACHE_SIGNING_KEY" ]]; then
+            : "${PACKAGE_PUBLISH_TOKEN:?Set PACKAGE_PUBLISH_TOKEN with write access to the package repository}"
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo '::notice::Cache publication skipped. NIX_CACHE_SIGNING_KEY is unset.'
+          fi
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: steps.signing.outputs.enabled == 'true'
+        with:
+          persist-credentials: false
+      - uses: cachix/install-nix-action@d698718aa798980d17dd749f03beae0b51183399 # v31
+        if: steps.signing.outputs.enabled == 'true'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        if: steps.signing.outputs.enabled == 'true'
+        with:
+          name: nix-cache
+          path: ${{ runner.temp }}/nix-cache
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.nix_cache_from_run || github.run_id }}
+      - name: Sign and publish NARs and index
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PACKAGE_PUBLISH_TOKEN }}
+          NIX_CACHE_SIGNING_KEY: ${{ secrets.NIX_CACHE_SIGNING_KEY }}
+        run: |
+          python3 scripts/nix-cache.py publish "$RUNNER_TEMP/nix-cache" \
+            --repository "$PACKAGE_REPOSITORY" --tag "nix-cache-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
