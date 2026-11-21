@@ -6,8 +6,19 @@
 }:
 let
   cfg = config.zhiyu;
-  bsp = pkgs.zhiyu;
+  bsp = import ./packages.nix { inherit pkgs; };
   p = bsp.packages;
+  camera = {
+    upstream = pkgs.libcamera;
+    fork = p.libcamera;
+  };
+  # The closure rewriter requires equal-length store basenames.
+  cameraReplacement = pkgs.runCommand camera.upstream.name { } ''
+    for lib in libcamera libcamera-base; do
+      test -e "${camera.fork}/lib/$lib.so.${camera.upstream.version}"
+    done
+    ln -s ${camera.fork} "$out"
+  '';
   kernel = config.boot.kernelPackages.kernel;
   initramfs = (bsp.mkInitramfs kernel).initramfs;
   images = bsp.mkImages kernel {
@@ -44,7 +55,7 @@ in
     camera.enable = lib.mkOption {
       type = lib.types.bool;
       default = true;
-      description = "Build camera consumers against the Zhiyu fork matching the nixpkgs libcamera ABI.";
+      description = "Use the ABI-matched Zhiyu libcamera in the system runtime closure.";
     };
     sensors.enable = lib.mkOption {
       type = lib.types.bool;
@@ -76,14 +87,10 @@ in
       }
     ];
 
-    nixpkgs.overlays = [
-      (
-        if cfg.camera.enable then
-          import ./overlay.nix
-        else
-          final: prev: { inherit ((import ./overlay.nix) final prev) zhiyu; }
-      )
-    ];
+    system.replaceDependencies.replacements = lib.optional cfg.camera.enable {
+      oldDependency = camera.upstream;
+      newDependency = cameraReplacement;
+    };
     boot.kernelPackages = lib.mkDefault (pkgs.linuxPackagesFor p.kernel);
     boot.kernelModules = [ "fastrpc" ] ++ lib.optional cfg.sensors.enable "uinput";
     boot.initrd.enable = false;
@@ -105,7 +112,7 @@ in
       p.flasher
       pkgs.qbootctl
     ]
-    ++ lib.optional cfg.camera.enable pkgs.libcamera;
+    ++ lib.optional cfg.camera.enable camera.upstream;
     environment.etc."machine-info".text = "CHASSIS=tablet\n";
     environment.etc."alsa/ucm2".source = ucm;
     environment.sessionVariables.ALSA_CONFIG_UCM2 = ucm;
@@ -150,6 +157,7 @@ in
     environment.etc."zhiyu/boot-images".source = images.packages.zhiyu-images;
     environment.etc."zhiyu/boot-id".source = id;
     system.build = {
+      zhiyuCamera = lib.mkIf cfg.camera.enable camera;
       zhiyuPipewire = pkgs.pipewire;
       zhiyuImages = images.packages.zhiyu-images;
       zhiyuInitramfs = initramfs;

@@ -1,9 +1,8 @@
-{
-  pkgs,
-  sources,
-  cameraBase,
-}:
+{ pkgs }:
 let
+  sources = import ./sources.nix { inherit pkgs; };
+  cameraBase = pkgs.libcamera;
+  cameraABI = pkgs.lib.versions.majorMinor cameraBase.version;
   kernel = pkgs.callPackage ./kernel.nix {
     source = sources.kernel-source;
     kernelPatches = [ ];
@@ -40,7 +39,16 @@ let
     // defaultImages
     // {
       inherit kernel dtb;
-      inherit (pkgs) libcamera;
+      libcamera =
+        if pkgs.stdenv.hostPlatform.isAarch64 then
+          {
+            "0.7" = packages.libcamera-0_7;
+            "0.8" = packages.libcamera-0_8;
+          }
+          .${cameraABI}
+            or (throw "zhiyu libcamera supports nixpkgs libcamera ABIs 0.7 and 0.8, found ${cameraABI}")
+        else
+          cameraBase;
       libcamera-0_7 = import ./libcamera.nix {
         base = cameraBase;
         source = sources."libcamera/0.7";

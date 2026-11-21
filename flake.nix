@@ -6,11 +6,8 @@
     { self, nixpkgs }:
     let
       system = "aarch64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ self.overlays.default ];
-      };
-      p = pkgs.zhiyu.packages;
+      pkgs = import nixpkgs { inherit system; };
+      bsp = import ./nix/packages.nix { inherit pkgs; };
       # Evaluate hardware options in a private context. The check never
       # constructs a system toplevel or exports a distribution configuration.
       cfg =
@@ -28,9 +25,9 @@
     in
     {
       overlays.default = import ./nix/overlay.nix;
-      packages.${system} = p;
+      packages.${system} = bsp.packages;
       nixosModules.default = import ./nix/nixos-module.nix;
-      checks.${system} = import ./nix/checks.nix { inherit pkgs p cfg; };
+      checks.${system} = import ./nix/checks.nix { inherit pkgs bsp cfg; };
       formatter = nixpkgs.lib.genAttrs [ "x86_64-linux" system ] (
         platform: nixpkgs.legacyPackages.${platform}.nixfmt
       );

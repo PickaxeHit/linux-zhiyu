@@ -1,12 +1,16 @@
 {
   pkgs,
-  p,
+  bsp,
   cfg,
 }:
 let
   inherit (pkgs) runCommand;
+  p = bsp.packages;
+  camera = cfg.system.build.zhiyuCamera;
+  cameraReplacements = cfg.system.replaceDependencies.replacements;
+  cameraReplacement = builtins.head cameraReplacements;
   kernel = cfg.boot.kernelPackages.kernel;
-  imagesWithCmdline = pkgs.zhiyu.mkImages p.kernel { kernelParams = [ "lsm=landlock,yama" ]; };
+  imagesWithCmdline = bsp.mkImages p.kernel { kernelParams = [ "lsm=landlock,yama" ]; };
   image = imagesWithCmdline.packages;
   simulator = pkgs.callPackage ./flasher.nix { simulate = true; };
 in
@@ -48,10 +52,18 @@ in
     assert image.zhiyu-vendor-boot.drvPath == p.zhiyu-vendor-boot.drvPath;
     assert image.zhiyu-init-boot.drvPath == p.zhiyu-init-boot.drvPath;
     assert image.zhiyu-vbmeta.drvPath != p.zhiyu-vbmeta.drvPath;
-    assert builtins.any (
-      input: (input.pname or "") == "libcamera-zhiyu" && input.drvPath == pkgs.libcamera.drvPath
-    ) cfg.system.build.zhiyuPipewire.buildInputs;
+    assert cfg.system.build.zhiyuPipewire.drvPath == pkgs.pipewire.drvPath;
+    assert camera.upstream.drvPath == pkgs.libcamera.drvPath;
+    assert camera.fork.drvPath == p.libcamera.drvPath;
+    assert camera.fork.drvPath != camera.upstream.drvPath;
+    assert builtins.length cameraReplacements == 1;
+    assert cameraReplacement.oldDependency.drvPath == camera.upstream.drvPath;
+    assert cameraReplacement.newDependency.name == camera.upstream.name;
     runCommand "zhiyu-evaluation" { } "touch $out";
+  camera-runtime = runCommand "zhiyu-camera-runtime-test" { } ''
+    test "$(readlink ${cameraReplacement.newDependency})" = "${camera.fork}"
+    touch "$out"
+  '';
   boot-tools =
     runCommand "zhiyu-boot-tools-test"
       {
