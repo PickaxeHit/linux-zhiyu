@@ -85,6 +85,8 @@ def validate(data: dict) -> dict:
     for name, meta in data.items():
         if not isinstance(meta, dict):
             die(f"{name}: entry must be an object")
+        if "nix" in meta and not isinstance(meta["nix"], bool):
+            die(f"{name}: 'nix' must be a boolean")
         kind = meta.get("type")
         if kind == "git":
             require_string(name, meta, "url")

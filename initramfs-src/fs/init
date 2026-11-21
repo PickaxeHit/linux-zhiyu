@@ -482,7 +482,7 @@ sd_rootfs() {
 	mount -t ext4 -o rw,noatime "$bd" /newroot || { cmsg "ext4 mount of $bd failed"; return 1; }
 	cmsg "ext4 $bd mounted"
 
-	finish_rootfs || { umount /newroot; return 1; }
+	finish_rootfs --sd-rescue || { umount /newroot; return 1; }
 }
 
 # Where to hand over.  /sbin/init is the FHS location; NixOS keeps its
@@ -493,6 +493,22 @@ sd_rootfs() {
 # chrooted: an absolute link such as NixOS's /nix/store path points inside
 # the new root, not into the initramfs.
 rootfs_init() {
+	if [ "${1:-}" = --sd-rescue ]; then
+		/bin/zhiyu-boot-select --sd-rescue 2>/dev/kmsg
+		return $?
+	fi
+	# On userdata the Nix ramdisk treats a root with NixOS profiles as NixOS,
+	# even if it also ships /sbin/init.
+	if [ -f /etc/zhiyu-strict-boot ]; then
+		for p in /newroot/nix/var/nix/profiles/system \
+		         /newroot/nix/var/nix/profiles/zhiyu-boot \
+		         /newroot/nix/var/nix/profiles/zhiyu-pending \
+		         /newroot/nix/var/nix/profiles/system-*-link; do
+			[ -L "$p" ] || continue
+			/bin/zhiyu-boot-select 2>/dev/kmsg
+			return $?
+		done
+	fi
 	# FHS: /sbin/init, possibly a symlink to an absolute path.
 	if [ -L /newroot/sbin/init ]; then
 		t=$(readlink /newroot/sbin/init)
@@ -528,7 +544,7 @@ rootfs_init() {
 }
 
 finish_rootfs() {
-	init=$(rootfs_init) || {
+	init=$(rootfs_init "$@") || {
 		cmsg "REFUSING: no /sbin/init and no NixOS system init"
 		return 1
 	}

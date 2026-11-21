@@ -84,8 +84,10 @@ img=$OUT/vendor_boot.img
 	--vendor_boot "$img"
 
 [ "$(stat -c %s "$img")" -le "$SIZE" ] || die "vendor_boot.img larger than partition"
+salt=()
+if [ -n "${AVB_SALT:-}" ]; then salt=(--salt "$AVB_SALT"); fi
 "$AVBTOOL" add_hash_footer --image "$img" --partition_name vendor_boot \
-	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" \
+	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" "${salt[@]}" \
 	--prop "com.android.build.vendor_boot.os_version:$OS_VERSION" \
 	--prop "com.android.build.vendor_boot.security_patch:$OS_PATCH" >/dev/null
 "$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null

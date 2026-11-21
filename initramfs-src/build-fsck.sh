@@ -19,6 +19,7 @@ mkdir -p "$(dirname "$out")"
 rm -rf "$build"
 mkdir -p "$build"
 cp -a "$src/." "$build/"
+chmod -R u+w "$build"
 src=$build
 jobs=${JOBS:-$(nproc)}
 CROSS=${CROSS_COMPILE-aarch64-linux-gnu-}
@@ -30,7 +31,7 @@ die() { echo "build-fsck.sh: $*" >&2; exit 1; }
 mkdir -p "$(dirname "$out")"
 cd "$src"
 
-[ -f configure ] || ./autogen.sh >/dev/null 2>&1
+[ -f configure ] || ./autogen.sh >/dev/null
 # Force every optional dependency off so the result does not depend on what
 # the build host happens to have installed: with libuuid/libselinux/liblz4
 # present, configure compiles in uuid_unparse()/LZ4_compress_fast_extState()
@@ -45,7 +46,7 @@ for feature in HAVE_LIBUUID HAVE_LIBSELINUX HAVE_LIBLZ4 HAVE_LIBLZO2; do
 	grep -q "#define $feature" config.h \
 		&& die "$feature was detected; the static link needs $feature"
 done
-make -j"$jobs" >/dev/null 2>&1
+make -j"$jobs" >/dev/null
 
 # libtool still links a dynamic binary even with LDFLAGS=-static, so link the
 # objects that were just built against the static convenience library by hand.

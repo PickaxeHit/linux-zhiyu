@@ -69,12 +69,20 @@
     "type": "git",
     "url": "https://android.googlesource.com/platform/system/tools/mkbootimg",
     "tag": "android-15.0.0_r1",
-    "rev": "c40a04c0620c5a0dab87497857805b8d9b8a827a"
+    "rev": "c40a04c0620c5a0dab87497857805b8d9b8a827a",
+    "nix": false
   },
   "avb": {
     "type": "git",
     "url": "https://android.googlesource.com/platform/external/avb",
     "tag": "android-15.0.0_r1",
-    "rev": "25a14f7e3e6493a7f1a42aa9f78209d4dbe848e9"
+    "rev": "25a14f7e3e6493a7f1a42aa9f78209d4dbe848e9",
+    "nix": false
+  },
+  "qcom-va-driver": {
+    "type": "git",
+    "url": "https://github.com/radxa-pkg/qcom-va-driver.git",
+    "tag": "v1.1.1",
+    "rev": "35eff37ffcf79643eb29583f1960c5f636e287df"
   }
 }

@@ -1,0 +1,107 @@
+{
+  "audioreach": {
+    "archive": "https://codeload.github.com/linux-msm/audioreach-topology/tar.gz/35e482d209ecacdda205eea75866a957396e7b0a",
+    "fetcher": "unpacked",
+    "hash": "sha256-YhbPH8HOKWOgUNvpWe+P9RuF0CJKFNtR4QO+Htu3veU=",
+    "rev": "35e482d209ecacdda205eea75866a957396e7b0a",
+    "url": "https://github.com/linux-msm/audioreach-topology.git"
+  },
+  "busybox": {
+    "fetcher": "git",
+    "hash": "sha256-KML3+jzUEA4+0FrEh1w/Fpt78A5DdTZMHr9YW5nFJQ4=",
+    "rev": "fc71374dfccd46448c62947269a35f1420d7ee28",
+    "url": "https://git.busybox.net/busybox"
+  },
+  "f2fs-tools": {
+    "fetcher": "git",
+    "hash": "sha256-zNG1F//+BTBzlEc6qNVixyuCB6PMZD5Kf8pVK0ePYiA=",
+    "rev": "06c027abc6153c4a97cba5317844e8dcaaee3cf7",
+    "url": "https://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git"
+  },
+  "firmware": {
+    "archive": "https://codeload.github.com/PickaxeHit/linux-zhiyu-firmware/tar.gz/0b8d11b935653e428df458a0469b69590de9619b",
+    "fetcher": "unpacked",
+    "hash": "sha256-vSwiWRk/p3cLcPEXR7loE6/r2xWWzUCx0CSae7pvmoA=",
+    "rev": "0b8d11b935653e428df458a0469b69590de9619b",
+    "url": "https://github.com/PickaxeHit/linux-zhiyu-firmware.git"
+  },
+  "hexagonrpc": {
+    "archive": "https://codeload.github.com/linux-msm/hexagonrpc/tar.gz/435ed1cd68e20f8a9fe4871233ed1f8ce7ccf9e8",
+    "fetcher": "unpacked",
+    "hash": "sha256-njhDLpkEuA2PSPe9rpYvlDN4JLgkYCfgZ5oX/NFx2Ho=",
+    "rev": "435ed1cd68e20f8a9fe4871233ed1f8ce7ccf9e8",
+    "url": "https://github.com/linux-msm/hexagonrpc.git"
+  },
+  "kernel-source": {
+    "archive": "https://codeload.github.com/PickaxeHit/linux-kernel-zhiyu/tar.gz/c43439cdf54f03154a283aa1af06fe5cd55598a3",
+    "fetcher": "unpacked",
+    "hash": "sha256-XuL5Jl9OmfHGxo3NZYVm2ypMT22wInRCdbH8TCQwYOE=",
+    "rev": "c43439cdf54f03154a283aa1af06fe5cd55598a3",
+    "url": "https://github.com/PickaxeHit/linux-kernel-zhiyu.git",
+    "version": "7.3.1"
+  },
+  "libcamera/0.7": {
+    "archive": "https://codeload.github.com/PickaxeHit/libcamera-zhiyu/tar.gz/332b91cb463216003b10792f5fa7b7a12073946d",
+    "fetcher": "unpacked",
+    "hash": "sha256-op4KBOSyI1KpfG4VYlUdwCzPqHRZxzbOHQXylnfQrAI=",
+    "rev": "332b91cb463216003b10792f5fa7b7a12073946d",
+    "url": "https://github.com/PickaxeHit/libcamera-zhiyu.git",
+    "version": "0.7.2"
+  },
+  "libcamera/0.8": {
+    "archive": "https://codeload.github.com/PickaxeHit/libcamera-zhiyu/tar.gz/1226e39800bb56aa0568ff83c5a27950e2a9ef80",
+    "fetcher": "unpacked",
+    "hash": "sha256-S767dk7ENBrglaiUx2JA1BoEtIx0nl/awxS4sUKVhNs=",
+    "rev": "1226e39800bb56aa0568ff83c5a27950e2a9ef80",
+    "url": "https://github.com/PickaxeHit/libcamera-zhiyu.git",
+    "version": "0.8.0"
+  },
+  "mink-idl-compiler": {
+    "archive": "https://codeload.github.com/quic/mink-idl-compiler/tar.gz/95ebb8d6031dd2c8d3f6277e50edadee8a119d5b",
+    "fetcher": "unpacked",
+    "hash": "sha256-zKQUF2FeKDkX5jymiAZ220WmvwK6Yv3qfzBa/ionySQ=",
+    "rev": "95ebb8d6031dd2c8d3f6277e50edadee8a119d5b",
+    "url": "https://github.com/quic/mink-idl-compiler.git"
+  },
+  "minkipc": {
+    "archive": "https://codeload.github.com/quic/minkipc/tar.gz/5e3c6951d13162a262ea65ea8e8351228f092b58",
+    "fetcher": "unpacked",
+    "hash": "sha256-52vUyTz9rLG/qmLrkS4IO+AMVbXqsBQa5RcVRy0RuQs=",
+    "rev": "5e3c6951d13162a262ea65ea8e8351228f092b58",
+    "url": "https://github.com/quic/minkipc.git"
+  },
+  "openssl": {
+    "archive": "https://codeload.github.com/openssl/openssl/tar.gz/a279090b9cd6b682a5a178410765a63e619fa2d9",
+    "fetcher": "unpacked",
+    "hash": "sha256-H/lpzqtql/CRq+9tbJ+ck6WqAMNgESP1yXe+jPH/X9s=",
+    "rev": "a279090b9cd6b682a5a178410765a63e619fa2d9",
+    "url": "https://github.com/openssl/openssl.git"
+  },
+  "qcbor": {
+    "archive": "https://codeload.github.com/laurencelundblade/QCBOR/tar.gz/930708bb86481e88879eb1d87fd4d664f1d69503",
+    "fetcher": "unpacked",
+    "hash": "sha256-tpCW0YjTipdpYwgFVVV0pSb4OH3QoJSbhbb48/WhTFw=",
+    "rev": "930708bb86481e88879eb1d87fd4d664f1d69503",
+    "url": "https://github.com/laurencelundblade/QCBOR.git"
+  },
+  "qcom-va-driver": {
+    "archive": "https://codeload.github.com/radxa-pkg/qcom-va-driver/tar.gz/35eff37ffcf79643eb29583f1960c5f636e287df",
+    "fetcher": "unpacked",
+    "hash": "sha256-f8lFb8PvM9Iuvpvxn4RpKbYMFhbH+U/DR2hCzMR7VMY=",
+    "rev": "35eff37ffcf79643eb29583f1960c5f636e287df",
+    "url": "https://github.com/radxa-pkg/qcom-va-driver.git"
+  },
+  "quic-teec": {
+    "archive": "https://codeload.github.com/quic/quic-teec/tar.gz/34fa8197a34a06ec0187c2958c776f3c3a6b9ec1",
+    "fetcher": "unpacked",
+    "hash": "sha256-i3rj0DmFPlch5E/9P5wxQ9aiBYtFxaKVjo0tR4UoV7o=",
+    "rev": "34fa8197a34a06ec0187c2958c776f3c3a6b9ec1",
+    "url": "https://github.com/quic/quic-teec.git"
+  },
+  "sensh": {
+    "fetcher": "git",
+    "hash": "sha256-sh/0BoGpBXF+GzLstQ8mObsCtDcnccm7yT0xArijn+g=",
+    "rev": "560b48080283fe73ca5e67635b566177028cebc9",
+    "url": "https://gitlab.com/flamingradian/sensh.git"
+  }
+}

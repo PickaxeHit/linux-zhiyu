@@ -29,12 +29,12 @@ TPLG_OUT=${TPLG_OUT:-$root/out/sm8750-tplg.bin}
 die() { echo "build.sh: $*" >&2; exit 1; }
 
 # ---- 1. busybox (built from source, statically linked) --------------------
-BB_OUT="$BB" "$here/build-busybox.sh"
+if [ "${PREBUILT:-0}" != 1 ]; then BB_OUT="$BB" "$here/build-busybox.sh"; fi
 file -b "$BB" | grep -q "statically linked" || die "$BB is not statically linked"
 
 
 # ---- 2. staging tree ------------------------------------------------------
-stage=$(mktemp -d "$here/.stage.XXXXXX")
+stage=$(mktemp -d "${STAGE_PARENT:-$here}/.stage.XXXXXX")
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage"/bin "$stage"/dev/pts "$stage"/etc/modprobe.d \
 	"$stage"/lib/firmware "$stage"/lib/modules/"$VER" \
@@ -60,6 +60,10 @@ done < "$here/busybox-applets.txt"
 # sends the single management command that hands the address to the kernel, so
 # the value never has to be written into the device tree.
 CC_AARCH64=${CC_AARCH64:-${CROSS_COMPILE-aarch64-linux-gnu-}gcc}
+if [ "${PREBUILT:-0}" = 1 ]; then
+	install -m 0755 "$STATIC_HELPERS"/bin/* "$stage/bin/"
+	touch "$stage/etc/zhiyu-strict-boot"
+else
 for src in "$here"/src/*.c; do
 	[ "$(basename "$src")" != userdata-map.c ] || continue
 	[ -f "$src" ] || continue
@@ -71,11 +75,13 @@ for src in "$here"/src/*.c; do
 	echo "helper : $(basename "$tool") ($(stat -c %s "$tool") bytes)"
 done
 
+fi
+
 # A fully static fsck.f2fs lets the initramfs repair a dirty f2fs checkpoint
 # before it mounts the shared userdata volume.  Built from the pinned
 # f2fs-tools release with --without-selinux/--without-libuuid, so it has no
 # runtime dependencies.
-F2FS_OUT="$fsck" bash "$here/build-fsck.sh"
+if [ "${PREBUILT:-0}" != 1 ]; then F2FS_OUT="$fsck" bash "$here/build-fsck.sh"; fi
 [ -x "$fsck" ] || die "missing $fsck"
 if [ -x "$fsck" ]; then
 	install -m 0755 "$fsck" "$stage/bin/fsck.f2fs"
@@ -83,18 +89,27 @@ if [ -x "$fsck" ]; then
 fi
 
 # Stage fully static clients built from source and verified static libraries.
-"$here/../keymint/stage-initramfs.sh" "$stage"
+if [ "${PREBUILT:-0}" = 1 ]; then
+	install -m 0755 "$KEYMINT_TOOLS"/bin/* "$stage/bin/"
+else
+	"$here/../keymint/stage-initramfs.sh" "$stage"
+fi
 
 # ---- 3. firmware blobs ----------------------------------------------------
 # The firmware repository is pinned by deps/deps.json and fetched into
 # .sources/firmware; it carries the firmware tree, the SNS registry and its
 # own license notices.
-cp -a "$firmware/firmware/." "$stage/lib/firmware/"
+cp -a "${FW_TREE:-$firmware/firmware}/." "$stage/lib/firmware/"
+if [ "${PREBUILT:-0}" = 1 ]; then
+	find "$stage/lib/firmware" -type d -exec chmod 0755 {} +
+fi
 
 # the SM8750 audio topology is *built* (m4 + alsatplg), not a blob: it is
 # installed on top of the firmware tree at the path the ADSP firmware looks for
-OUT="$TPLG_OUT" "$here/tplg/build.sh" || die "topology build failed"
-install -Dm644 "$TPLG_OUT" "$stage/lib/firmware/qcom/sm8750/sm8750-tplg.bin"
+if [ "${PREBUILT:-0}" != 1 ]; then
+	OUT="$TPLG_OUT" "$here/tplg/build.sh" || die "topology build failed"
+	install -Dm644 "$TPLG_OUT" "$stage/lib/firmware/qcom/sm8750/sm8750-tplg.bin"
+fi
 fw=$(find "$stage/lib/firmware" -type f | wc -l)
 
 # ---- 4. kernel modules built from source ----------------------------------
@@ -109,7 +124,20 @@ while IFS=$'\t' read -r rel src; do
 done < "$here/modules.tsv"
 
 # ---- 5. modprobe index and load order -------------------------------------
-depmod -b "$stage" "$VER" 2>/dev/null || echo "   depmod: warnings ignored"
+if [ "${PREBUILT:-0}" = 1 ]; then
+	moddir="$stage/lib/modules/$VER"
+	install -m 0644 "$MODULES_DIR"/../modules.builtin{,.modinfo} "$moddir/"
+	awk -F '\t' '$1 != "" && $1 !~ /^#/ { print $1 }' "$here/modules.tsv" > "$moddir/modules.order"
+	# depmod returns success for unresolved symbols, so inspect diagnostics.
+	depmod -e -F "$SYSTEM_MAP" -b "$stage" "$VER" 2> "$stage/depmod.log"
+	if [ -s "$stage/depmod.log" ]; then
+		cat "$stage/depmod.log" >&2
+		die "depmod reported incomplete module dependencies"
+	fi
+	rm "$stage/depmod.log"
+else
+	depmod -b "$stage" "$VER" 2>/dev/null || echo "   depmod: warnings ignored"
+fi
 
 # depmod knows the dependency graph; hand it to init so the modules can be
 # insmod'ed in an order that never hits "Unknown symbol" (see order-modules.py

@@ -18,6 +18,11 @@
 #include <sys/sysmacros.h>
 #include <unistd.h>
 
+/* Linux UAPI project quota index, omitted by some libc headers. */
+#ifndef PRJQUOTA
+#define PRJQUOTA 2
+#endif
+
 #define NAME "android-data-root"
 #define NODE "/dev/mapper/" NAME
 static unsigned char buffer[4096];

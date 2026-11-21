@@ -32,6 +32,7 @@ work=$(mktemp -d "$OUT/.build.XXXXXX"); trap 'rm -rf "$work"' EXIT
 
 # empty cpio archive (".", ".." only) — same thing the original kit produced
 mkdir -p "$work/empty"
+if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then touch -d "@$SOURCE_DATE_EPOCH" "$work/empty"; fi
 ( cd "$work/empty" && find . -print0 | cpio --null -o --format=newc --owner=0:0 --reproducible --quiet | gzip -n -9 ) > "$work/empty.cpio.gz"
 echo "ramdisk: empty ($(stat -c %s "$work/empty.cpio.gz") bytes)"
 
@@ -41,8 +42,10 @@ img=$OUT/init_boot.img
 	--output "$img"
 
 [ "$(stat -c %s "$img")" -le "$SIZE" ] || die "init_boot.img larger than partition"
+salt=()
+if [ -n "${AVB_SALT:-}" ]; then salt=(--salt "$AVB_SALT"); fi
 "$AVBTOOL" add_hash_footer --image "$img" --partition_name init_boot \
-	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" \
+	--partition_size "$SIZE" --algorithm SHA256_RSA4096 --key "$KEY" "${salt[@]}" \
 	--prop "com.android.build.init_boot.os_version:$OS_VERSION" \
 	--prop "com.android.build.init_boot.security_patch:$OS_PATCH" >/dev/null
 "$AVBTOOL" verify_image --image "$img" --key "$KEY" >/dev/null
