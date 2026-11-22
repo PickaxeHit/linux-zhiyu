@@ -113,7 +113,7 @@ rec {
     installPhase = ''
       runHook preInstall
       install -Dm755 sensord "$out/bin/zhiyu-sensord"
-      install -Dm644 ${./sensord-dbus.conf} "$out/share/dbus-1/system.d/zhiyu-sensord.conf"
+      install -Dm644 ${../sensors/sensord-dbus.conf} "$out/share/dbus-1/system.d/zhiyu-sensord.conf"
       runHook postInstall
     '';
   };

@@ -12,8 +12,8 @@ NotifyAccess=all
 TimeoutStartSec=30
 # The fastrpc driver only autoloads on machine-specific udev events; loading
 # it here guarantees /dev/fastrpc-adsp exists before sensh talks to the ADSP.
-ExecStartPre=-/usr/bin/modprobe -q fastrpc
-ExecStartPre=-/usr/bin/modprobe -q uinput
+ExecStartPre=-modprobe -q fastrpc
+ExecStartPre=-modprobe -q uinput
 ExecStart=/usr/local/bin/zhiyu-sensord
 # UPower retains an open evdev fd across device removal; refresh it on hot restart.
 ExecStartPost=-/usr/bin/systemctl try-restart --no-block upower.service

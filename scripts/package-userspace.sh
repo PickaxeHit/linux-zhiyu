@@ -56,11 +56,14 @@ install -Dm644 sensors/zhiyu-sensord.service \
   "$STAGE_ROOT/zhiyu-sensord"/usr/lib/systemd/system/zhiyu-sensord.service
 sed -i 's#^ExecStart=.*#ExecStart=/usr/bin/zhiyu-sensord#' \
   "$STAGE_ROOT/zhiyu-sensord"/usr/lib/systemd/system/zhiyu-sensord.service
+# iio-sensor-proxy owns net.hadess.SensorProxy.conf. Give this policy its own filename.
+install -Dm644 sensors/sensord-dbus.conf \
+  "$STAGE_ROOT/zhiyu-sensord"/usr/share/dbus-1/system.d/zhiyu-sensord.conf
 bash scripts/stage-license-notices.sh "$STAGE_ROOT/zhiyu-sensord" zhiyu-sensord
 PKG_NAME=zhiyu-sensord PKG_LICENSE=GPL-2.0-or-later \
 PKG_VERSION=1.0.0 \
 PKG_DESC="SensorProxy daemon backed by sensh/SNS Client" \
-PKG_DEB_DEPENDS="libc6, libglib2.0-0t64" \
-PKG_ARCH_DEPENDS="glibc glib2" \
-PKG_RPM_REQUIRES=sensh \
+PKG_DEB_DEPENDS="libc6, libglib2.0-0t64, kmod" \
+PKG_ARCH_DEPENDS="glibc glib2 kmod" \
+PKG_RPM_REQUIRES="sensh, kmod" \
 scripts/emit-package.sh "$STAGE_ROOT/zhiyu-sensord" "$PACKAGE_OUT"
