@@ -91,6 +91,11 @@ in
       oldDependency = camera.upstream;
       newDependency = cameraReplacement;
     };
+    services.displayManager.plasma-login-manager.package =
+      lib.mkIf (cfg.camera.enable && config.services.displayManager.plasma-login-manager.enable)
+        (
+          lib.mkDefault (import ./plasma-login-manager.nix { base = pkgs.kdePackages.plasma-login-manager; })
+        );
     boot.kernelPackages = lib.mkDefault (pkgs.linuxPackagesFor p.kernel);
     boot.kernelModules = [ "fastrpc" ] ++ lib.optional cfg.sensors.enable "uinput";
     boot.initrd.enable = false;
