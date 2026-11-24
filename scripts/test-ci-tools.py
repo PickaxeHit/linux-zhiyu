@@ -98,4 +98,74 @@ class Tests(unittest.TestCase):
             self.assertNotEqual(subprocess.run(cmd,cwd=p,env=env,capture_output=True).returncode,0)
             self.assertEqual(subprocess.run(cmd,cwd=p,env=dict(env,STRICT_LOCK='false'),capture_output=True).returncode,0)
 
+    def test_fedora_rolling_publication(self):
+        publisher = ROOT/'scripts/publish-fedora-rpms.sh'
+        for fail_index in (False, True):
+            with self.subTest(fail_index=fail_index), tempfile.TemporaryDirectory() as t:
+                p = Path(t)
+                bin_dir = p/'bin'; bin_dir.mkdir()
+                rpms = p/'rpms'; rpms.mkdir()
+                names = ['linux-zhiyu-'+n for n in ('modules','headers','firmware','images')]
+                names += ['libcamera-zhiyu','zhiyu-sensord','hexagonrpc','sensh']
+                packages = [n+'-1-2.aarch64.rpm' for n in names]
+                packages.append('libcamera-zhiyu-2-2.aarch64.rpm')
+                for name in packages: (rpms/name).touch()
+                (rpms/'repodata').mkdir()
+                (rpms/'repodata'/'stale.xml.gz').touch()
+                primary = 'a'*64+'-primary.xml.gz'
+                old_primary = 'b'*64+'-primary.xml.gz'
+                old_rpm = 'hexagonrpc-1-1.aarch64.rpm'
+                old = [(1, old_rpm), (2, old_primary), (3, packages[0]),
+                       (4, primary), (5, 'repomd.xml'), (6, 'README.txt')]
+                (p/'previous').write_text(''.join(f'{i}\t{n}\n' for i,n in old))
+                mocks = {
+                    'git': '''#!/bin/sh
+if [ "$1" = show ]; then
+  printf '%s\n' '{"hexagonrpc":{"rev":"abc","url":"https://github.com/test/hexagonrpc"},"sensh":{"rev":"abc","url":"https://gitlab.com/test/sensh"}}'
+fi
+''',
+                    'createrepo_c': '''#!/usr/bin/env python3
+import sys,gzip
+from pathlib import Path
+from xml.sax.saxutils import quoteattr
+a=sys.argv
+d=Path(a[a.index("--outputdir")+1])/"repodata"
+d.mkdir()
+packages=Path(a[a.index("--pkglist")+1]).read_text().splitlines()
+name="a"*64+"-primary.xml.gz"
+with gzip.open(d/name,"wt") as f:
+    f.write('<metadata xmlns="http://linux.duke.edu/metadata/common">'+''.join('<package><location href='+quoteattr(p)+'/></package>' for p in packages)+'</metadata>')
+(d/"repomd.xml").write_text('<repomd xmlns="http://linux.duke.edu/metadata/repo"><data type="primary"><location href="repodata/'+name+'"/></data></repomd>')
+''',
+                    'gh': '''#!/usr/bin/env python3
+import os,sys
+from pathlib import Path
+a=sys.argv[1:]
+with open(os.environ["MOCK_LOG"],"a") as f: f.write(" ".join(a)+"\\n")
+if a[0]=="api" and "--paginate" in a:
+    print(Path(os.environ["MOCK_PREVIOUS"]).read_text(),end="")
+elif a[0]=="api" and "--jq" in a:
+    print(42)
+elif a[:2]==["release","upload"] and any(x.endswith("/repomd.xml") for x in a) and os.environ["FAIL_INDEX"]=="1":
+    sys.exit(1)
+'''}
+                for name, body in mocks.items():
+                    tool = bin_dir/name; tool.write_text(body); tool.chmod(0o755)
+                env = dict(os.environ, PATH=str(bin_dir)+os.pathsep+os.environ['PATH'],
+                           PACKAGE_REPOSITORY='test/repo', GITHUB_REPOSITORY='test/source',
+                           MOCK_LOG=str(p/'log'), MOCK_PREVIOUS=str(p/'previous'),
+                           FAIL_INDEX=str(int(fail_index)))
+                result = subprocess.run(['bash',str(publisher),str(rpms),'abc'],cwd=p,env=env,capture_output=True,text=True)
+                log = (p/'log').read_text().splitlines()
+                deletes = [line for line in log if line.startswith('api --method DELETE')]
+                if fail_index:
+                    self.assertNotEqual(result.returncode,0)
+                    self.assertFalse(deletes)
+                else:
+                    self.assertEqual(result.returncode,0,result.stderr)
+                    self.assertEqual(deletes,['api --method DELETE repos/test/repo/releases/assets/1',
+                                              'api --method DELETE repos/test/repo/releases/assets/2'])
+                    index_upload = next(i for i,line in enumerate(log) if line.startswith('release upload') and '/repomd.xml' in line)
+                    self.assertTrue(all(log.index(line)>index_upload for line in deletes))
+
 if __name__=='__main__': unittest.main(verbosity=2)
