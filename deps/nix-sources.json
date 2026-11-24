@@ -33,10 +33,10 @@
     "url": "https://github.com/linux-msm/hexagonrpc.git"
   },
   "kernel-source": {
-    "archive": "https://codeload.github.com/PickaxeHit/linux-kernel-zhiyu/tar.gz/c43439cdf54f03154a283aa1af06fe5cd55598a3",
+    "archive": "https://codeload.github.com/PickaxeHit/linux-kernel-zhiyu/tar.gz/183aa0309b07829aaaa9a0ece7124786742e623a",
     "fetcher": "unpacked",
-    "hash": "sha256-XuL5Jl9OmfHGxo3NZYVm2ypMT22wInRCdbH8TCQwYOE=",
-    "rev": "c43439cdf54f03154a283aa1af06fe5cd55598a3",
+    "hash": "sha256-XHeqCbJ6SduEsYCJPsfn9r/Ibjz34LH0hyXZ8o6Dg+g=",
+    "rev": "183aa0309b07829aaaa9a0ece7124786742e623a",
     "url": "https://github.com/PickaxeHit/linux-kernel-zhiyu.git",
     "version": "7.3.1"
   },
