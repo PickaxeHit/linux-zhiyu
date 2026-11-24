@@ -7510,6 +7510,7 @@
 			phy-names = "ufsphy";
 			#reset-cells = <0x01>;
 			qcom,ice = <0x126>;
+			qcom,icc-sleep-floor-kbps = <819200>;
 			status = "okay";
 			vcc-supply = <0x127>;
 			vcc-max-microamp = <0x13d620>;
