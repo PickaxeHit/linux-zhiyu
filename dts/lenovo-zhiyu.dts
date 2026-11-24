@@ -8074,7 +8074,8 @@
 			qcom,qmp = <0x7a>;
 			qcom,smem-states = <0x133 0x00>;
 			qcom,smem-state-names = "stop";
-			status = "disabled";
+			status = "okay";
+			firmware-name = "qcom/sm8750/cdsp.mdt", "qcom/sm8750/cdsp_dtb.mdt";
 
 			glink-edge {
 				interrupts-extended = <0x23 0x06 0x00 0x01>;
