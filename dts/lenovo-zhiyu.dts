@@ -3951,6 +3951,12 @@
 			dmas = <0x72 0x04 0x72 0x05>;
 			dma-names = "rx", "tx";
 			iommus = <0x28 0x480 0x00 0x28 0x481 0x00>;
+			/*
+			 * QCE is shared with secure firmware and the Linux driver
+			 * is disabled. An unbound QCE keeps the memory interconnects
+			 * from dropping their initial bandwidth votes.
+			 */
+			status = "disabled";
 		};
 
 		hwlock@1f40000 {
